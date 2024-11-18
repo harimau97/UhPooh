@@ -1,4 +1,4 @@
-package src.main.java.com.ssafy.edu.config;
+package com.ssafy.edu.config;
 
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;

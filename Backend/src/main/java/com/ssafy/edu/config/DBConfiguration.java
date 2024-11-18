@@ -1,4 +1,4 @@
-package src.main.java.com.ssafy.edu.config;
+package com.ssafy.edu.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @PropertySource("classpath:/application.properties")
-@MapperScan(basePackages = {"com.ssafy.edu.**.mapper"})
+@MapperScan(basePackages = {"com.ssafy.edu.**.dao"})
 public class DBConfiguration {
     
     final ApplicationContext applicationContext;
