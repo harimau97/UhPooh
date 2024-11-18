@@ -298,7 +298,7 @@ public class UserController {
             } else {
                 response.put("success", false);
                 response.put("message", "존재하지 않는 회원입니다.");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);z
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
             response.put("success", false);
