@@ -7,7 +7,7 @@
 
     <!-- 전체 회원 목록 조회 -->
     <select id="userList" resultType="User">
-        SELECT userEmail, userName, isAdmin, regTime
+        SELECT *
         FROM users
     </select>
 
@@ -41,7 +41,7 @@
 
     <!-- 회원 상세 정보 -->
     <select id="userDetail" parameterType="int" resultType="User">
-        SELECT *
+        SELECT userEmail, userName, isAdmin
         FROM users
         WHERE userId = #{userId}
     </select>
