@@ -22,11 +22,18 @@ public class UserController {
         this.userService = userService;
     }
     
-    @Operation(summary = "전체 사용자 목록 조회", description = "모든 사용자 정보를 조회합니다.")
+    @Operation(summary = "전체 사용자 목록 조회", description = "관리자만 전체 사용자 목록 조회 가능")
     @GetMapping("/list")
-    public ResponseEntity<Map<String, Object>> userList() {
+    public ResponseEntity<Map<String, Object>> userList(@RequestParam int requestUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null || requestUser.getIsAdmin() == 0) {
+                response.put("success", false);
+                response.put("message", "관리자만 접근할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
             List<User> users = userService.userList();
             response.put("success", true);
             response.put("users", users);
@@ -34,6 +41,29 @@ public class UserController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "사용자 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @Operation(summary = "회원 상세 조회", description = "특정 회원의 상세 정보 조회 (필수: userId)")
+    @GetMapping("/{userId}")
+    public ResponseEntity<Map<String, Object>> userDetail(@PathVariable int userId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User user = userService.userDetail(userId);
+            
+            if (user != null) {
+                response.put("success", true);
+                response.put("user", user);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("success", false);
+                response.put("message", "해당 사용자를 찾을 수 없습니다.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "회원 정보 조회 중 오류가 발생했습니다: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -86,11 +116,27 @@ public class UserController {
         }
     }
     
-    @Operation(summary = "회원정보 수정", description = "사용자 정보 수정 (필수: userId, 수정가능: userName, pImage)")
+    @Operation(summary = "회원정보 수정", description = "사용자 정보 수정 (일반 회원은 자신의 정보만, 관리자는 모든 회원 정보 수정 가능)")
     @PatchMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> userUpdate(@PathVariable int userId, @RequestBody User user) {
+    public ResponseEntity<Map<String, Object>> userUpdate(
+            @PathVariable int userId,
+            @RequestBody User user,
+            @RequestParam int requestUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null) {
+                response.put("success", false);
+                response.put("message", "유효하지 않은 사용자입니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            
+            if (requestUser.getIsAdmin() == 0 && requestUserId != userId) {
+                response.put("success", false);
+                response.put("message", "자신의 정보만 수정할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
             user.setUserId(userId);
             int result = userService.userUpdate(user);
             
@@ -195,6 +241,44 @@ public class UserController {
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "로그아웃 처리 중 오류가 발생했습니다: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @Operation(summary = "회원 탈퇴", description = "회원 정보 삭제 (일반 회원은 자신만, 관리자는 모든 회원 삭제 가능)")
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Map<String, Object>> userDelete(
+            @PathVariable int userId,
+            @RequestParam int requestUserId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null) {
+                response.put("success", false);
+                response.put("message", "유효하지 않은 사용자입니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            
+            if (requestUser.getIsAdmin() == 0 && requestUserId != userId) {
+                response.put("success", false);
+                response.put("message", "자신의 계정만 삭제할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
+            int result = userService.userDelete(userId);
+            
+            if (result > 0) {
+                response.put("success", true);
+                response.put("message", "회원 탈퇴가 완료되었습니다.");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("success", false);
+                response.put("message", "존재하지 않는 회원입니다.");
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+            }
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "회원 탈퇴 처리 중 오류가 발생했습니다: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
