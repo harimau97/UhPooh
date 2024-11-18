@@ -45,13 +45,25 @@ public class UserController {
         }
     }
     
-    @Operation(summary = "회원 상세 조회", description = "특정 회원의 상세 정보 조회 (필수: userId)")
+    @Operation(summary = "회원 상세 조회", description = "회원 상세 정보 조회 (일반 회원은 자신의 정보만, 관리자는 모든 회원 정보 조회 가능)")
     @GetMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> userDetail(@PathVariable int userId) {
+    public ResponseEntity<Map<String, Object>> userDetail(@PathVariable int userId, @RequestParam int requestUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            User user = userService.userDetail(userId);
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null) {
+                response.put("success", false);
+                response.put("message", "유효하지 않은 사용자입니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
             
+            if (requestUser.getIsAdmin() == 0 && requestUserId != userId) {
+                response.put("success", false);
+                response.put("message", "자신의 정보만 조회할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
+            User user = userService.userDetail(userId);
             if (user != null) {
                 response.put("success", true);
                 response.put("user", user);
@@ -118,10 +130,7 @@ public class UserController {
     
     @Operation(summary = "회원정보 수정", description = "사용자 정보 수정 (일반 회원은 자신의 정보만, 관리자는 모든 회원 정보 수정 가능)")
     @PatchMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> userUpdate(
-            @PathVariable int userId,
-            @RequestBody User user,
-            @RequestParam int requestUserId) {
+    public ResponseEntity<Map<String, Object>> userUpdate(@PathVariable int userId, @RequestBody User user, @RequestParam int requestUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
             User requestUser = userService.userDetail(requestUserId);
@@ -188,14 +197,25 @@ public class UserController {
         }
     }
     
-    @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (필수: userId, password)")
+    @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (일반 회원은 자신의 비밀번호만, 관리자는 모든 회원의 비밀번호 변경 가능)")
     @PatchMapping("/{userId}/password")
-    public ResponseEntity<Map<String, Object>> updatePassword(
-            @PathVariable int userId,
-            @RequestBody Map<String, String> request) {
+    public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId, @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
         
         Map<String, Object> response = new HashMap<>();
         try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null) {
+                response.put("success", false);
+                response.put("message", "유효하지 않은 사용자입니다.");
+                return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+            }
+            
+            if (requestUser.getIsAdmin() == 0 && requestUserId != userId) {
+                response.put("success", false);
+                response.put("message", "자신의 비밀번호만 변경할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
             if (!request.containsKey("password")) {
                 response.put("success", false);
                 response.put("message", "비밀번호를 입력해주세요.");
@@ -208,9 +228,15 @@ public class UserController {
             
             int result = userService.updatePassword(user);
             
-            response.put("success", result > 0);
-            response.put("message", result > 0 ? "비밀번호가 성공적으로 수정되었습니다." : "비밀번호 수정에 실패했습니다.");
-            return new ResponseEntity<>(response, result > 0 ? HttpStatus.OK : HttpStatus.BAD_REQUEST);
+            if (result > 0) {
+                response.put("success", true);
+                response.put("message", "비밀번호가 성공적으로 수정되었습니다.");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else {
+                response.put("success", false);
+                response.put("message", "비밀번호 수정에 실패했습니다.");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             response.put("success", false);
             response.put("message", "비밀번호 수정 중 오류가 발생했습니다: " + e.getMessage());
@@ -247,9 +273,7 @@ public class UserController {
     
     @Operation(summary = "회원 탈퇴", description = "회원 정보 삭제 (일반 회원은 자신만, 관리자는 모든 회원 삭제 가능)")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Map<String, Object>> userDelete(
-            @PathVariable int userId,
-            @RequestParam int requestUserId) {
+    public ResponseEntity<Map<String, Object>> userDelete(@PathVariable int userId, @RequestParam int requestUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
             User requestUser = userService.userDetail(requestUserId);
@@ -274,7 +298,7 @@ public class UserController {
             } else {
                 response.put("success", false);
                 response.put("message", "존재하지 않는 회원입니다.");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);z
             }
         } catch (Exception e) {
             response.put("success", false);
