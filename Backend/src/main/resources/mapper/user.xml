@@ -13,7 +13,7 @@
 
     <!-- 로그인 -->
     <select id="userLogin" parameterType="User" resultType="User">
-        SELECT userEmail, password, isAdmin
+        SELECT userId, userEmail, userName, isAdmin, isLogin
         FROM users
         WHERE userEmail = #{userEmail} AND password = #{password}
     </select>
