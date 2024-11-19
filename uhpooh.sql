@@ -20,7 +20,7 @@ CREATE TABLE users (
 -- Token table
 CREATE TABLE token (
     id INTEGER NOT NULL AUTO_INCREMENT,
-    is_logged_out BIT,
+    isLogin BOOLEAN,
     userId INTEGER,
     accessToken VARCHAR(255),
     refreshToken VARCHAR(255),
