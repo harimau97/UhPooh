@@ -198,7 +198,7 @@ public class UserController {
     }
     
     @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (일반 회원은 자신의 비밀번호만, 관리자는 모든 회원의 비밀번호 변경 가능)")
-    @PatchMapping("/{userId}/password")
+    @PatchMapping("/password/{userId}")
     public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId, @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
         
         Map<String, Object> response = new HashMap<>();
