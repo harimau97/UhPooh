@@ -136,7 +136,7 @@ public class ReviewController {
         }
     }
     
-    @Operation(summary = "제목으로 리뷰 검색", description = "리뷰 제목으로 검색")
+    @Operation(summary = "제목으로 리뷰 검색, 페이징", description = "리뷰 제목으로 검색")
     @GetMapping("/search/title")
     public ResponseEntity<Map<String, Object>> searchByTitle(
             @RequestParam String keyword,
@@ -167,7 +167,7 @@ public class ReviewController {
         }
     }
     
-    @Operation(summary = "작성자로 리뷰 검색", description = "리뷰 작성자로 검색")
+    @Operation(summary = "작성자로 리뷰 검색, 페이징", description = "리뷰 작성자로 검색")
     @GetMapping("/search/writer")
     public ResponseEntity<Map<String, Object>> searchByWriter(
             @RequestParam String keyword,
@@ -197,4 +197,36 @@ public class ReviewController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    
+    @Operation(summary = "장소별 리뷰 목록 조회, 페이징", description = "특정 장소의 리뷰 목록 조회 (필수: placeId)")
+    @GetMapping("/place/{placeId}")
+    public ResponseEntity<Map<String, Object>> getReviewsByPlace(
+            @PathVariable int placeId,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Map<String, Object> params = new HashMap<>();
+            params.put("placeId", placeId);
+            params.put("start", (page - 1) * size);
+            params.put("size", size);
+            
+            List<Review> reviews = reviewService.getReviewsByPlace(params);
+            int totalCount = reviewService.getPlaceReviewCount(placeId);
+            
+            response.put("success", true);
+            response.put("reviews", reviews);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "장소별 리뷰 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }    
+    
 }

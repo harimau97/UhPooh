@@ -343,7 +343,7 @@ public class UserController {
         return new ResponseEntity<>(response, HttpStatus.OK);
       } else {
         response.put("success", false);
-        response.put("message", "존재하지 않는 회원입니다.");
+        response.put("message", "존재하지 않는 회원입니다..");
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
       }
     } catch (Exception e) {
