@@ -12,7 +12,7 @@ import com.ssafy.edu.jwt.service.CustomUserService;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/none")
 public class AuthController {
 
   @Autowired
