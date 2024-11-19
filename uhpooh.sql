@@ -8,7 +8,7 @@ USE uhpooh;
 CREATE TABLE users (
     userId INT AUTO_INCREMENT PRIMARY KEY,
     userEmail VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255),
+    password VARBINARY(255),
     userName VARCHAR(50) NOT NULL,
     pImage VARCHAR(255),
     isAdmin BOOLEAN DEFAULT FALSE,

@@ -1,5 +1,6 @@
 package com.ssafy.edu.controller;
 
+import com.ssafy.edu.jwt.service.CustomUserService;
 import com.ssafy.edu.user.model.dto.User;
 import com.ssafy.edu.user.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +18,10 @@ import java.util.Map;
 public class UserController {
     
     private final UserService userService;
+    private final CustomUserService customUserService;
     
-    public UserController(UserService userService) {
+    public UserController(CustomUserService customUserService, UserService userService) {
+        this.customUserService = customUserService;
         this.userService = userService;
     }
     
@@ -451,4 +454,15 @@ public class UserController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    
+    @GetMapping("/validate")
+    public boolean validate(@RequestParam String token) {
+        return customUserService.validateAccessToken(token);
+    }
+    
+    @GetMapping("/protected")
+    public ResponseEntity<String> protectedEndpoint() {
+        return ResponseEntity.ok("You have accessed a protected endpoint!");
+    }
+    
 }
