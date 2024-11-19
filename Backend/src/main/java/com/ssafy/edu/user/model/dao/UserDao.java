@@ -4,6 +4,7 @@ import com.ssafy.edu.user.model.dto.User;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface UserDao {
@@ -27,4 +28,16 @@ public interface UserDao {
     public int updatePassword(User user);
     
     public int updateLoginStatus(User user);
+    
+    public List<User> searchByEmail(Map<String, Object> params);
+    
+    public int getEmailSearchCount(Map<String, Object> params);
+    
+    public List<User> searchByName(Map<String, Object> params);
+    
+    public int getNameSearchCount(Map<String, Object> params);
+    
+    public List<User> searchByAdminStatus(Map<String, Object> params);
+    
+    public int getAdminSearchCount(Map<String, Object> params);
 }

@@ -135,4 +135,66 @@ public class ReviewController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @Operation(summary = "제목으로 리뷰 검색", description = "리뷰 제목으로 검색")
+    @GetMapping("/search/title")
+    public ResponseEntity<Map<String, Object>> searchByTitle(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<Review> reviews = reviewService.searchByTitle(searchParams);
+            int totalCount = reviewService.getTitleSearchCount(searchParams);
+            
+            response.put("success", true);
+            response.put("reviews", reviews);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "리뷰 검색 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    @Operation(summary = "작성자로 리뷰 검색", description = "리뷰 작성자로 검색")
+    @GetMapping("/search/writer")
+    public ResponseEntity<Map<String, Object>> searchByWriter(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<Review> reviews = reviewService.searchByWriter(searchParams);
+            int totalCount = reviewService.getWriterSearchCount(searchParams);
+            
+            response.put("success", true);
+            response.put("reviews", reviews);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "리뷰 검색 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }

@@ -306,4 +306,121 @@ public class UserController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @Operation(summary = "이메일로 회원 검색", description = "이메일로 회원 검색")
+    @GetMapping("/search/email")
+    public ResponseEntity<Map<String, Object>> searchByEmail(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam int requestUserId
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null || requestUser.getIsAdmin() == 0) {
+                response.put("success", false);
+                response.put("message", "관리자만 접근할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<User> users = userService.searchByEmail(searchParams);
+            int totalCount = userService.getEmailSearchCount(searchParams);
+            
+            response.put("success", true);
+            response.put("users", users);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "회원 검색 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    @Operation(summary = "닉네임으로 회원 검색", description = "닉네임으로 회원 검색")
+    @GetMapping("/search/name")
+    public ResponseEntity<Map<String, Object>> searchByName(
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam int requestUserId
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null || requestUser.getIsAdmin() == 0) {
+                response.put("success", false);
+                response.put("message", "관리자만 접근할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<User> users = userService.searchByName(searchParams);
+            int totalCount = userService.getNameSearchCount(searchParams);
+            
+            response.put("success", true);
+            response.put("users", users);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "회원 검색 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+    
+    @Operation(summary = "관리자 여부로 회원 검색", description = "관리자 여부로 회원 검색")
+    @GetMapping("/search/admin")
+    public ResponseEntity<Map<String, Object>> searchByAdminStatus(
+            @RequestParam int isAdmin,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam int requestUserId
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User requestUser = userService.userDetail(requestUserId);
+            if (requestUser == null || requestUser.getIsAdmin() == 0) {
+                response.put("success", false);
+                response.put("message", "관리자만 접근할 수 있습니다.");
+                return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
+            }
+            
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("isAdmin", isAdmin);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<User> users = userService.searchByAdminStatus(searchParams);
+            int totalCount = userService.getAdminSearchCount(searchParams);
+            
+            response.put("success", true);
+            response.put("users", users);
+            response.put("currentPage", page);
+            response.put("totalItems", totalCount);
+            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", "회원 검색 중 오류가 발생했습니다: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }

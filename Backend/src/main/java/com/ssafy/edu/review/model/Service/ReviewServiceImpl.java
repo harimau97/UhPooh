@@ -5,6 +5,7 @@ import com.ssafy.edu.review.model.dto.Review;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ReviewServiceImpl implements ReviewService {
@@ -38,5 +39,25 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public Review reviewDetail(int reviewId) {
         return reviewDao.reviewDetail(reviewId);
+    }
+    
+    @Override
+    public List<Review> searchByTitle(Map<String, Object> params) {
+        return reviewDao.searchByTitle(params);
+    }
+    
+    @Override
+    public int getTitleSearchCount(Map<String, Object> params) {
+        return reviewDao.getTitleSearchCount(params);
+    }
+    
+    @Override
+    public List<Review> searchByWriter(Map<String, Object> params) {
+        return reviewDao.searchByWriter(params);
+    }
+    
+    @Override
+    public int getWriterSearchCount(Map<String, Object> params) {
+        return reviewDao.getWriterSearchCount(params);
     }
 }

@@ -6,8 +6,11 @@
 
     <!-- 전체 리뷰 목록 조회 -->
     <select id="reviewList" resultType="Review">
-        SELECT *
-        FROM reviews
+        SELECT
+        r.*,
+        u.userName as userName
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
     </select>
 
     <!-- 리뷰 작성 -->
@@ -48,9 +51,65 @@
 
     <!-- 리뷰 상세 조회 -->
     <select id="reviewDetail" parameterType="int" resultType="Review">
-        SELECT *
-        FROM reviews
-        WHERE reviewId = #{reviewId}
+        SELECT
+        r.*,
+        u.userName as userName
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE r.reviewId = #{reviewId}
+    </select>
+
+    <!-- 제목으로 리뷰 검색 -->
+    <select id="searchByTitle" parameterType="map" resultType="Review">
+        SELECT
+        r.reviewId,
+        r.userId,
+        r.placeId,
+        r.title,
+        r.content,
+        r.images,
+        r.regTime,
+        r.updTime,
+        u.userName
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE r.title LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY r.regTime DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 제목 검색 결과 총 개수 -->
+    <select id="getTitleSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM reviews r
+        WHERE r.title LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 작성자로 리뷰 검색 -->
+    <select id="searchByWriter" parameterType="map" resultType="Review">
+        SELECT
+        r.reviewId,
+        r.userId,
+        r.placeId,
+        r.title,
+        r.content,
+        r.images,
+        r.regTime,
+        r.updTime,
+        u.userName
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE u.userName LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY r.regTime DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 작성자 검색 결과 총 개수 -->
+    <select id="getWriterSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE u.userName LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
 </mapper>

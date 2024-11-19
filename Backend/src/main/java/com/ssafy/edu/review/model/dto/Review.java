@@ -17,5 +17,6 @@ public class Review {
     private String images;
     private String regTime;
     private String updTime;
+    private String userName;
 
 }
