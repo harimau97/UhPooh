@@ -66,14 +66,14 @@
         SELECT 1
         FROM users
         WHERE userId = #{userId}
-        AND CONVERT(AES_DECRYPT(FROM_BASE64(password), 'REDACTED') USING utf8) = #{password}
+        AND password = AES_ENCRYPT(#{password}, 'REDACTED')
         )
     </select>
 
     <!-- 비밀번호 수정 -->
     <update id="updatePassword" parameterType="User">
         UPDATE users
-        SET password = TO_BASE64(AES_ENCRYPT(#{password}, 'REDACTED')),
+        SET password = AES_ENCRYPT(#{password}, 'REDACTED'),
         updTime = now()
         WHERE userId = #{userId}
     </update>
