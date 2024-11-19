@@ -13,6 +13,7 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 // Swagger-UI 확인
 // http://localhost/swagger-ui.html
 // http://localhost:8080/uhpooh/swagger-ui.html
+// DMoMJOGwHfUj/2x791wwbtXozdxwl/cvwft6sefzuNlzB8NRTRfzgQl0/tm9SHlFLalUUwmtrWa41U33H/pTEQ==
 // @OpenAPIDefinition(
 // info = @Info(
 // title = "SSAFY Board API 명세서",
