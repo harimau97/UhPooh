@@ -27,7 +27,7 @@ public class FileConfiguration {
     }
   }
 
-  // @Bean
+  @Bean
   public void initializeFileSystem() throws IOException {
     // 프로필 이미지 디렉토리 생성
     String profilePath = uploadPath + "/profile";
