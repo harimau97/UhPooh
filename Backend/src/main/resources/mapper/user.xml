@@ -60,6 +60,16 @@
         WHERE userName = #{userName}
     </select>
 
+    <!-- 현재 비밀번호 확인 -->
+    <select id="checkPassword" parameterType="User" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM users
+        WHERE userId = #{userId}
+        AND password = #{password}
+        )
+    </select>
+
     <!-- 비밀번호 수정 -->
     <update id="updatePassword" parameterType="User">
         UPDATE users

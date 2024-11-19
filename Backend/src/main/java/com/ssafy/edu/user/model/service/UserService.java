@@ -23,6 +23,8 @@ public interface UserService {
     
     int userNameCheck(String userName);
     
+    boolean checkPassword(User user);
+    
     int updatePassword(User user);
     
     int updateLoginStatus(User user);

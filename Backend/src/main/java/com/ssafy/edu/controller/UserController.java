@@ -197,12 +197,13 @@ public class UserController {
         }
     }
     
-    @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (일반 회원은 자신의 비밀번호만, 관리자는 모든 회원의 비밀번호 변경 가능)")
+    @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (관리자가 변경 불가능)")
     @PatchMapping("/password/{userId}")
     public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId, @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
         
         Map<String, Object> response = new HashMap<>();
         try {
+            // 1. 로그인 한 사용자 확인
             User requestUser = userService.userDetail(requestUserId);
             if (requestUser == null) {
                 response.put("success", false);
@@ -210,31 +211,58 @@ public class UserController {
                 return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
             }
             
-            if (requestUser.getIsAdmin() == 0 && requestUserId != userId) {
+            // 2. 본인 확인
+            if (requestUserId != userId) {
                 response.put("success", false);
                 response.put("message", "자신의 비밀번호만 변경할 수 있습니다.");
                 return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
             }
             
-            if (!request.containsKey("password")) {
+            // 3. 필수 파라미터 검증
+            if (!request.containsKey("currentPassword") ||
+                    !request.containsKey("newPassword") ||
+                    !request.containsKey("confirmPassword")) {
                 response.put("success", false);
-                response.put("message", "비밀번호를 입력해주세요.");
+                response.put("message", "현재 비밀번호, 새로운 비밀번호, 비밀번호 확인이 모두 필요합니다.");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
             
+            // 4. 현재 비밀번호 확인
+            User checkUser = new User();
+            checkUser.setUserId(userId);
+            checkUser.setPassword(request.get("currentPassword"));
+            
+            if (!userService.checkPassword(checkUser)) {
+                response.put("success", false);
+                response.put("message", "현재 비밀번호가 일치하지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            
+            // 5. 새 비밀번호 일치 여부 확인
+            String newPassword = request.get("newPassword");
+            String confirmPassword = request.get("confirmPassword");
+            
+            if (!newPassword.equals(confirmPassword)) {
+                response.put("success", false);
+                response.put("message", "새로운 비밀번호가 일치하지 않습니다.");
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            
+            
+            // 7. 비밀번호 변경
             User user = new User();
             user.setUserId(userId);
-            user.setPassword(request.get("password"));
+            user.setPassword(newPassword);
             
             int result = userService.updatePassword(user);
             
             if (result > 0) {
                 response.put("success", true);
-                response.put("message", "비밀번호가 성공적으로 수정되었습니다.");
+                response.put("message", "비밀번호가 성공적으로 변경되었습니다.");
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else {
                 response.put("success", false);
-                response.put("message", "비밀번호 수정에 실패했습니다.");
+                response.put("message", "비밀번호 변경에 실패했습니다.");
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
