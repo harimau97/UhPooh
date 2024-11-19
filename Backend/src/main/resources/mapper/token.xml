@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.edu.jwt.dao.tokenDao">
+
+    <!-- Insert new Access Token -->
+    <insert id="insertAccessToken">
+        INSERT INTO token (userId, accessToken, isLogin)
+        VALUES (#{userId}, #{accessToken}, 1);
+    </insert>
+
+    <!-- Update Access Token for a user -->
+    <update id="updateAccessToken" >
+        UPDATE token
+        SET accessToken = #{accessToken}, isLogin = 1
+        WHERE userId = #{userId};
+    </update>
+
+    <!-- Retrieve Access Token by userId -->
+    <select id="getAccessTokenByUserId" >
+        SELECT accessToken
+        FROM token
+        WHERE userId = #{userId} AND isLogin = 1;
+    </select>
+
+    <!-- Invalidate Access Token (logout) -->
+    <update id="invalidateAccessToken" >
+        UPDATE token
+        SET isLogin = 0
+        WHERE userId = #{userId};
+    </update>
+
+</mapper>
