@@ -27,5 +27,9 @@ public interface ReviewDao {
     
     public int getWriterSearchCount(Map<String, Object> params);
     
+    public List<Review> getReviewsByPlace(Map<String, Object> params);
+    
+    public int getPlaceReviewCount(int placeId);
+    
     
 }
