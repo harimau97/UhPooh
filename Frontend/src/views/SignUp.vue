@@ -3,7 +3,7 @@
     <div class="container">
       <h1>회원 가입</h1>
 
-      <form>
+      <form action="#">
         <div class="form-group">
           <label for="memberId">이름</label>
           <input
@@ -14,7 +14,10 @@
             placeholder="이름을 입력하세요"
             title="3글자 이상 입력하세요."
             minlength="3"
+            maxlength="10"
             required="required"
+            v-model="userName"
+            @input="checkForm()"
           />
           <br />
         </div>
@@ -26,19 +29,23 @@
             name="userEmail"
             class="form-control"
             pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)"
+            title="이메일 형식이 맞지 않습니다."
             placeholder="이메일을 입력하세요"
             required="required"
+            v-model="userEmail"
+            @input="checkForm"
           />
         </div>
-        <button
-          type="button"
-          id="checkIdBtn"
-          @click="checkId"
-          class="inline-block px-6 py-3 font-bold tracking-wide text-white uppercase bg-gradient-to-r from-yellow-500 via-red-500 to-purple-800 rounded-full shadow-md transition ease-in-out hover:shadow-lg duration-400"
-        >
-          이메일 중복 확인
-        </button>
-
+        <div class="mt-4">
+          <button
+            type="button"
+            id="checkIdBtn"
+            @click="checkId"
+            class="inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
+          >
+            이메일 중복 확인
+          </button>
+        </div>
         <div class="form-group">
           <label for="password">비밀번호</label>
           <input
@@ -50,6 +57,8 @@
             title="숫자,영어 소문자, 대문자, 특수문자(~!@#$%)가 하나 이상 필요합니다."
             minlength="8"
             required="required"
+            v-model="password"
+            @input="checkForm"
           />
         </div>
 
@@ -57,12 +66,148 @@
           <button
             type="submit"
             @click="signUp"
-            class="inline-block px-6 py-3 font-bold tracking-wide text-white uppercase bg-gradient-to-r from-yellow-500 via-red-500 to-purple-800 rounded-full shadow-md transition ease-in-out hover:shadow-lg duration-400"
+            :disabled="!activeSignUP"
+            :class="[
+              'inline-block px-8 py-3 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg border-2',
+              activeSignUP
+                ? 'bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800'
+                : 'bg-gray-400 border-gray-400 cursor-not-allowed',
+            ]"
           >
             회원 가입
           </button>
         </div>
       </form>
+      <ul>
+        <li class="flex">
+          <svg
+            v-show="validName"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="green"
+              stroke-width="15"
+              fill="none"
+            />
+          </svg>
+          <svg
+            v-show="!validName"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <line
+              x1="20"
+              y1="20"
+              x2="80"
+              y2="80"
+              stroke="red"
+              stroke-width="15"
+            />
+            <line
+              x1="20"
+              y1="80"
+              x2="80"
+              y2="20"
+              stroke="red"
+              stroke-width="15"
+            /></svg
+          >이름은 3글자 이상 10글자 이하인가요?
+        </li>
+        <li class="flex">
+          <svg
+            v-show="validEmail"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="green"
+              stroke-width="15"
+              fill="none"
+            /></svg
+          ><svg
+            v-show="!validEmail"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <line
+              x1="20"
+              y1="20"
+              x2="80"
+              y2="80"
+              stroke="red"
+              stroke-width="15"
+            />
+            <line
+              x1="20"
+              y1="80"
+              x2="80"
+              y2="20"
+              stroke="red"
+              stroke-width="15"
+            /></svg
+          >이메일 형식을 충족하셨나요?
+        </li>
+
+        <li class="flex pr-2">
+          <svg
+            v-show="validPassword"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="green"
+              stroke-width="15"
+              fill="none"
+            />
+          </svg>
+          <svg
+            v-show="!validPassword"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <line
+              x1="20"
+              y1="20"
+              x2="80"
+              y2="80"
+              stroke="red"
+              stroke-width="15"
+            />
+            <line
+              x1="20"
+              y1="80"
+              x2="80"
+              y2="20"
+              stroke="red"
+              stroke-width="15"
+            />
+          </svg>
+          비밀번호는 숫자, 영어 소문자 및 대문자, 특수문자(!@#$%^&*)가 하나 이상
+          필요합니다.
+        </li>
+      </ul>
     </div>
 
     <footer>
@@ -77,11 +222,48 @@ import { useRoute, useRouter } from "vue-router";
 import { ref } from "vue";
 const isChecked = ref(false);
 const router = useRouter();
+const userEmail = ref("");
+const userName = ref("");
+const password = ref("");
+const validName = ref(false);
+const validEmail = ref(false);
+const validPassword = ref(false);
+const activeSignUP = ref(false);
+const checkForm = () => {
+  const hasUppercase = /[A-Z]/.test(password.value);
+  const hasLowercase = /[a-z]/.test(password.value);
+  const hasNumber = /[0-9]/.test(password.value);
+  const hasSpecialChar = /[!@#$%^&*]/.test(password.value);
+  const hasEmailFormat =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/.test(
+      userEmail.value
+    );
+
+  // Name validation (3-10 characters)
+  validName.value = userName.value.length >= 2 && userName.value.length <= 10;
+
+  // Email validation
+  validEmail.value = hasEmailFormat;
+
+  // Password validation
+  validPassword.value =
+    hasUppercase &&
+    hasLowercase &&
+    hasNumber &&
+    hasSpecialChar &&
+    password.value.length >= 8;
+
+  activeSignUP.value =
+    validName.value &&
+    validEmail.value &&
+    validPassword.value &&
+    isChecked.value;
+
+  console.log(activeSignUP.value);
+};
 
 const checkId = () => {
-  var emailField = document.getElementById("userEmail");
-  var email = emailField.value;
-  isChecked.value = !isChecked.value;
+  var email = userEmail.value;
   console.log(isChecked.value);
   console.log(email);
   if (email === "") {
@@ -95,11 +277,12 @@ const checkId = () => {
         "http://localhost:8080/uhpooh/api/user/check/email/" + email
       );
       console.log(response.data);
+      isChecked.value = true;
       alert(response.data.message);
     } catch (error) {
       console.error(error);
       alert("이미 사용중인 이메일입니다.");
-      emailField.value = "";
+      userEmail.value = "";
     }
   };
   fetchData();
@@ -107,16 +290,16 @@ const checkId = () => {
 
 const signUp = () => {
   event.preventDefault();
-  var userName = document.getElementById("userName").value;
-  var userEmail = document.getElementById("userEmail").value;
-  var password = document.getElementById("password").value;
+  var uName = userName.value;
+  var uEmail = userEmail.value;
+  var password = password.value;
   if (isChecked.value === true) {
-    if (userName !== "" && userEmail !== "" && password !== "") {
+    if (uName !== "" && uEmail !== "" && password !== "") {
       const sendData = async () => {
         await axios
           .post("http://localhost:8080/uhpooh/api/user/signup", {
-            userName: userName,
-            userEmail: userEmail,
+            userName: uName,
+            userEmail: uEmail,
             password: password,
           })
           .then((response) => {
@@ -167,13 +350,14 @@ p {
 
 /* 폼 스타일 */
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
   text-align: left;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 10px;
   font-size: 16px;
   color: #333;
 }
@@ -184,27 +368,6 @@ p {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
-}
-
-/* 버튼 스타일 */
-.btn {
-  display: inline-block;
-  padding: 12px 30px;
-  background-color: #833ab4;
-  background-image: linear-gradient(45deg, #fcb045, #fd1d1d, #833ab4);
-  border-radius: 50px;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  transition: background 0.4s ease;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-.btn:hover {
-  background-position: right center;
-  background-color: #fd1d1d;
 }
 
 /* 링크 스타일 */

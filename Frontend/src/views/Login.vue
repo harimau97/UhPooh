@@ -26,9 +26,18 @@
           placeholder="Your password ..."
           required="required"
         />
-        <input type="submit" value="로그인" />
       </form>
-      <a href="${root}/regist">회원가입</a>
+      <button
+        type="submit"
+        class="w-[8rem] h-[3rem] inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
+      >
+        로그인
+      </button>
+      <button
+        class="w-[8rem] h-[3rem] inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
+      >
+        <RouterLink to="/signup">회원가입</RouterLink>
+      </button>
     </div>
   </body>
 </template>
@@ -68,19 +77,19 @@ label {
   font-weight: bold;
   color: #555;
   display: block;
-  margin-bottom: 10px;
 }
 
 input[type="text"],
 input[type="password"] {
   width: 100%;
   padding: 15px;
-  margin: 10px 0;
+  margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
   font-size: 16px;
   background-color: #f9f9f9;
+  margin-bottom: 10px;
   transition: all 0.3s ease;
 }
 
@@ -109,18 +118,5 @@ input[type="submit"] {
 input[type="submit"]:hover {
   background-position: right center;
   background-color: #fd1d1d;
-}
-
-a {
-  display: inline-block;
-  margin-top: 20px;
-  color: #833ab4;
-  font-size: 16px;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-a:hover {
-  color: #fd1d1d;
 }
 </style>
