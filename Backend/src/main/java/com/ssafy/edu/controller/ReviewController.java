@@ -3,6 +3,8 @@ package com.ssafy.edu.controller;
 import com.ssafy.edu.review.model.Service.ReviewService;
 import com.ssafy.edu.review.model.dto.Review;
 import io.swagger.v3.oas.annotations.Operation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,123 +18,125 @@ import java.util.Map;
 @CrossOrigin("*")
 public class ReviewController {
     
+    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
+    private static final int DEFAULT_PAGE_SIZE = 10;
+    private static final String ERROR_PREFIX = "오류가 발생했습니다: ";
+    
     private final ReviewService reviewService;
     
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
     
+    private ResponseEntity<Map<String, Object>> createResponse(boolean success, String message, HttpStatus status) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", success);
+        response.put("message", message);
+        return new ResponseEntity<>(response, status);
+    }
+    
+    private ResponseEntity<Map<String, Object>> createResponse(boolean success, String message, Object data, HttpStatus status) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", success);
+        response.put("message", message);
+        response.put("data", data);
+        return new ResponseEntity<>(response, status);
+    }
+    
+    private Map<String, Object> createPageResponse(List<?> items, int page, int totalCount, int size) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("items", items);
+        data.put("currentPage", page);
+        data.put("totalItems", totalCount);
+        data.put("totalPages", (int) Math.ceil((double) totalCount / size));
+        return data;
+    }
+    
     @Operation(summary = "리뷰 목록 조회", description = "전체 리뷰 목록 조회")
     @GetMapping("/list")
     public ResponseEntity<Map<String, Object>> reviewList() {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Requesting review list");
         try {
             List<Review> reviews = reviewService.reviewList();
-            response.put("success", true);
-            response.put("reviews", reviews);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return createResponse(true, "리뷰 목록 조회 성공", reviews, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in reviewList: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @Operation(summary = "리뷰 상세 조회", description = "특정 리뷰의 상세 정보 조회 (필수: reviewId)")
     @GetMapping("/detail/{reviewId}")
     public ResponseEntity<Map<String, Object>> reviewDetail(@PathVariable int reviewId) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Requesting review detail - reviewId: {}", reviewId);
         try {
             Review review = reviewService.reviewDetail(reviewId);
             if (review != null) {
-                response.put("success", true);
-                response.put("review", review);
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                return createResponse(true, "리뷰 조회 성공", review, HttpStatus.OK);
             } else {
-                response.put("success", false);
-                response.put("message", "해당 리뷰를 찾을 수 없습니다.");
-                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+                return createResponse(false, "해당 리뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 조회 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in reviewDetail: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @Operation(summary = "리뷰 작성", description = "리뷰 작성 (필수: userId, placeId, title, content, images)")
     @PostMapping("/write")
     public ResponseEntity<Map<String, Object>> addReview(@RequestBody Review review) {
-        Map<String, Object> response = new HashMap<>();
-        
+        logger.info("Adding new review for userId: {}, placeId: {}", review.getUserId(), review.getPlaceId());
         try {
             int result = reviewService.addReview(review);
             if (result > 0) {
-                response.put("success", true);
-                response.put("message", "리뷰가 작성되었습니다.");
-                return new ResponseEntity<>(response, HttpStatus.CREATED);
+                return createResponse(true, "리뷰가 작성되었습니다.", HttpStatus.CREATED);
             } else {
-                response.put("success", false);
-                response.put("message", "리뷰 작성에 실패했습니다.");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return createResponse(false, "리뷰 작성에 실패했습니다.", HttpStatus.BAD_REQUEST);
             }
         } catch (IllegalArgumentException e) {
-            response.put("success", false);
-            response.put("message", "잘못된 입력값: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            logger.error("Invalid input in addReview: ", e);
+            return createResponse(false, "잘못된 입력값: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 작성 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in addReview: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @Operation(summary = "리뷰 수정", description = "특정 리뷰 정보 수정 (필수: reviewId)")
     @PutMapping("/edit/{reviewId}")
     public ResponseEntity<Map<String, Object>> updateReview(@PathVariable int reviewId, @RequestBody Review review) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Updating review - reviewId: {}", reviewId);
         try {
             review.setReviewId(reviewId);
             int result = reviewService.updateReview(review);
             if (result > 0) {
-                response.put("success", true);
-                response.put("message", "리뷰가 수정되었습니다.");
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                return createResponse(true, "리뷰가 수정되었습니다.", HttpStatus.OK);
             } else {
-                response.put("success", false);
-                response.put("message", "리뷰 수정에 실패했습니다.");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return createResponse(false, "리뷰 수정에 실패했습니다.", HttpStatus.BAD_REQUEST);
             }
         } catch (IllegalArgumentException e) {
-            response.put("success", false);
-            response.put("message", "잘못된 입력값: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            logger.error("Invalid input in updateReview: ", e);
+            return createResponse(false, "잘못된 입력값: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 수정 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in updateReview: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
     @Operation(summary = "리뷰 삭제", description = "특정 리뷰 삭제 (필수: reviewId)")
     @DeleteMapping("/delete/{reviewId}")
     public ResponseEntity<Map<String, Object>> deleteReview(@PathVariable int reviewId) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Deleting review - reviewId: {}", reviewId);
         try {
             int result = reviewService.deleteReview(reviewId);
             if (result > 0) {
-                response.put("success", true);
-                response.put("message", "리뷰가 삭제되었습니다.");
-                return new ResponseEntity<>(response, HttpStatus.OK);
+                return createResponse(true, "리뷰가 삭제되었습니다.", HttpStatus.OK);
             } else {
-                response.put("success", false);
-                response.put("message", "리뷰 삭제에 실패했습니다.");
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return createResponse(false, "리뷰 삭제에 실패했습니다.", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 삭제 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in deleteReview: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
@@ -143,7 +147,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Searching reviews by title - keyword: {}, page: {}, size: {}", keyword, page, size);
         try {
             Map<String, Object> searchParams = new HashMap<>();
             searchParams.put("keyword", keyword);
@@ -153,17 +157,11 @@ public class ReviewController {
             List<Review> reviews = reviewService.searchByTitle(searchParams);
             int totalCount = reviewService.getTitleSearchCount(searchParams);
             
-            response.put("success", true);
-            response.put("reviews", reviews);
-            response.put("currentPage", page);
-            response.put("totalItems", totalCount);
-            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
-            
-            return ResponseEntity.ok(response);
+            Map<String, Object> pageData = createPageResponse(reviews, page, totalCount, size);
+            return createResponse(true, "검색 성공", pageData, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 검색 중 오류가 발생했습니다: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            logger.error("Error in searchByTitle: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
@@ -174,7 +172,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Searching reviews by writer - keyword: {}, page: {}, size: {}", keyword, page, size);
         try {
             Map<String, Object> searchParams = new HashMap<>();
             searchParams.put("keyword", keyword);
@@ -184,17 +182,11 @@ public class ReviewController {
             List<Review> reviews = reviewService.searchByWriter(searchParams);
             int totalCount = reviewService.getWriterSearchCount(searchParams);
             
-            response.put("success", true);
-            response.put("reviews", reviews);
-            response.put("currentPage", page);
-            response.put("totalItems", totalCount);
-            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
-            
-            return ResponseEntity.ok(response);
+            Map<String, Object> pageData = createPageResponse(reviews, page, totalCount, size);
+            return createResponse(true, "검색 성공", pageData, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "리뷰 검색 중 오류가 발생했습니다: " + e.getMessage());
-            return ResponseEntity.internalServerError().body(response);
+            logger.error("Error in searchByWriter: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
     
@@ -205,7 +197,7 @@ public class ReviewController {
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
-        Map<String, Object> response = new HashMap<>();
+        logger.info("Getting reviews by place - placeId: {}, page: {}, size: {}", placeId, page, size);
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("placeId", placeId);
@@ -215,18 +207,11 @@ public class ReviewController {
             List<Review> reviews = reviewService.getReviewsByPlace(params);
             int totalCount = reviewService.getPlaceReviewCount(placeId);
             
-            response.put("success", true);
-            response.put("reviews", reviews);
-            response.put("currentPage", page);
-            response.put("totalItems", totalCount);
-            response.put("totalPages", (int) Math.ceil((double) totalCount / size));
-            
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            Map<String, Object> pageData = createPageResponse(reviews, page, totalCount, size);
+            return createResponse(true, "장소별 리뷰 조회 성공", pageData, HttpStatus.OK);
         } catch (Exception e) {
-            response.put("success", false);
-            response.put("message", "장소별 리뷰 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error in getReviewsByPlace: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }    
-    
+    }
 }
