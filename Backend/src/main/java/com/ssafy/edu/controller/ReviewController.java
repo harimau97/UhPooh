@@ -61,7 +61,7 @@ public class ReviewController {
     }
     
     @Operation(summary = "리뷰 작성", description = "리뷰 작성 (필수: userId, placeId, title, content, images)")
-    @PostMapping("/review")
+    @PostMapping("/write")
     public ResponseEntity<Map<String, Object>> addReview(@RequestBody Review review) {
         Map<String, Object> response = new HashMap<>();
         
