@@ -41,7 +41,13 @@
             type="button"
             id="checkIdBtn"
             @click="checkId"
-            class="inline-block px-8 py-3 font-bold tracking-wide text-white uppercase bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full border-2 border-blue-700 shadow-lg transition-all duration-400 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800"
+            :disabled="!validEmail"
+            :class="[
+              'inline-block px-8 py-3 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg border-2',
+              validEmail
+                ? 'bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800'
+                : 'bg-gray-400 border-gray-400 cursor-not-allowed',
+            ]"
           >
             이메일 중복 확인
           </button>
@@ -60,6 +66,22 @@
             v-model="password"
             @input="checkForm"
           />
+        </div>
+        <div class="form-group">
+          <label for="memberId">기본 주소</label>
+          <input
+            type="text"
+            class="form-control"
+            id="userAddress"
+            name="userAddress"
+            placeholder="기본으로 사용할 주소를 입력하세요"
+            minlength="10"
+            maxlength="100"
+            required="required"
+            v-model="userAddress"
+            @input="checkForm()"
+          />
+          <br />
         </div>
 
         <div class="form-group">
@@ -207,6 +229,49 @@
           비밀번호는 숫자, 영어 소문자 및 대문자, 특수문자(!@#$%^&*)가 하나 이상
           필요합니다.
         </li>
+        <li class="flex pr-2">
+          <svg
+            v-show="validAddress"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <circle
+              cx="50"
+              cy="50"
+              r="40"
+              stroke="green"
+              stroke-width="15"
+              fill="none"
+            />
+          </svg>
+          <svg
+            v-show="!validAddress"
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 100 100"
+          >
+            <line
+              x1="20"
+              y1="20"
+              x2="80"
+              y2="80"
+              stroke="red"
+              stroke-width="15"
+            />
+            <line
+              x1="20"
+              y1="80"
+              x2="80"
+              y2="20"
+              stroke="red"
+              stroke-width="15"
+            />
+          </svg>
+          주소를 입력하셨나요?
+        </li>
       </ul>
     </div>
 
@@ -225,9 +290,11 @@ const router = useRouter();
 const userEmail = ref("");
 const userName = ref("");
 const password = ref("");
+const userAddress = ref("");
 const validName = ref(false);
 const validEmail = ref(false);
 const validPassword = ref(false);
+const validAddress = ref(false);
 const activeSignUP = ref(false);
 const checkForm = () => {
   const hasUppercase = /[A-Z]/.test(password.value);
@@ -238,6 +305,7 @@ const checkForm = () => {
     /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/.test(
       userEmail.value
     );
+  const hasAddress = userAddress.value.length > 9;
 
   // Name validation (3-10 characters)
   validName.value = userName.value.length >= 2 && userName.value.length <= 10;
@@ -253,10 +321,13 @@ const checkForm = () => {
     hasSpecialChar &&
     password.value.length >= 8;
 
+  validAddress.value = hasAddress;
+
   activeSignUP.value =
     validName.value &&
     validEmail.value &&
     validPassword.value &&
+    validAddress.value &&
     isChecked.value;
 
   console.log(activeSignUP.value);
@@ -289,10 +360,12 @@ const checkId = () => {
 };
 
 const signUp = () => {
+  console.log("회원가입 시작");
   event.preventDefault();
   var uName = userName.value;
   var uEmail = userEmail.value;
-  var password = password.value;
+  var uPassword = password.value;
+  var uAddress = userAddress.value;
   if (isChecked.value === true) {
     if (uName !== "" && uEmail !== "" && password !== "") {
       const sendData = async () => {
@@ -300,7 +373,8 @@ const signUp = () => {
           .post("http://localhost:8080/uhpooh/api/user/signup", {
             userName: uName,
             userEmail: uEmail,
-            password: password,
+            password: uPassword,
+            userAddress: uAddress,
           })
           .then((response) => {
             alert("회원 가입 완료");
@@ -312,8 +386,6 @@ const signUp = () => {
       sendData();
       router.push("/");
     }
-  } else if (isChecked.value === false) {
-    alert("이메일 중복 확인을 진행해주세요.");
   }
 };
 </script>
