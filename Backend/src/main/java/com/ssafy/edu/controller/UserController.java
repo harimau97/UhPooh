@@ -135,7 +135,7 @@ public class UserController {
     }
   }
 
-  @Operation(summary = "회원가입", description = "새로운 사용자 등록 (필수: userEmail, password, userName)")
+  @Operation(summary = "회원가입", description = "새로운 사용자 등록 (필수: userEmail, password, userName, userAddress)")
   @PostMapping("/signup")
   public ResponseEntity<Map<String, Object>> userSignup(@RequestBody User user) {
     logger.info("Signup attempt for user email: {}", user.getUserEmail());
@@ -213,7 +213,7 @@ public class UserController {
     }
   }
 
-  @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (관리자가 변경 불가능)")
+  @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (관리자가 변경 불가능) (필수: currentPassword, newPassword, confirmPassword)")
   @PatchMapping("/password/{userId}")
   public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId,
       @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
