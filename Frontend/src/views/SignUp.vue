@@ -283,7 +283,7 @@
 
 <script setup>
 import axios from "axios";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { ref } from "vue";
 const isChecked = ref(false);
 const router = useRouter();

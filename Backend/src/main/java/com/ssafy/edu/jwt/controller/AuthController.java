@@ -38,6 +38,11 @@ public class AuthController {
     return customUserService.validateAccessToken(token);
   }
 
+  @GetMapping("/compare")
+  public boolean compare(@RequestParam String token) {
+    return customUserService.validateAccessToken(token);
+  }
+
   @PostMapping("/logout")
   public String logout(@RequestParam Long userId) {
     customUserService.logoutUser(userId);

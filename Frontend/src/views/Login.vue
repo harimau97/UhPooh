@@ -7,31 +7,30 @@
     <h3>Login</h3>
 
     <div>
-      <form action="${root}/login" method="post">
-        <input type="hidden" name="command" value="login" />
+      <form>
         <label for="fname">아이디</label>
         <input
           type="text"
-          id="fname"
-          name="memberId"
-          placeholder="Your memberId..."
+          name="userEmail"
+          placeholder="이메일을 입력해주세요."
           required="required"
+          v-model="userEmail"
         />
 
         <label for="lname">패스워드</label>
         <input
           type="password"
-          id="lname"
           name="password"
-          placeholder="Your password ..."
+          placeholder="비밀 번호를 입력해주세요."
           required="required"
+          v-model="password"
         />
       </form>
       <button
-        type="submit"
+        type="button"
         class="w-[8rem] h-[3rem] inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
       >
-        로그인
+        <Button @click="login">로그인</Button>
       </button>
       <button
         class="w-[8rem] h-[3rem] inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
@@ -42,7 +41,33 @@
   </body>
 </template>
 
-<script setup></script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+
+import axios from "axios";
+const userEmail = ref("");
+const password = ref("");
+
+const login = async () => {
+  console.log(userEmail.value);
+  console.log(password.value);
+  await axios
+    .post("http://localhost:8080/uhpooh/api/user/login", {
+      userEmail: userEmail.value,
+      password: password.value,
+    })
+    .then((response) => {
+      alert("환영합니다." + userEmail.value + "님");
+      console.log(response.data);
+      router.push("/");
+    })
+    .catch((err) => {
+      alert(err);
+    });
+};
+</script>
 
 <style scoped>
 #loginBody {
