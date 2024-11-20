@@ -8,11 +8,11 @@
       ]"
     >
       <div
-        class="bg-blue-500 bg-opacity-60 rounded-lg shadow-lg max-w-screen-md h-1/2 w-80 p-2 absolute bottom-5 right-5"
+        class="absolute right-5 bottom-5 p-2 w-80 max-w-screen-md h-1/2 bg-blue-500 bg-opacity-60 rounded-lg shadow-lg"
       >
         <button
           @click="openChat = false"
-          class="w-6 h-6 bg-indigo-800 text-gray-300 hover:text-gray-100 hover:bg-indigo-600 rounded-full flex items-center justify-center absolute top-1 right-1 shadow-md transition-colors duration-300 z-50 hover:invert"
+          class="flex absolute top-1 right-1 z-50 justify-center items-center w-6 h-6 text-gray-300 bg-indigo-800 rounded-full shadow-md transition-colors duration-300 hover:text-gray-100 hover:bg-indigo-600 hover:invert"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -38,8 +38,9 @@
     </div>
   </transition>
   <button
+    v-show="isLoggined"
     @click="openChat = !openChat"
-    class="hover:animate-bounce ml-4 bg-slate-500 text-white px-1 py-1 rounded-full fixed bottom-4 right-1 z-50"
+    class="fixed right-1 bottom-4 z-50 px-1 py-1 ml-4 text-white rounded-full hover:animate-bounce bg-slate-500"
   >
     <svg
       width="40px"
@@ -64,6 +65,13 @@ import { applyReactInVue, applyPureReactInVue } from "veaury";
 import { ref } from "vue";
 import ChatReactComponent from "../react_app/Chat.jsx";
 import Header from "./Header.vue";
+import { inject, watch } from "vue";
+
+const isLoggined = inject("isLoggedIn");
+watch(isLoggined, (newVal) => {
+  console.log("isLoggedIn 상태 변경:", newVal);
+});
+
 const config = {
   APP_ID: "7D7B93DC-9263-4488-9841-B1C8F158E8B4",
   USER_ID: "Bob_1",
