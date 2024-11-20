@@ -42,15 +42,15 @@
         >
           로그인
         </RouterLink>
+        <button
+          v-show="isLoggined"
+          @click="logout"
+          class="text-white transition-colors hover:text-blue-300"
+        >
+          로그아웃
+        </button>
       </div>
     </nav>
-    <button
-      v-show="isLoggined"
-      class="text-white transition-colors hover:text-blue-300"
-      @click="logout"
-    >
-      로그아웃
-    </button>
   </header>
 </template>
 
