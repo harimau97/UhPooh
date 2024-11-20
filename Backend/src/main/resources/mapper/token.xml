@@ -29,5 +29,23 @@
         SET isLogin = 0
         WHERE userId = #{userId};
     </update>
+    
+    <select id="provideToken">
+    	SELECT token
+    	FROM token
+    	WHERE userId = #{userId};
+    </select>
+    
+    <delete id="clearToken">
+    	DELETE 
+    	FROM token
+    	WHERE userId = #{userId};
+    </delete>
+    
+    <select id="getToken">
+    	SELECT accessToken
+    	FROM token
+    	where accessToken = #{accessToken} AND userId=#{userId};
+    </select>
 
 </mapper>
