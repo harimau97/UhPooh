@@ -11,12 +11,6 @@ import { RouterLink, RouterView, useRoute } from "vue-router";
 import MainHeader from "./views/Header.vue";
 import DefaultHeader from "./views/DefaultHeader.vue";
 
-const userAddress = ref("");
-const updateUserAddress = (address) => {
-  userAddress.value = address; // 자식에서 전달받은 값으로 상태 업데이트
-  console.log("Updated userAddress in parent:", userAddress.value);
-};
-
 const isLoggedIn = computed(() => userAuthenticated.value);
 console.log(isLoggedIn.value);
 provide("isLoggedIn", isLoggedIn);

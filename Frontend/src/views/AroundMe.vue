@@ -12,6 +12,7 @@ import { inject } from "vue";
 const userAddress = ref(localStorage.getItem("targetAddress"));
 console.log(userAddress.value);
 const keyword = ref(userAddress.value);
+
 const mapContainer = ref(null);
 
 let map;
@@ -29,8 +30,10 @@ onMounted(() => {
     level: 3,
   };
   map = new kakao.maps.Map(mapContainer.value, mapOptions);
-
-  searchPlaces();
+  if (localStorage.getItem("targetAddress") !== null) {
+    searchPlaces();
+  }
+  localStorage.removeItem("targetAddress");
 });
 function searchPlaces() {
   const ps = new kakao.maps.services.Places();
