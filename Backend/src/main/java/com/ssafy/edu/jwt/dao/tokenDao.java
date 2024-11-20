@@ -9,4 +9,10 @@ public interface tokenDao {
   void invalidateAccessToken(@Param("userId") Long userId);
 
   String getAccessTokenByUserId(@Param("userId") Long userId);
+
+  String provideToken(@Param("userId") Long userId);
+
+  String getToken(@Param("accessToken") String accessToken, @Param("userId") Long userId);
+
+  void clearToken(@Param("userId") Long userId);
 }

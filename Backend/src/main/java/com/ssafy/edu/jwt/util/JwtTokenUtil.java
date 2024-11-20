@@ -24,7 +24,11 @@ public class JwtTokenUtil {
   // Validate Token
   public boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token);
+      Claims claims = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+
+      if (claims.getExpiration().before(new Date())) {
+        return false; // 토큰이 만료됨
+      }
       return true;
     } catch (JwtException | IllegalArgumentException e) {
       return false;
