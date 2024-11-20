@@ -20,8 +20,8 @@
 
     <!-- 회원가입 -->
     <insert id="userSignup" parameterType="User">
-        INSERT INTO users (userEmail, password, userName)
-        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName})
+        INSERT INTO users (userEmail, password, userName, userAddress)
+        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName}, #{userAddress})
     </insert>
 
     <!-- 회원정보 수정 -->
