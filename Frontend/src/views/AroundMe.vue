@@ -1,10 +1,21 @@
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import axios from "axios";
+import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
+import { inject } from "vue";
 
-const userAddress = ref("방배동");
+// const isLoggined = inject("isLoggedIn");
+// isAuthenticated();
+// getUserInfo();
+
+const userAddress = ref(localStorage.getItem("targetAddress"));
+console.log(userAddress.value);
+const keyword = ref(userAddress.value);
 const mapContainer = ref(null);
-const keyword = ref(userAddress);
+
 let map;
+userAddress.value = localStorage.getItem("userAddress");
 var iwContent =
   '<div style="display:flex; justify-content:center; padding:10px;  color:#333; white-space:normal; max-width:200px;"></div>';
 var infowindow = new kakao.maps.InfoWindow({
@@ -108,11 +119,11 @@ function searchPlaces() {
 
 <template>
   <body
-    class="font-sans h-full bg-gray-50 text-gray-800 flex flex-col items-center m-0 p-0"
+    class="flex flex-col items-center p-0 m-0 h-full font-sans text-gray-800 bg-gray-50"
   >
     <div class="flex items-center mb-5 w-[90%]" id="search-container">
       <input
-        class="w-full p-3 border mt-5 border-gray-300 rounded-full outline-none text-base shadow-md text-center"
+        class="p-3 mt-5 w-full text-base text-center rounded-full border border-gray-300 shadow-md outline-none"
         type="text"
         id="search-input"
         placeholder="수영장 주변 지하철역을 검색해주세요."
@@ -121,7 +132,7 @@ function searchPlaces() {
       />
 
       <!-- <button
-        class="px-5 py-2 ml-2 bg-blue-500 border-none text-white rounded-full cursor-pointer text-base shadow-md transition-colors duration-300 hover:bg-blue-600"
+        class="px-5 py-2 ml-2 text-base text-white bg-blue-500 rounded-full border-none shadow-md transition-colors duration-300 cursor-pointer hover:bg-blue-600"
         id="search-button"
         onclick="searchPlaces()"
       >

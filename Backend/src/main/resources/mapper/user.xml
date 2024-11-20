@@ -20,14 +20,15 @@
 
     <!-- 회원가입 -->
     <insert id="userSignup" parameterType="User">
-        INSERT INTO users (userEmail, password, userName)
-        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName})
+        INSERT INTO users (userEmail, password, userName, userAddress)
+        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName}, #{userAddress})
     </insert>
 
     <!-- 회원정보 수정 -->
     <update id="userUpdate" parameterType="User">
         UPDATE users
         SET userName = #{userName},
+        userAddress = #{userAddress},
         pImage = #{pImage},
         updTime = now()
         WHERE userId = #{userId}
@@ -58,6 +59,16 @@
         SELECT COUNT(*)
         FROM users
         WHERE userName = #{userName}
+    </select>
+
+    <!-- 현재 비밀번호 확인 -->
+    <select id="checkPassword" parameterType="User" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM users
+        WHERE userId = #{userId}
+        AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+        )
     </select>
 
     <!-- 비밀번호 수정 -->

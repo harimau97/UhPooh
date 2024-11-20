@@ -44,4 +44,24 @@ public class CustomUserService {
   public void logoutUser(Long userId) {
     tdao.invalidateAccessToken(userId);
   }
+
+  // token provider
+  public String tokenProvider(int userId) {
+    return tdao.getAccessTokenByUserId((long) userId);
+  }
+
+  // clear user's token to avoid error
+  public void clearToken(int userId) {
+    tdao.clearToken((long) userId);
+  }
+
+  // 토큰 비교
+  public boolean getToken(String token, int userId) {
+    if (tdao.getToken(token, (long) userId) != null) {
+      System.out.println(tdao.getToken(token, (long) userId));
+      return true;
+    } else {
+      return false;
+    }
+  }
 }

@@ -8,19 +8,20 @@ USE uhpooh;
 CREATE TABLE users (
     userId INT AUTO_INCREMENT PRIMARY KEY,
     userEmail VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255),
+    password VARBINARY(255),
     userName VARCHAR(50) NOT NULL,
+    userAddress VARCHAR(50) NOT NULL,
+    chatId VARCHAR(50),
     pImage VARCHAR(255),
     isAdmin BOOLEAN DEFAULT FALSE,
     regTime DATETIME DEFAULT CURRENT_TIMESTAMP,
     updTime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    isLogin BOOLEAN DEFAULT TRUE
+    isLogin BOOLEAN DEFAULT FALSE
 );
-
 -- Token table
 CREATE TABLE token (
     id INTEGER NOT NULL AUTO_INCREMENT,
-    is_logged_out BIT,
+    isLogin BOOLEAN DEFAULT FALSE,
     userId INTEGER,
     accessToken VARCHAR(255),
     refreshToken VARCHAR(255),

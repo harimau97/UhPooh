@@ -12,7 +12,7 @@ import com.ssafy.edu.jwt.service.CustomUserService;
 
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/none")
 public class AuthController {
 
   @Autowired
@@ -35,6 +35,11 @@ public class AuthController {
 
   @GetMapping("/validate")
   public boolean validate(@RequestParam String token) {
+    return customUserService.validateAccessToken(token);
+  }
+
+  @GetMapping("/compare")
+  public boolean compare(@RequestParam String token) {
     return customUserService.validateAccessToken(token);
   }
 

@@ -24,4 +24,16 @@ public interface ReviewService {
     List<Review> searchByWriter(Map<String, Object> params);
     
     int getWriterSearchCount(Map<String, Object> params);
+    
+    List<Review> getReviewsByPlace(Map<String, Object> params);
+    
+    int getPlaceReviewCount(int placeId);
+    
+    List<Review> searchByWriterInPlace(Map<String, Object> params);
+    
+    int getWriterSearchCountInPlace(Map<String, Object> params);
+    
+    List<Review> searchByTitleInPlace(Map<String, Object> params);
+    
+    int getTitleSearchCountInPlace(Map<String, Object> params);
 }

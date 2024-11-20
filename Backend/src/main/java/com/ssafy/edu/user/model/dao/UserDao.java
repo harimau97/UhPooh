@@ -25,6 +25,8 @@ public interface UserDao {
     
     public int userNameCheck(String userName);
     
+    public boolean checkPassword(User user);
+    
     public int updatePassword(User user);
     
     public int updateLoginStatus(User user);
