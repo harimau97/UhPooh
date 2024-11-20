@@ -59,9 +59,18 @@ const login = async () => {
       password: password.value,
     })
     .then((response) => {
-      alert("환영합니다." + userEmail.value + "님");
+      console.log(response.data.user);
+      localStorage.setItem("userId", response.data.user.userId);
+      localStorage.setItem("userName", response.data.user.userName);
+      localStorage.setItem("userAddress", response.data.user.userAddress);
+      localStorage.setItem("pImage", response.data.user.pImage);
+      localStorage.setItem("userToken", response.data.userToken);
+      alert("환영합니다." + response.data.user.userName + "님");
       console.log(response.data);
-      router.push("/");
+      console.log(localStorage.getItem("userToken"));
+      router.push("/").then(() => {
+        location.reload();
+      });
     })
     .catch((err) => {
       alert(err);

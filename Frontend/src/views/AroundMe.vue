@@ -3,14 +3,19 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
+import { inject } from "vue";
 
-isAuthenticated();
-getUserInfo();
+// const isLoggined = inject("isLoggedIn");
+// isAuthenticated();
+// getUserInfo();
 
-const userAddress = ref("방배동");
+const userAddress = ref(localStorage.getItem("targetAddress"));
+console.log(userAddress.value);
+const keyword = ref(userAddress.value);
 const mapContainer = ref(null);
-const keyword = ref(userAddress);
+
 let map;
+userAddress.value = localStorage.getItem("userAddress");
 var iwContent =
   '<div style="display:flex; justify-content:center; padding:10px;  color:#333; white-space:normal; max-width:200px;"></div>';
 var infowindow = new kakao.maps.InfoWindow({

@@ -45,7 +45,7 @@
     <select id="getToken">
     	SELECT accessToken
     	FROM token
-    	where accessToken = #{accessToken} AND userId=#{userId};
+    	where accessToken = #{accessToken} AND userId=#{userId} AND isLogin = 1;
     </select>
 
 </mapper>

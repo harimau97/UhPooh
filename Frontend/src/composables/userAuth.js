@@ -3,21 +3,21 @@ import { ref } from "vue";
 const userAuthenticated = ref(false);
 
 const isAuthenticated = async () => {
-  const token = localStorage.getItem("accessToken");
+  console.log("start validation!!!");
+  const token = localStorage.getItem("userToken");
   if (!token) return false;
 
   try {
     // 서버로 토큰 검증 요청
-    const response = await axios.get(
-      "/api/user/validate",
-      { userId: localStorage.getItem("userId") },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+
+    const response = await axios.get("/api/user/validate", {
+      params: {
+        userId: localStorage.getItem("userId"),
+        accessToken: token,
+      },
+    });
     userAuthenticated.value = true; // 서버에서 유효성 확인 결과 반환
+    console.log("검증 성공");
   } catch (error) {
     console.error("Token validation failed:", error);
     userAuthenticated.value = false;
@@ -26,11 +26,21 @@ const isAuthenticated = async () => {
 };
 
 const getUserInfo = async () => {
+  console.log("Fetch user data!!!");
+  console.log(userAuthenticated.value);
+  console.log(localStorage.getItem("userId"));
   if (userAuthenticated.value) {
     try {
       const response = await axios.get(
-        "http://localhost:8080/uhpooh/api/user/" +
-          localStorage.getItem("userId")
+        `http://localhost:8080/uhpooh/api/user/${localStorage.getItem(
+          "userId"
+        )}`,
+        {
+          params: {
+            userId: localStorage.getItem("userId"),
+            requestUserId: localStorage.getItem("userId"),
+          },
+        }
       );
       localStorage.setItem("userName", response.data.userName);
       localStorage.setItem("userId", response.data.userId);
