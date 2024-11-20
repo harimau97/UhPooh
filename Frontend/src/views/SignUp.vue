@@ -41,7 +41,7 @@
             type="button"
             id="checkIdBtn"
             @click="checkId"
-            class="inline-block px-8 py-3 bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg hover:from-blue-700 hover:via-blue-600 hover:to-blue-800 border-2 border-blue-700"
+            class="inline-block px-8 py-3 font-bold tracking-wide text-white uppercase bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 rounded-full border-2 border-blue-700 shadow-lg transition-all duration-400 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800"
           >
             이메일 중복 확인
           </button>
@@ -210,7 +210,7 @@
       </ul>
     </div>
 
-    <footer>
+    <footer class="flex justify-center">
       <p>&copy; 2024 Your Website. Made with ❤️</p>
     </footer>
   </div>

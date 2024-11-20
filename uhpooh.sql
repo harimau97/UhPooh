@@ -10,6 +10,7 @@ CREATE TABLE users (
     userEmail VARCHAR(255) NOT NULL UNIQUE,
     password VARBINARY(255),
     userName VARCHAR(50) NOT NULL,
+    userAddress VARCHAR(50) NOT NULL,
     pImage VARCHAR(255),
     isAdmin BOOLEAN DEFAULT FALSE,
     regTime DATETIME DEFAULT CURRENT_TIMESTAMP,
