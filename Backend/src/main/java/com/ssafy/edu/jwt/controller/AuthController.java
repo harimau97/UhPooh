@@ -45,7 +45,7 @@ public class AuthController {
 
   @PostMapping("/logout")
   public String logout(@RequestParam Long userId) {
-    customUserService.logoutUser(userId);
+    customUserService.logoutUser(userId.intValue());
     return "Logged out successfully!";
   }
 }

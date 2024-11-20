@@ -11,9 +11,11 @@ public class CustomUserService {
   @Autowired
   private tokenDao tdao;
 
+
   public CustomUserService(tokenDao tdao) {
     super();
     this.tdao = tdao;
+
   }
 
   @Autowired
@@ -41,8 +43,10 @@ public class CustomUserService {
   }
 
   // Logout User
-  public void logoutUser(Long userId) {
-    tdao.invalidateAccessToken(userId);
+  public void logoutUser(int userId) {
+
+    tdao.invalidateAccessToken((long) userId);
+
   }
 
   // token provider
@@ -51,9 +55,9 @@ public class CustomUserService {
   }
 
   // clear user's token to avoid error
-  public void clearToken(int userId) {
-    tdao.clearToken((long) userId);
-  }
+  // public void clearToken(int userId) {
+  // tdao.clearToken((long) userId);
+  // }
 
   // 토큰 비교
   public boolean getToken(String token, int userId) {

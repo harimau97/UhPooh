@@ -29,26 +29,27 @@ const getUserInfo = async () => {
   console.log("Fetch user data!!!");
   console.log(userAuthenticated.value);
   console.log(localStorage.getItem("userId"));
-  if (userAuthenticated.value) {
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/uhpooh/api/user/${localStorage.getItem(
-          "userId"
-        )}`,
-        {
-          params: {
-            userId: localStorage.getItem("userId"),
-            requestUserId: localStorage.getItem("userId"),
-          },
-        }
-      );
-      localStorage.setItem("userName", response.data.userName);
-      localStorage.setItem("userId", response.data.userId);
-      localStorage.setItem("userAddress", response.data.userAddress);
-      localStorage.setItem("pImage", response.data.pImage);
-    } catch (error) {
-      console.log(error);
-    }
+  const userId = localStorage.getItem("userId");
+
+  if (!userId) {
+    console.error("No userId found in localStorage!");
+    return;
+  }
+
+  try {
+    const response = await axios.get(
+      `http://localhost:8080/uhpooh/api/user/${userId}`,
+      {
+        params: {
+          requestUserId: userId,
+        },
+      }
+    );
+    localStorage.setItem("userName", response.data.data.userName);
+    localStorage.setItem("userAddress", response.data.data.userAddress);
+    localStorage.setItem("pImage", response.data.data.pImage);
+  } catch (error) {
+    console.log(error);
   }
 };
 

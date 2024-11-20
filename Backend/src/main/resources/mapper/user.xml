@@ -80,12 +80,19 @@
     </update>
 
     <!-- 로그인 상태 변경 -->
-    <update id="updateLoginStatus" parameterType="User">
+    <update id="updateLoginStatus" >
         UPDATE users
         SET isLogin = #{isLogin},
         updTime = now()
         WHERE userId = #{userId}
     </update>
+    
+    <!-- 로그인 상태 조회 -->
+    <select id="checkLoginStatus">
+        SELECT isLogin
+        FROM users
+        WHERE userId=#{userId}
+    </select>
 
     <!-- 이메일로 회원 검색 -->
     <select id="searchByEmail" parameterType="map" resultType="User">

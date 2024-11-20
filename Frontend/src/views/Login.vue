@@ -65,12 +65,10 @@ const login = async () => {
       localStorage.setItem("userAddress", response.data.user.userAddress);
       localStorage.setItem("pImage", response.data.user.pImage);
       localStorage.setItem("userToken", response.data.userToken);
-      alert("환영합니다." + response.data.user.userName + "님");
+      alert("환영합니다. " + response.data.user.userName + "님");
       console.log(response.data);
       console.log(localStorage.getItem("userToken"));
-      router.push("/").then(() => {
-        location.reload();
-      });
+      location.replace("/");
     })
     .catch((err) => {
       alert(err);

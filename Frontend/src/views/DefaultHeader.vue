@@ -13,6 +13,7 @@
           :key="item.text"
           :to="item.path"
           class="text-gray-700 transition-colors hover:text-blue-600"
+          @click="clearTargetAddress(item.path)"
         >
           {{ item.text }}
         </RouterLink>
@@ -31,10 +32,16 @@
 import { RouterLink } from "vue-router";
 
 const navigationLinks = [
-  { text: "수영장 찾기", path: "/search" },
+  { text: "수영장 찾기", path: "/around" },
   { text: "이용 가이드", path: "/guide" },
   { text: "파트너 등록", path: "/partner" },
 ];
+
+const clearTargetAddress = (path) => {
+  if (path === "/around") {
+    localStorage.removeItem("targetAddress"), location.replace("/around");
+  }
+};
 </script>
 
 <style scoped>
