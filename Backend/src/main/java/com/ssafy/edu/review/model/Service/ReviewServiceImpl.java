@@ -70,4 +70,24 @@ public class ReviewServiceImpl implements ReviewService {
     public int getPlaceReviewCount(int placeId) {
         return reviewDao.getPlaceReviewCount(placeId);
     }
+    
+    @Override
+    public List<Review> searchByWriterInPlace(Map<String, Object> params) {
+        return reviewDao.searchByWriterInPlace(params);
+    }
+    
+    @Override
+    public int getWriterSearchCountInPlace(Map<String, Object> params) {
+        return reviewDao.getWriterSearchCountInPlace(params);
+    }
+    
+    @Override
+    public List<Review> searchByTitleInPlace(Map<String, Object> params) {
+        return reviewDao.searchByTitleInPlace(params);
+    }
+    
+    @Override
+    public int getTitleSearchCountInPlace(Map<String, Object> params) {
+        return reviewDao.getTitleSearchCountInPlace(params);
+    }
 }

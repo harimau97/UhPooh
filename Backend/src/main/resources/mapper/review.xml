@@ -131,4 +131,44 @@
         WHERE placeId = #{placeId}
     </select>
 
+    <!-- 장소별 작성자 검색 -->
+    <select id="searchByWriterInPlace" parameterType="map" resultType="Review">
+        SELECT
+        r.*,
+        u.userName as userName
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE r.placeId = #{placeId}
+        AND u.userName LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY r.regTime DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 장소별 작성자 검색 총 개수 -->
+    <select id="getWriterSearchCountInPlace" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM reviews r
+        JOIN users u ON r.userId = u.userId
+        WHERE r.placeId = #{placeId}
+        AND u.userName LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 장소별 제목 검색 -->
+    <select id="searchByTitleInPlace" parameterType="map" resultType="Review">
+        SELECT *
+        FROM reviews
+        WHERE placeId = #{placeId}
+        AND title LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY regTime DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 장소별 제목 검색 총 개수 -->
+    <select id="getTitleSearchCountInPlace" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM reviews
+        WHERE placeId = #{placeId}
+        AND title LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
 </mapper>

@@ -28,6 +28,7 @@
     <update id="userUpdate" parameterType="User">
         UPDATE users
         SET userName = #{userName},
+        userAddress = #{userAddress},
         pImage = #{pImage},
         updTime = now()
         WHERE userId = #{userId}

@@ -214,4 +214,60 @@ public class ReviewController {
             return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    
+    @Operation(summary = "장소별 작성자로 리뷰 검색, 페이징", description = "특정 장소의 리뷰를 작성자로 검색")
+    @GetMapping("/place/search/writer/{placeId}")
+    public ResponseEntity<Map<String, Object>> searchByWriterInPlace(
+            @PathVariable int placeId,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        logger.info("Searching reviews by writer in place - placeId: {}, keyword: {}, page: {}, size: {}",
+                placeId, keyword, page, size);
+        try {
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("placeId", placeId);
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<Review> reviews = reviewService.searchByWriterInPlace(searchParams);
+            int totalCount = reviewService.getWriterSearchCountInPlace(searchParams);
+            
+            Map<String, Object> pageData = createPageResponse(reviews, page, totalCount, size);
+            return createResponse(true, "장소별 작성자 검색 성공", pageData, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error in searchByWriterInPlace: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    
+    @Operation(summary = "장소별 제목으로 리뷰 검색, 페이징", description = "특정 장소의 리뷰를 제목으로 검색")
+    @GetMapping("/place/search/title/{placeId}")
+    public ResponseEntity<Map<String, Object>> searchByTitleInPlace(
+            @PathVariable int placeId,
+            @RequestParam String keyword,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        logger.info("Searching reviews by title in place - placeId: {}, keyword: {}, page: {}, size: {}",
+                placeId, keyword, page, size);
+        try {
+            Map<String, Object> searchParams = new HashMap<>();
+            searchParams.put("placeId", placeId);
+            searchParams.put("keyword", keyword);
+            searchParams.put("start", (page - 1) * size);
+            searchParams.put("size", size);
+            
+            List<Review> reviews = reviewService.searchByTitleInPlace(searchParams);
+            int totalCount = reviewService.getTitleSearchCountInPlace(searchParams);
+            
+            Map<String, Object> pageData = createPageResponse(reviews, page, totalCount, size);
+            return createResponse(true, "장소별 제목 검색 성공", pageData, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error("Error in searchByTitleInPlace: ", e);
+            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
