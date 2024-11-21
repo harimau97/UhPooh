@@ -14,5 +14,5 @@ public interface tokenDao {
 
   String getToken(@Param("accessToken") String accessToken, @Param("userId") Long userId);
 
-  void clearToken(@Param("userId") Long userId);
+  // void clearToken(@Param("userId") Long userId);
 }

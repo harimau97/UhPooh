@@ -113,7 +113,7 @@ public class UserController {
       if (loginUser != null) {
         loginUser.setIsLogin(1);
         userService.updateLoginStatus(loginUser);
-        customUserService.clearToken(loginUser.getUserId());
+        // customUserService.clearToken(loginUser.getUserId());
         customUserService.loginUser((long) loginUser.getUserId());
         String userToken = customUserService.tokenProvider(loginUser.getUserId());
         System.out.println(userToken.toString());
@@ -135,7 +135,8 @@ public class UserController {
     }
   }
 
-  @Operation(summary = "회원가입", description = "새로운 사용자 등록 (필수: userEmail, password, userName, userAddress)")
+  @Operation(summary = "회원가입",
+      description = "새로운 사용자 등록 (필수: userEmail, password, userName, userAddress)")
   @PostMapping("/signup")
   public ResponseEntity<Map<String, Object>> userSignup(@RequestBody User user) {
     logger.info("Signup attempt for user email: {}", user.getUserEmail());
@@ -213,7 +214,8 @@ public class UserController {
     }
   }
 
-  @Operation(summary = "비밀번호 수정", description = "비밀번호 변경 (관리자가 변경 불가능) (필수: currentPassword, newPassword, confirmPassword)")
+  @Operation(summary = "비밀번호 수정",
+      description = "비밀번호 변경 (관리자가 변경 불가능) (필수: currentPassword, newPassword, confirmPassword)")
   @PatchMapping("/password/{userId}")
   public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId,
       @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
@@ -275,11 +277,11 @@ public class UserController {
       User user = new User();
       user.setUserId(userId);
       user.setIsLogin(0);
+      userService.updateLoginStatus(user);
+      int result = userService.checkLoginStatus(user);
 
-      int result = userService.updateLoginStatus(user);
-
-      if (result > 0) {
-        customUserService.logoutUser((long) userId);
+      if (result == 0) {
+        customUserService.logoutUser(userId);
         return createResponse(true, "로그아웃 되었습니다.", HttpStatus.OK);
       } else {
         return createResponse(false, "로그아웃에 실패했습니다.", HttpStatus.BAD_REQUEST);
@@ -289,7 +291,16 @@ public class UserController {
       return createResponse(false, "로그아웃 처리 중 오류가 발생했습니다: " + e.getMessage(),
           HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+
   }
+
+  // 로그아웃 api 충돌 방지
+  // @GetMapping("/logout/{userId}")
+  // public ResponseEntity<?> handleInvalidMethod() {
+  // return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("로그아웃은 POST 메서드로만 지원됩니다.");
+  // }
 
   @Operation(summary = "회원 탈퇴", description = "회원 정보 삭제 (일반 회원은 자신만, 관리자는 모든 회원 삭제 가능)")
   @DeleteMapping("/{userId}")

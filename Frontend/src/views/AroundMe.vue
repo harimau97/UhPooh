@@ -122,89 +122,64 @@ function searchPlaces() {
 
 <template>
   <body
-    class="flex flex-col items-center p-0 m-0 h-full font-sans text-gray-800 bg-gray-50"
+    class="flex flex-col items-center p-0 m-0 min-h-screen font-sans text-gray-800 bg-gray-50"
   >
-    <div class="flex items-center mb-5 w-[90%]" id="search-container">
+    <!-- Search Container -->
+    <div class="flex items-center mb-5 w-[90%] mt-6" id="search-container">
       <input
-        class="p-3 mt-5 w-full text-base text-center rounded-full border border-gray-300 shadow-md outline-none"
+        class="p-4 w-full text-lg text-gray-600 text-center rounded-full border border-gray-200 shadow-lg bg-white outline-none transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
         type="text"
         id="search-input"
         placeholder="수영장 주변 지하철역을 검색해주세요."
         v-model="keyword"
         @change="searchPlaces"
       />
-
-      <!-- <button
-        class="px-5 py-2 ml-2 text-base text-white bg-blue-500 rounded-full border-none shadow-md transition-colors duration-300 cursor-pointer hover:bg-blue-600"
-        id="search-button"
-        onclick="searchPlaces()"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="25"
-          height="25"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          class="feather feather-search"
-        >
-          <circle cx="11" cy="11" r="8"></circle>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-        </svg>
-      </button> -->
     </div>
 
+    <!-- Map Container -->
     <div
-      class="w-[90%] h-[400px] rounded-lg shadow-lg mb-5"
+      class="w-[90%] h-[400px] rounded-lg shadow-lg bg-gray-100 border border-gray-200 overflow-hidden mb-6"
       id="map"
       ref="mapContainer"
     ></div>
 
-    <div id="results"></div>
+    <!-- Results Container -->
+    <div
+      id="results"
+      class="w-[90%] max-h-[400px] bg-white rounded-lg shadow-lg border border-gray-200 overflow-y-scroll overflow-x-hidden flex flex-col gap-3 p-4"
+    ></div>
   </body>
 </template>
 
 <style>
 #results {
-  width: 90%;
-  max-height: 400px;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  padding-top: 5px;
   scroll-behavior: smooth;
 }
+
 #result-item {
-  background-color: #e4e5ee;
-  border: solid black 0.5px;
-  border-radius: 15px;
-  margin-bottom: 3px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  background-color: #f9f9f9;
+  border: solid #e0e0e0 1px;
+  border-radius: 12px;
+  padding: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
   cursor: pointer;
 }
 
 #result-item:hover {
   transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
 }
 
 #result-item strong {
-  color: #262626;
+  color: #2d3748;
   font-size: 18px;
+  font-weight: 700;
   display: block;
-  font-weight: bold;
 }
 
 #result-item p {
-  color: #423d3d;
+  color: #718096;
   font-size: 14px;
   margin-top: 5px;
-  font-weight: bold;
 }
 </style>

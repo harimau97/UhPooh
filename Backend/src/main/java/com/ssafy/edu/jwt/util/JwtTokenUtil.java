@@ -12,7 +12,7 @@ public class JwtTokenUtil {
 
   private final String SECRET_KEY =
       "insert your key here";
-  private final long EXPIRATION_TIME = 1000 * 60 * 60; // 3 in milliseconds
+  private final long EXPIRATION_TIME = 1000 * 60 * 10; // 3 in milliseconds
 
   // Generate Token
   public String generateToken(Long userId) {

@@ -1,18 +1,30 @@
 <template>
-  <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+  <div
+    class="flex overflow-hidden relative justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-white"
+  >
     <!-- Animated Background Elements -->
-    <div class="absolute inset-0 overflow-hidden">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[length:20px_20px]"></div>
-      <div class="absolute top-0 -left-4 w-96 h-96 bg-sky-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-      <div class="absolute top-0 -right-4 w-96 h-96 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-      <div class="absolute bottom-0 left-20 w-96 h-96 bg-gray-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000"></div>
+    <div class="overflow-hidden absolute inset-0">
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[length:20px_20px]"
+      ></div>
+      <div
+        class="absolute top-0 -left-4 w-96 h-96 bg-sky-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob"
+      ></div>
+      <div
+        class="absolute top-0 -right-4 w-96 h-96 bg-blue-50 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+      ></div>
+      <div
+        class="absolute bottom-0 left-20 w-96 h-96 bg-gray-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+      ></div>
     </div>
 
     <!-- Login Container -->
-    <div class="relative w-full max-w-md mx-4 -mt-20">
+    <div class="relative mx-4 -mt-20 w-full max-w-md">
       <!-- Login Card -->
-      <div class="bg-white/80 backdrop-blur-lg rounded-md shadow-2xl border border-gray-100 animate-slide-up">
-        <div class="py-12 px-8">
+      <div
+        class="rounded-md border border-gray-100 shadow-2xl backdrop-blur-lg bg-white/80 animate-slide-up"
+      >
+        <div class="px-8 py-12">
           <form>
             <!-- Email Input -->
             <div class="space-y-3">
@@ -25,12 +37,12 @@
                 placeholder="이메일을 입력해주세요."
                 required="required"
                 v-model="userEmail"
-                class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                class="px-4 py-4 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
               />
             </div>
 
             <!-- Password Input -->
-            <div class="space-y-3 mt-8">
+            <div class="mt-8 space-y-3">
               <label for="lname" class="block text-sm font-bold text-gray-700">
                 비밀번호
               </label>
@@ -40,12 +52,12 @@
                 placeholder="비밀번호를 입력해주세요."
                 required="required"
                 v-model="password"
-                class="w-full px-4 py-4 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                class="px-4 py-4 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
               />
             </div>
 
             <!-- Action Buttons -->
-            <div class="space-y-4 mt-12">
+            <div class="mt-12 space-y-4">
               <button
                 type="button"
                 @click="login"
@@ -66,8 +78,12 @@
       </div>
 
       <!-- Additional Links -->
-      <div class="mt-6 text-center space-y-2 animate-fade-in-delay">
-        <a href="#" class="text-sm text-gray-600 hover:text-gray-800 transition-colors">비밀번호를 잊으셨나요?</a>
+      <div class="mt-6 space-y-2 text-center animate-fade-in-delay">
+        <a
+          href="#"
+          class="text-sm text-gray-600 transition-colors hover:text-gray-800"
+          >비밀번호를 잊으셨나요?</a
+        >
       </div>
     </div>
   </div>
@@ -169,4 +185,3 @@ const login = async () => {
   }
 }
 </style>
-

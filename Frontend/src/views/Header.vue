@@ -32,6 +32,7 @@
           :key="item.text"
           :to="item.path"
           class="text-white transition-colors hover:text-blue-300"
+          @click="clearTargetAddress"
         >
           {{ item.text }}
         </RouterLink>
@@ -57,16 +58,39 @@
 <script setup>
 import { onMounted } from "vue";
 import { inject } from "vue";
+import axios from "axios";
 
 const isLoggined = inject("isLoggedIn");
 
 console.log(isLoggined.value);
+console.log(localStorage.getItem("userId"));
 
 const logout = () => {
-  localStorage.clear(); // localStorage 초기화
+  const uId = localStorage.getItem("userId");
+  const tryLogout = async () => {
+    try {
+      console.log("로그아웃 시작");
+      const response = await axios({
+        method: "post", // 강제로 POST로 설정
+        url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {}, // POST 요청에 필요한 데이터
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  tryLogout();
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userName");
+  localStorage.removeItem("userAddress");
+  localStorage.removeItem("pImage");
   isLoggined.value = false; // 로그인 상태 변경
-  alert("로그아웃 완료");
-  location.reload();
+
+  location.replace("/"); // 메인 페이지로 이동;
 };
 
 const navigationLinks = [
@@ -75,6 +99,8 @@ const navigationLinks = [
   { text: "파트너 등록", path: "/partner" },
 ];
 </script>
+
+const clearTargetAddress = () => { localStorage.removeItem("targetAddress"); };
 
 <style scoped>
 .router-link-active {

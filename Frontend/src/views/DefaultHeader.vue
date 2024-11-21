@@ -13,15 +13,24 @@
           :key="item.text"
           :to="item.path"
           class="text-gray-700 transition-colors hover:text-blue-600"
+          @click="clearTargetAddress(item.path)"
         >
           {{ item.text }}
         </RouterLink>
         <RouterLink
+          v-show="!isLoggined"
           to="/login"
           class="text-gray-700 transition-colors hover:text-blue-600"
         >
           로그인
         </RouterLink>
+        <button
+          v-show="isLoggined"
+          @click="logout"
+          class="text-gray-700 transition-colors hover:text-blue-600"
+        >
+          로그아웃
+        </button>
       </div>
     </nav>
   </header>
@@ -29,12 +38,52 @@
 
 <script setup>
 import { RouterLink } from "vue-router";
+import { onMounted, inject } from "vue";
+import axios from "axios";
 
+const isLoggined = inject("isLoggedIn");
+
+console.log(isLoggined.value);
+console.log(localStorage.getItem("userId"));
+
+const logout = () => {
+  const uId = localStorage.getItem("userId");
+  const tryLogout = async () => {
+    try {
+      console.log("로그아웃 시작");
+      const response = await axios({
+        method: "post", // 강제로 POST로 설정
+        url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        data: {}, // POST 요청에 필요한 데이터
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  tryLogout();
+  localStorage.removeItem("userToken");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("userName");
+  localStorage.removeItem("userAddress");
+  localStorage.removeItem("pImage");
+  isLoggined.value = false; // 로그인 상태 변경
+
+  location.replace("/"); // 메인 페이지로 이동;
+};
 const navigationLinks = [
-  { text: "수영장 찾기", path: "/search" },
+  { text: "수영장 찾기", path: "/around" },
   { text: "이용 가이드", path: "/guide" },
   { text: "파트너 등록", path: "/partner" },
 ];
+
+const clearTargetAddress = (path) => {
+  if (path === "/around") {
+    localStorage.removeItem("targetAddress"), location.replace("/around");
+  }
+};
 </script>
 
 <style scoped>
