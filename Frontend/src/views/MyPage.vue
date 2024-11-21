@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import {
   User,
@@ -37,6 +37,7 @@ const fileInput = ref(null);
 // 사용자 데이터 로드
 onMounted(async () => {
   const userId = localStorage.getItem("userId");
+  const isAdmin = localStorage.getItem("isAdmin");
 
   if (!userId) {
     alert("로그인이 필요한 서비스입니다.");
@@ -44,12 +45,14 @@ onMounted(async () => {
     return;
   }
 
+  // localStorage에서 기본 정보 가져오기
   user.value = {
     ...user.value,
     name: localStorage.getItem("userName") || "사용자",
     email: localStorage.getItem("userEmail") || "이메일 미설정",
     location: localStorage.getItem("userAddress") || "주소 미설정",
     profileImage: localStorage.getItem("pImage") || "default-profile.png",
+    membershipLevel: isAdmin === "1" ? "Admin" : "Member",
   };
 
   try {
@@ -58,7 +61,6 @@ onMounted(async () => {
     );
     if (response.ok) {
       const userData = await response.json();
-
       user.value.stats = [
         { label: "예약", value: userData.reservationCount || "0" },
         { label: "리뷰", value: userData.reviewCount || "0" },
@@ -105,8 +107,9 @@ const handleFileUpload = async (event) => {
     if (response.ok) {
       const result = await response.json();
       // 프로필 이미지 경로 업데이트 및 localStorage 저장
-      user.value.profileImage = result.imageUrl || result.path || result;
-      localStorage.setItem("pImage", user.value.profileImage);
+      const imagePath = result.imageUrl || result.path || result;
+      user.value.profileImage = imagePath;
+      localStorage.setItem("pImage", imagePath);
       alert("프로필 이미지가 업데이트되었습니다.");
     } else {
       throw new Error("이미지 업로드에 실패했습니다.");
@@ -117,26 +120,41 @@ const handleFileUpload = async (event) => {
   }
 };
 
-const menuItems = [
-  {
-    icon: Clock,
-    label: "이용 내역",
-    path: "/history",
-    description: "수영장 예약 및 이용 기록",
-  },
-  {
-    icon: Star,
-    label: "즐겨찾기",
-    path: "/favorites",
-    description: "자주 가는 수영장 모음",
-  },
-  {
-    icon: Settings,
-    label: "설정",
-    path: "/settings",
-    description: "앱 설정 및 개인정보 관리",
-  },
-];
+const menuItems = computed(() => {
+  const items = [
+    {
+      icon: Clock,
+      label: "이용 내역",
+      path: "/history",
+      description: "수영장 예약 및 이용 기록",
+    },
+    {
+      icon: Star,
+      label: "즐겨찾기",
+      path: "/favorites",
+      description: "자주 가는 수영장 모음",
+    },
+    {
+      icon: Settings,
+      label: "설정",
+      path: "/settings",
+      description: "앱 설정 및 개인정보 관리",
+    },
+  ];
+
+  // isAdmin이 1인 경우에만 Admin 메뉴 추가
+  if (localStorage.getItem("isAdmin") === "1") {
+    items.push({
+      icon: User,
+      label: "Admin",
+      path: "/admin",
+      description: "전체 회원 목록 관리",
+      adminStyle: true, // 스타일 구분을 위한 플래그
+    });
+  }
+
+  return items;
+});
 
 const isLoggined = inject("isLoggedIn");
 const handleLogout = () => {
@@ -145,12 +163,12 @@ const handleLogout = () => {
     try {
       console.log("로그아웃 시작");
       const response = await axios({
-        method: "post", // 강제로 POST로 설정
+        method: "post",
         url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
         headers: {
           "Content-Type": "application/json",
         },
-        data: {}, // POST 요청에 필요한 데이터
+        data: {},
       });
     } catch (error) {
       console.error(error);
@@ -162,9 +180,9 @@ const handleLogout = () => {
   localStorage.removeItem("userName");
   localStorage.removeItem("userAddress");
   localStorage.removeItem("pImage");
-  isLoggined.value = false; // 로그인 상태 변경
+  isLoggined.value = false;
 
-  location.replace("/"); // 메인 페이지로 이동;
+  location.replace("/");
 };
 </script>
 
@@ -200,7 +218,12 @@ const handleLogout = () => {
           <div class="flex gap-2 items-center">
             <h1 class="text-2xl font-bold">{{ user.name }}</h1>
             <span
-              class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded-full"
+              :class="[
+                'px-3 py-1 text-sm rounded-full',
+                user.membershipLevel === 'Admin' 
+                  ? 'text-red-600 bg-red-100' 
+                  : 'text-blue-600 bg-blue-100'
+              ]"
             >
               {{ user.membershipLevel }}
             </span>
@@ -237,9 +260,18 @@ const handleLogout = () => {
       >
         <div class="flex gap-4 items-center">
           <div
-            class="flex justify-center items-center w-10 h-10 bg-blue-50 rounded-full"
+            :class="[
+              'flex justify-center items-center w-10 h-10 rounded-full',
+              item.adminStyle ? 'bg-red-50' : 'bg-blue-50'
+            ]"
           >
-            <component :is="item.icon" class="w-5 h-5 text-blue-600" />
+            <component 
+              :is="item.icon" 
+              :class="[
+                'w-5 h-5',
+                item.adminStyle ? 'text-red-600' : 'text-blue-600'
+              ]" 
+            />
           </div>
           <div>
             <div class="font-medium">{{ item.label }}</div>

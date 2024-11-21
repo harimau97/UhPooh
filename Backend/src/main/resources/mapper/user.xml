@@ -114,7 +114,7 @@
         SELECT *
         FROM users
         WHERE userName LIKE CONCAT('%', #{keyword}, '%')
-        ORDER BY userId DESC
+        ORDER BY regTime DESC
         LIMIT #{start}, #{size}
     </select>
 
@@ -129,7 +129,7 @@
         SELECT *
         FROM users
         WHERE isAdmin = #{isAdmin}
-        ORDER BY userId DESC
+        ORDER BY regTime DESC
         LIMIT #{start}, #{size}
     </select>
 
@@ -144,6 +144,24 @@
         SET pImage = #{pImage}
         WHERE userId = #{userId}
     </update>
+
+    <!-- 전체 검색 -->
+    <select id="searchEverything" parameterType="map" resultType="User">
+        SELECT *
+        FROM users
+        WHERE userName LIKE CONCAT('%', #{keyword}, '%')
+        OR userEmail LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY regTime DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 검색된 전체 데이터 수를 가져오는 쿼리 추가 -->
+    <select id="getTotalEverythingCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userName LIKE CONCAT('%', #{keyword}, '%')
+        OR userEmail LIKE CONCAT('%', #{keyword}, '%')
+    </select>
 
 
 

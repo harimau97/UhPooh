@@ -20,11 +20,10 @@ public class UserServiceImpl implements UserService {
     this.userDao = userDao;
       this.tokenDao = tokenDao;
   }
-
-
+  
+  
   @Override
   public List<User> userList() {
-
     return userDao.userList();
   }
 
@@ -137,5 +136,21 @@ public class UserServiceImpl implements UserService {
     
     user.setPImage(imageUrl);
     return userDao.updateProfileImage(userId, imageUrl);
+  }
+  
+  @Override
+  public int getTotalUserCount() {
+    return userDao.getTotalUserCount();
+  }
+  
+  // 전체 검색 메서드 구현
+  @Override
+  public List<User> searchEverything(Map<String, Object> params) {
+    return userDao.searchEverything(params);
+  }
+  
+  @Override
+  public int getTotalEverythingCount(Map<String, Object> params) {
+    return userDao.getTotalEverythingCount(params);
   }
 }
