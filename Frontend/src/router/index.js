@@ -32,6 +32,16 @@ const router = createRouter({
       name: "signup",
       component: () => import("../views/SignUp.vue"),
     },
+    {
+      path: "/placeBoard",
+      name: "placeBoard",
+      component: () => import("../views/placeBoard.vue"),
+    },
+    {
+      path: "/mypage",
+      name: "mypage",
+      component: () => import("../views/MyPage.vue"),
+    },
   ],
 });
 
