@@ -44,12 +44,21 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       component: () => import("../views/Admin.vue"),
-      meta: { requiresAuth: true, requiresAdmin: true }, // Admin 권한 필요
+      meta: { requiresAuth: true, requiresAdmin: true },
     },
   ],
+  // 스크롤 동작 추가
+  scrollBehavior(to, from, savedPosition) {
+    // savedPosition은 브라우저의 뒤로/앞으로 버튼을 사용할 때만 존재
+    if (savedPosition) {
+      return savedPosition;
+    }
+    // 기본적으로는 페이지 최상단으로 스크롤
+    return { top: 0 };
+  },
 });
 
-// 전역 라우터 가드 설정 업데이트
+// 전역 라우터 가드 설정
 router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     await isAuthenticated();
