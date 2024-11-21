@@ -114,34 +114,33 @@ function searchPlaces() {
               </div>
             `);
           });
-          itemEl
-            .addEventListener("click", () => handleClick(place.place_name));
+          itemEl.addEventListener("click", () => handleClick(place.place_name));
           bounds.extend(marker.getPosition());
         }
       });
       resultDiv.scrollTop = 0;
       map.setBounds(bounds);
-      
+
       // 검색 결과가 표시된 후 지도 중심점 조정
       setTimeout(() => {
         const mapCenter = map.getCenter();
         // 지도 컨테이너의 너비와 높이를 가져옵니다
         const containerWidth = mapContainer.value.clientWidth;
         const containerHeight = mapContainer.value.clientHeight;
-        
+
         // 검색결과 리스트의 너비를 고려하여 오프셋을 계산합니다
         // 화면이 작을 때는 offset을 조정합니다
         const offset = window.innerWidth <= 768 ? 0 : containerWidth * 0.2;
-        
+
         // 새로운 중심점을 계산합니다
         const newCenter = new kakao.maps.LatLng(
           mapCenter.getLat(),
           mapCenter.getLng()
         );
-        
+
         // 지도의 중심을 새로운 위치로 부드럽게 이동시킵니다
         map.panTo(newCenter);
-        
+
         // 지도 레벨을 조정하여 모든 마커가 잘 보이도록 합니다
         const currentLevel = map.getLevel();
         if (currentLevel < 3) {
@@ -172,7 +171,9 @@ function handleKeyPress(event) {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-white overflow-x-hidden">
+  <div
+    class="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-white overflow-x-hidden"
+  >
     <div class="flex flex-col flex-1 p-4 overflow-hidden">
       <!-- Search Container -->
       <div class="relative mx-auto mb-4 w-full max-w-3xl">
@@ -264,6 +265,8 @@ function handleKeyPress(event) {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   transition: all 0.5s ease;
+  flex-shrink: 1;
+  position: relative;
 }
 
 .map-container-searched {
@@ -380,7 +383,8 @@ function handleKeyPress(event) {
 
   .map-container-searched {
     width: 100%;
-    height: 50%;
+    height: 100%;
+    flex: 0 0 50%;
   }
 
   .results-container {
