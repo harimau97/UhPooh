@@ -1,52 +1,15 @@
 <template>
-  <div
-    class="flex overflow-hidden relative flex-col justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-white"
-  >
-    <!-- Title -->
-    <h1 class="mb-4 text-sm font-bold text-gray-700">회원가입</h1>
-
-    <!-- Signup Container -->
-    <div class="relative mx-4 w-full max-w-xl">
-      <div
-        class="rounded-md border border-gray-100 shadow-2xl backdrop-blur-lg bg-white/80"
-      >
+  <div class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+    <h1 class="text-sm font-bold text-gray-700 mb-2">회원가입</h1>
+    
+    <div class="relative w-full max-w-lg mx-4 -mt-40">
+      <div class="bg-white/80 backdrop-blur-lg rounded-md shadow-2xl border border-gray-100">
         <div class="p-8">
-          <form class="space-y-6">
-            <!-- Nickname Input -->
-            <div class="space-y-1">
-              <label
-                for="userName"
-                class="block text-sm font-bold text-gray-700"
-              >
-                닉네임
-              </label>
-              <input
-                type="text"
-                id="userName"
-                name="userName"
-                v-model="userName"
-                @input="checkForm()"
-                placeholder="닉네임을 입력해주세요"
-                required="required"
-                maxlength="20"
-                class="px-4 py-3 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
-                :class="userName && !validName ? 'border-red-300' : ''"
-              />
-              <p
-                v-if="userName && !validName"
-                class="mt-1 text-sm text-red-500"
-              >
-                닉네임은 2~20자의 한글, 영문, 숫자, 특수문자(_,-)만 사용
-                가능합니다.
-              </p>
-            </div>
+          <form class="space-y-6">           
 
             <!-- Email Input -->
             <div class="space-y-1">
-              <label
-                for="userEmail"
-                class="block text-sm font-bold text-gray-700"
-              >
+              <label for="userEmail" class="block text-sm font-bold text-gray-700">
                 이메일
               </label>
               <input
@@ -57,38 +20,23 @@
                 @input="checkEmailValidity"
                 placeholder="이메일을 입력해주세요"
                 required="required"
-                class="px-4 py-3 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
-                :class="
-                  userEmail &&
-                  (!validEmail || emailExists ? 'border-red-300' : '')
-                "
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="userEmail && ((!validEmail || emailExists) ? 'border-red-300' : '')"
               />
-              <p
-                v-if="userEmail && !validEmail"
-                class="mt-1 text-sm text-red-500"
-              >
+              <p v-if="userEmail && !validEmail" class="text-sm text-red-500 mt-1">
                 이메일 형식만 가능합니다.
               </p>
-              <p
-                v-if="userEmail && validEmail && emailExists"
-                class="mt-1 text-sm text-red-500"
-              >
+              <p v-if="userEmail && validEmail && emailExists" class="text-sm text-red-500 mt-1">
                 이미 사용중인 이메일입니다.
               </p>
-              <p
-                v-if="userEmail && validEmail && !emailExists && emailChecked"
-                class="mt-1 text-sm text-blue-500"
-              >
+              <p v-if="userEmail && validEmail && !emailExists && emailChecked" class="text-sm text-blue-500 mt-1">
                 사용 가능한 이메일입니다.
               </p>
             </div>
 
             <!-- Password Input -->
             <div class="space-y-1">
-              <label
-                for="password"
-                class="block text-sm font-bold text-gray-700"
-              >
+              <label for="password" class="block text-sm font-bold text-gray-700">
                 비밀번호
               </label>
               <input
@@ -100,24 +48,17 @@
                 placeholder="비밀번호를 입력해주세요"
                 required="required"
                 minlength="8"
-                class="px-4 py-3 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
                 :class="password && !validPassword ? 'border-red-300' : ''"
               />
-              <p
-                v-if="password && !validPassword"
-                class="mt-1 text-sm text-red-500"
-              >
-                비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야
-                합니다.
+              <p v-if="password && !validPassword" class="text-sm text-red-500 mt-1">
+                비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.
               </p>
             </div>
-
+            
             <!-- Confirm Password Input -->
             <div class="space-y-1">
-              <label
-                for="confirmPassword"
-                class="block text-sm font-bold text-gray-700"
-              >
+              <label for="confirmPassword" class="block text-sm font-bold text-gray-700">
                 비밀번호 확인
               </label>
               <input
@@ -128,27 +69,39 @@
                 @input="checkForm"
                 placeholder="비밀번호를 다시 입력해주세요"
                 required="required"
-                class="px-4 py-3 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
-                :class="
-                  confirmPassword && !validConfirmPassword
-                    ? 'border-red-300'
-                    : ''
-                "
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="confirmPassword && !validConfirmPassword ? 'border-red-300' : ''"
               />
-              <p
-                v-if="confirmPassword && !validConfirmPassword"
-                class="mt-1 text-sm text-red-500"
-              >
+              <p v-if="confirmPassword && !validConfirmPassword" class="text-sm text-red-500 mt-1">
                 비밀번호가 일치하지 않습니다.
+              </p>
+            </div>
+
+            <!-- Nickname Input -->
+            <div class="space-y-1">
+              <label for="userName" class="block text-sm font-bold text-gray-700">
+                닉네임
+              </label>
+              <input
+                type="text"
+                id="userName"
+                name="userName"
+                v-model="userName"
+                @input="checkForm()"
+                placeholder="닉네임을 입력해주세요"
+                required="required"
+                maxlength="20"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="userName && !validName ? 'border-red-300' : ''"
+              />
+              <p v-if="userName && !validName" class="text-sm text-red-500 mt-1">
+                닉네임은 2~20자의 한글, 영문, 숫자, 특수문자(_,-)만 사용 가능합니다.
               </p>
             </div>
 
             <!-- Address Input -->
             <div class="space-y-1">
-              <label
-                for="userAddress"
-                class="block text-sm font-bold text-gray-700"
-              >
+              <label for="userAddress" class="block text-sm font-bold text-gray-700">
                 기본 주소
               </label>
               <input
@@ -161,13 +114,10 @@
                 required="required"
                 minlength="10"
                 maxlength="100"
-                class="px-4 py-3 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
                 :class="userAddress && !validAddress ? 'border-red-300' : ''"
               />
-              <p
-                v-if="userAddress && !validAddress"
-                class="mt-1 text-sm text-red-500"
-              >
+              <p v-if="userAddress && !validAddress" class="text-sm text-red-500 mt-1">
                 주소는 10글자 이상 입력해주세요.
               </p>
             </div>
@@ -176,7 +126,7 @@
             <button
               type="submit"
               @click="signUp"
-              class="px-4 py-4 mt-8 w-full font-bold text-white bg-gradient-to-r from-sky-500 to-blue-500 rounded-sm transition-all duration-300 hover:from-sky-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-sky-300"
+              class="w-full py-4 px-4 rounded-sm font-bold text-white transition-all duration-300 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-sky-300 mt-8"
             >
               회원 가입
             </button>
@@ -227,11 +177,9 @@ const debounce = (fn, delay) => {
 // 이메일 중복 확인 (디바운스 적용)
 const checkEmailDuplicate = debounce(async (email) => {
   if (!email || !validEmail.value) return;
-
+  
   try {
-    await axios.get(
-      `http://localhost:8080/uhpooh/api/user/check/email/${email}`
-    );
+    await axios.get(`http://localhost:8080/uhpooh/api/user/check/email/${email}`);
     emailExists.value = false;
     emailChecked.value = true;
   } catch (error) {
@@ -250,13 +198,9 @@ const checkEmailValidity = () => {
 };
 
 // 입력값 변경 감지
-watch(
-  [userName, password, confirmPassword, userAddress],
-  () => {
-    checkForm();
-  },
-  { deep: true }
-);
+watch([userName, password, confirmPassword, userAddress], () => {
+  checkForm();
+}, { deep: true });
 
 // 비밀번호 확인 감지
 watch([password, confirmPassword], () => {
@@ -276,8 +220,7 @@ const checkForm = () => {
   const hasLetter = /[a-zA-Z]/.test(password.value);
   const hasNumber = /[0-9]/.test(password.value);
   const hasSpecialChar = /[!@#$%^&*]/.test(password.value);
-  validPassword.value =
-    password.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
+  validPassword.value = password.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
 
   // 비밀번호 확인 검사
   validConfirmPassword.value = password.value === confirmPassword.value;
@@ -289,37 +232,23 @@ const checkForm = () => {
 // 회원가입 처리
 const signUp = async (event) => {
   event.preventDefault();
-
+  
   // 모든 필드의 유효성 검사
-  if (
-    !userName.value ||
-    !userEmail.value ||
-    !password.value ||
-    !confirmPassword.value ||
-    !userAddress.value ||
-    !validName.value ||
-    !validEmail.value ||
-    !validPassword.value ||
-    !validConfirmPassword.value ||
-    !validAddress.value ||
-    emailExists.value
-  ) {
+  if (!userName.value || !userEmail.value || !password.value || !confirmPassword.value || !userAddress.value ||
+      !validName.value || !validEmail.value || !validPassword.value || !validConfirmPassword.value || !validAddress.value || emailExists.value) {
     alert("입력하신 정보를 다시 확인해주세요.");
     return;
   }
 
   // 회원가입 요청
   try {
-    const response = await axios.post(
-      "http://localhost:8080/uhpooh/api/user/signup",
-      {
-        userName: userName.value,
-        userEmail: userEmail.value,
-        password: password.value,
-        userAddress: userAddress.value,
-      }
-    );
-
+    const response = await axios.post("http://localhost:8080/uhpooh/api/user/signup", {
+      userName: userName.value,
+      userEmail: userEmail.value,
+      password: password.value,
+      userAddress: userAddress.value,
+    });
+    
     alert("회원 가입이 완료되었습니다.");
     router.push("/");
   } catch (error) {
