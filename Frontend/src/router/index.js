@@ -6,8 +6,6 @@ import {
   userAuthenticated,
 } from "../composables/userAuth";
 
-// 인증 확인 함수
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -20,7 +18,7 @@ const router = createRouter({
       path: "/around",
       name: "around",
       component: () => import("../views/AroundMe.vue"),
-      meta: { requiresAuth: false }, // 인증 필요
+      meta: { requiresAuth: false },
     },
     {
       path: "/login",
@@ -42,16 +40,28 @@ const router = createRouter({
       name: "mypage",
       component: () => import("../views/MyPage.vue"),
     },
+    {
+      path: "/admin",
+      name: "admin",
+      component: () => import("../views/Admin.vue"),
+      meta: { requiresAuth: true, requiresAdmin: true }, // Admin 권한 필요
+    },
   ],
 });
 
-// 전역 라우터 가드 설정
+// 전역 라우터 가드 설정 업데이트
 router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresAuth) {
     await isAuthenticated();
     if (!userAuthenticated.value) {
       alert("잘못된 접근입니다.");
       return next("/login");
+    }
+    
+    // Admin 페이지 접근 체크
+    if (to.meta.requiresAdmin && localStorage.getItem("isAdmin") !== "1") {
+      alert("관리자 권한이 필요합니다.");
+      return next("/");
     }
   } else {
     await getUserInfo();
