@@ -139,6 +139,12 @@
         WHERE isAdmin = #{isAdmin}
     </select>
 
+    <update id="updateProfileImage">
+        UPDATE users
+        SET pImage = #{pImage}
+        WHERE userId = #{userId}
+    </update>
+
 
 
 </mapper>

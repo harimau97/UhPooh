@@ -38,4 +38,6 @@ public interface ReviewDao {
     public int getWriterSearchCountInPlace(Map<String, Object> params);
     
     public List<Review> searchByWriterInPlace(Map<String, Object> params);
+    
+    public int updateReviewImage(int reviewId, String images);
 }

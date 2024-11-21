@@ -171,4 +171,10 @@
         AND title LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
+    <update id="updateReviewImage">
+        UPDATE reviews
+        SET images = #{images}
+        WHERE reviewId = #{reviewId}
+    </update>
+
 </mapper>
