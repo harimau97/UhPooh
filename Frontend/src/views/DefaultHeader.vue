@@ -3,7 +3,7 @@
     <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
       <RouterLink to="/" class="text-2xl font-bold text-blue-600">
-        <div class="text-2xl font-bold text-blue-600">어푸어푸</div>
+        <img src="../assets/logo_text.png" style="width: 130px; height: auto" />
       </RouterLink>
 
       <!-- Navigation Links -->

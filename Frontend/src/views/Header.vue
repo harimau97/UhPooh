@@ -22,7 +22,10 @@
     <nav class="container flex justify-between items-center px-4 py-6 mx-auto">
       <!-- Logo -->
       <RouterLink to="/" class="text-2xl font-bold text-white">
-        <div class="text-2xl font-bold text-white">어푸어푸</div>
+        <img
+          src="../assets/logo_text.png"
+          style="filter: invert(100%); width: 130px; height: auto"
+        />
       </RouterLink>
 
       <!-- Navigation Links -->

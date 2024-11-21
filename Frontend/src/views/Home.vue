@@ -119,13 +119,14 @@ onMounted(() => {
     <!-- Hero Section with Navigation -->
     <section class="relative h-screen">
       <!-- Video Background -->
-      <div class="overflow-hidden absolute inset-0 w-full h-full">
+      <div class="object-cover overflow-hidden absolute inset-0 w-full h-full">
         <video
           src="@/assets/swimming.mp4"
           autoplay
           loop
           muted
           playsinline
+          preload="auto"
           @loadeddata="handleVideoLoad"
           class="object-cover w-full h-full"
         ></video>
