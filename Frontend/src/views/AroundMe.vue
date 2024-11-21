@@ -10,10 +10,11 @@ const keyword = ref(userAddress.value);
 const mapContainer = ref(null);
 const isLoading = ref(false);
 const hasSearched = ref(false);
-
+const router = useRouter();
 let map;
 userAddress.value = localStorage.getItem("userAddress");
-var iwContent = '<div style="display:flex; justify-content:center; padding:10px; color:#333; white-space:normal; max-width:200px;"></div>';
+var iwContent =
+  '<div style="display:flex; justify-content:center; padding:10px; color:#333; white-space:normal; max-width:200px;"></div>';
 var infowindow = new kakao.maps.InfoWindow({
   content: iwContent,
   removable: true,
@@ -28,13 +29,19 @@ onMounted(() => {
   if (localStorage.getItem("targetAddress") !== null) {
     searchPlaces();
   }
+  if (localStorage.getItem("tempKeyword") !== null) {
+    console.log(localStorage.getItem("tempKeyword"));
+    keyword.value = localStorage.getItem("tempKeyword");
+    searchPlaces();
+    localStorage.removeItem("tempKeyword");
+  }
   localStorage.removeItem("targetAddress");
 });
 
 // 검색 함수는 동일하게 유지
 function searchPlaces() {
-  if (!keyword.value || keyword.value.trim() === '') {
-    alert('검색어를 입력해주세요.');
+  if (!keyword.value || keyword.value.trim() === "") {
+    alert("검색어를 입력해주세요.");
     return;
   }
 
@@ -45,7 +52,7 @@ function searchPlaces() {
   ps.keywordSearch(keyword.value + "+수영장", (data, status) => {
     isLoading.value = false;
     hasSearched.value = true;
-    
+
     if (status === kakao.maps.services.Status.OK) {
       const resultDiv = document.getElementById("results");
       resultDiv.innerHTML = "";
@@ -60,11 +67,11 @@ function searchPlaces() {
           const itemEl = document.createElement("div");
           itemEl.id = "result-item";
           itemEl.className = "result-card";
-          itemEl.onclick = () => window.open(place.place_url, "_blank");
+          itemEl.onclick = () => callBoard();
           itemEl.innerHTML = `
             <div class="flex items-start space-x-4">
               <div class="flex-shrink-0">
-                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                <div class="flex justify-center items-center w-12 h-12 bg-blue-100 rounded-full">
                   <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -75,6 +82,7 @@ function searchPlaces() {
                 <h3 class="text-lg font-semibold text-gray-900">${place.place_name}</h3>
                 <p class="mt-1 text-sm text-gray-500">${place.road_address_name}</p>
                 <p class="mt-1 text-sm text-gray-500">📞 ${place.phone}</p>
+                <p class="mt-1 text-sm text-gray-500"></p>
               </div>
             </div>
           `;
@@ -107,6 +115,10 @@ function searchPlaces() {
       });
       resultDiv.scrollTop = 0;
       map.setBounds(bounds);
+
+      localStorage.setItem("tempData", data);
+      console.log(localStorage.getItem("tempData"));
+      console.log(localStorage.getItem("tempKeyword"));
     } else {
       alert("검색 결과가 없습니다.");
       hasSearched.value = false;
@@ -114,23 +126,26 @@ function searchPlaces() {
   });
 }
 
+function callBoard() {
+  localStorage.setItem("tempKeyword", keyword.value);
+  router.push("/placeBoard");
+}
+
 // 엔터키 처리를 위한 함수
 function handleKeyPress(event) {
-  if (event.key === 'Enter') {
+  if (event.key === "Enter") {
     searchPlaces();
   }
 }
 </script>
 
 <template>
-  <div class="h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
-    <div class="p-4 flex-1 flex flex-col">
+  <div class="flex flex-col h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div class="flex flex-col flex-1 p-4">
       <!-- Search Container -->
-      <div class="relative max-w-3xl mx-auto w-full mb-4">
+      <div class="relative mx-auto mb-4 w-full max-w-3xl">
         <input
-          class="w-full h-12 px-6 text-lg text-gray-700 placeholder-gray-400 border-2 border-gray-200 rounded-full
-                 shadow-sm transition duration-200 ease-in-out
-                 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          class="px-6 w-full h-12 text-lg placeholder-gray-400 text-gray-700 rounded-full border-2 border-gray-200 shadow-sm transition duration-200 ease-in-out focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           type="text"
           id="search-input"
           placeholder="수영장 주변 지하철역을 검색해주세요"
@@ -138,40 +153,55 @@ function handleKeyPress(event) {
           @keypress="handleKeyPress"
           @input="keyword = $event.target.value"
         />
-        <button 
-          class="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-blue-500
-                 transition duration-200 ease-in-out"
+        <button
+          class="absolute right-4 top-1/2 p-2 text-gray-400 transition duration-200 ease-in-out transform -translate-y-1/2 hover:text-blue-500"
           @click="searchPlaces"
         >
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
         </button>
       </div>
 
       <!-- Loading Indicator -->
-      <div v-if="isLoading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      <div
+        v-if="isLoading"
+        class="absolute top-1/2 left-1/2 z-50 transform -translate-x-1/2 -translate-y-1/2"
+      >
+        <div
+          class="w-8 h-8 rounded-full border-b-2 border-blue-500 animate-spin"
+        ></div>
       </div>
 
       <!-- Content Container -->
-      <div :class="['flex-1 transition-all duration-500 ease-in-out', hasSearched ? 'content-container-searched' : 'content-container']">
+      <div
+        :class="[
+          'flex-1 transition-all duration-500 ease-in-out',
+          hasSearched ? 'content-container-searched' : 'content-container',
+        ]"
+      >
         <!-- Map Container -->
-        <div :class="['map-container transition-all duration-500 ease-in-out', hasSearched ? 'map-container-searched' : '']">
-          <div
-            class="w-full h-full"
-            id="map"
-            ref="mapContainer"
-          ></div>
+        <div
+          :class="[
+            'map-container transition-all duration-500 ease-in-out',
+            hasSearched ? 'map-container-searched' : '',
+          ]"
+        >
+          <div class="w-full h-full" id="map" ref="mapContainer"></div>
         </div>
 
         <!-- Results Container -->
-        <div 
-          v-if="hasSearched"
-          id="results"
-          class="results-container"
-        ></div>
+        <div v-show="hasSearched" id="results" class="results-container"></div>
       </div>
     </div>
   </div>
