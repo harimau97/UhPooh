@@ -13,6 +13,8 @@ public interface tokenDao {
   String provideToken(@Param("userId") Long userId);
 
   String getToken(@Param("accessToken") String accessToken, @Param("userId") Long userId);
-
-  // void clearToken(@Param("userId") Long userId);
+  
+  void userDelete(int userId);
+    
+    // void clearToken(@Param("userId") Long userId);
 }
