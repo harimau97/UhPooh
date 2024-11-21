@@ -76,7 +76,7 @@ const logout = () => {
 const navigationLinks = [
   { text: "수영장 찾기", path: "/around" },
   { text: "이용 가이드", path: "/guide" },
-  { text: "마이페이지", path: "/mypage" },
+  { text: "파트너 등록", path: "/partner" },
 ];
 
 const clearTargetAddress = (path) => {

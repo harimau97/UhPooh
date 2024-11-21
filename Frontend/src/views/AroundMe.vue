@@ -38,6 +38,12 @@ onMounted(() => {
   localStorage.removeItem("targetAddress");
 });
 
+const handleClick = async (currentPlace) => {
+  await localStorage.removeItem("currentPlace");
+  await localStorage.setItem("currentPlace", currentPlace);
+  callBoard(); // callBoard 함수 호출
+};
+
 // 검색 함수는 동일하게 유지
 function searchPlaces() {
   if (!keyword.value || keyword.value.trim() === "") {
@@ -67,7 +73,7 @@ function searchPlaces() {
           const itemEl = document.createElement("div");
           itemEl.id = "result-item";
           itemEl.className = "result-card";
-          itemEl.onclick = () => callBoard();
+
           itemEl.innerHTML = `
             <div class="flex items-start space-x-4">
               <div class="flex-shrink-0">
@@ -109,7 +115,9 @@ function searchPlaces() {
               </div>
             `);
           });
-
+          itemEl
+            // .querySelector("h3")
+            .addEventListener("click", () => handleClick(place.place_name));
           bounds.extend(marker.getPosition());
         }
       });
@@ -126,8 +134,8 @@ function searchPlaces() {
   });
 }
 
-function callBoard() {
-  localStorage.setItem("tempKeyword", keyword.value);
+async function callBoard() {
+  await localStorage.setItem("tempKeyword", keyword.value);
   router.push("/placeBoard");
 }
 

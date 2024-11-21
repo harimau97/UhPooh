@@ -47,10 +47,5 @@
     	FROM token
     	where accessToken = #{accessToken} AND userId=#{userId} AND isLogin = 1;
     </select>
-    
-    <delete id="userDelete">
-        DELETE FROM token
-        WHERE userId = #{userId}
-    </delete>
 
 </mapper>

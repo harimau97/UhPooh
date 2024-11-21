@@ -92,25 +92,14 @@ const socialLinks = [
   { name: "인스타그램", url: "#", icon: "instagram" },
 ];
 
-const navigationLinks = ["수영장 찾기", "이용 가이드", "마이페이지"];
-const serviceLinks = ["수영장 찾기", "이용 가이드", "마이페이지"];
+const navigationLinks = ["수영장 찾기", "이용 가이드", "파트너 등록"];
+const serviceLinks = ["수영장 찾기", "이용 가이드", "수영장 등록", "제휴 문의"];
 const supportLinks = [
   "자주 묻는 질문",
   "이용약관",
   "개인정보처리방침",
   "위치기반서비스 이용약관",
 ];
-
-const getServicePath = (link) => {
-  switch(link) {
-    case '수영장 찾기':
-      return '/around';
-    case '마이페이지':
-      return '/mypage';
-    default:
-      return '#';
-  }
-};
 
 const changeTargetAddress = async () => {
   await localStorage.setItem("targetAddress", searchInput.value);
@@ -126,7 +115,7 @@ onMounted(() => {
 </script>
 
 <template>
- <main class="min-h-screen">
+  <main class="min-h-screen">
     <!-- Hero Section with Navigation -->
     <section class="relative h-screen">
       <!-- Video Background -->
@@ -149,9 +138,7 @@ onMounted(() => {
       <!-- Hero Content -->
       <div class="container relative px-4 mx-auto h-full">
         <!-- Navigation -->
-          <div class="flex gap-6">
-            
-          </div>
+        <nav class="flex justify-between items-center py-6"></nav>
 
         <!-- Main Content -->
         <div class="mt-32 max-w-3xl">
@@ -223,6 +210,8 @@ onMounted(() => {
                 </div>
               </div>
             </div>
+
+            <!-- Search Suggestions (Optional) -->
           </div>
         </div>
       </div>
@@ -262,7 +251,9 @@ onMounted(() => {
     </section>
 
     <!-- Stats Section -->
-    <section class="overflow-hidden relative py-16 text-white bg-gradient-to-r from-blue-600 to-blue-700">
+    <section
+      class="overflow-hidden relative py-16 text-white bg-gradient-to-r from-blue-600 to-blue-700"
+    >
       <!-- Background Pattern -->
       <div class="absolute inset-0 opacity-10">
         <div
@@ -343,18 +334,19 @@ onMounted(() => {
     </section>
 
     <!-- CTA Section -->
-    <section class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600">
+    <section
+      class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600"
+    >
       <div class="container px-4 mx-auto text-center">
         <h2 class="mb-6 text-4xl font-bold">지금 바로 시작하세요</h2>
         <p class="mb-8 text-xl text-blue-100">
           더 이상 고민하지 마세요. 지금 바로 당신 근처의 수영장을 찾아보세요.
         </p>
-        <RouterLink
-          to="/around"
-          class="inline-block px-8 py-4 text-lg font-semibold text-blue-600 bg-white rounded-lg transition-colors hover:bg-blue-50"
+        <button
+          class="px-8 py-4 text-lg font-semibold text-blue-600 bg-white rounded-lg transition-colors hover:bg-blue-50"
         >
           수영장 찾기
-        </RouterLink>
+        </button>
       </div>
     </section>
 
@@ -378,26 +370,25 @@ onMounted(() => {
             </div>
           </div>
           <!-- Service Links -->
-<div>
-  <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
-  <ul class="space-y-2">
-    <li v-for="link in serviceLinks" :key="link">
-      <RouterLink 
-        :to="getServicePath(link)"
-        class="transition-colors hover:text-white"
-      >
-        {{ link }}
-      </RouterLink>
-    </li>
-  </ul>
-</div>
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
+            <ul class="space-y-2">
+              <li v-for="link in serviceLinks" :key="link">
+                <a href="#" class="transition-colors hover:text-white">{{
+                  link
+                }}</a>
+              </li>
+            </ul>
+          </div>
 
           <!-- Support Links -->
           <div>
             <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
             <ul class="space-y-2">
               <li v-for="link in supportLinks" :key="link">
-                <a href="#" class="transition-colors hover:text-white">{{ link }}</a>
+                <a href="#" class="transition-colors hover:text-white">{{
+                  link
+                }}</a>
               </li>
             </ul>
           </div>
@@ -424,7 +415,9 @@ onMounted(() => {
         </div>
 
         <div class="pt-8 mt-12 border-t border-gray-800">
-          <div class="flex flex-col gap-4 justify-between items-center md:flex-row">
+          <div
+            class="flex flex-col gap-4 justify-between items-center md:flex-row"
+          >
             <p>&copy; 2024 어푸어푸. All rights reserved.</p>
             <address class="not-italic text-center md:text-right">
               서울특별시 강남구 테헤란로 212 어푸어푸빌딩 501호<br />

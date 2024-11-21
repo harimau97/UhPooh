@@ -2,23 +2,18 @@ package com.ssafy.edu.user.model.service;
 
 import java.util.List;
 import java.util.Map;
-
-import com.ssafy.edu.jwt.dao.tokenDao;
 import org.springframework.stereotype.Service;
 import com.ssafy.edu.user.model.dao.UserDao;
 import com.ssafy.edu.user.model.dto.User;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
   private final UserDao userDao;
-  private final tokenDao tokenDao;
 
-  public UserServiceImpl(UserDao userDao, com.ssafy.edu.jwt.dao.tokenDao tokenDao) {
+  public UserServiceImpl(UserDao userDao) {
 
     this.userDao = userDao;
-      this.tokenDao = tokenDao;
   }
 
 
@@ -45,17 +40,12 @@ public class UserServiceImpl implements UserService {
 
     return userDao.userUpdate(user);
   }
-  
+
   @Override
-  @Transactional  // 트랜잭션 추가
   public int userDelete(int userId) {
-    // 먼저 토큰 삭제
-    tokenDao.userDelete(userId);
-    
-    // 그 다음 유저 삭제
+
     return userDao.userDelete(userId);
   }
-  
 
   @Override
   public User userDetail(int userId) {

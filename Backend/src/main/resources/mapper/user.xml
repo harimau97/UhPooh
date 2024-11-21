@@ -13,7 +13,7 @@
 
     <!-- 로그인 -->
     <select id="userLogin" parameterType="User" resultType="User">
-        SELECT *
+        SELECT userId, userEmail, userName, isAdmin, isLogin
         FROM users
         WHERE userEmail = #{userEmail} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
     </select>
@@ -42,7 +42,7 @@
 
     <!-- 회원 상세 정보 -->
     <select id="userDetail" parameterType="int" resultType="User">
-        SELECT *
+        SELECT userEmail, userName, isAdmin
         FROM users
         WHERE userId = #{userId}
     </select>
