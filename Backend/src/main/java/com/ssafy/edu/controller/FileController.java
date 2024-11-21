@@ -1,6 +1,9 @@
 package com.ssafy.edu.controller;
 
+import com.ssafy.edu.review.model.Service.ReviewService;
+import com.ssafy.edu.user.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,12 @@ public class FileController {
     private final String profileDir = baseDir + "/profiles/";
     private final String reviewDir = baseDir + "/reviews/";
     
+    @Autowired
+    private UserService userService;  // User 정보 업데이트를 위한 서비스
+    
+    @Autowired
+    private ReviewService reviewService;  // Review 정보 업데이트를 위한 서비스
+    
     public FileController() {
         createDirectories();
     }
@@ -46,7 +55,30 @@ public class FileController {
             @RequestPart("file") MultipartFile file,
             @PathVariable int userId) {
         log.debug("프로필 이미지 업로드 요청. userId: {}", userId);
-        return uploadFile(file, profileDir, "profile");
+        
+        ResponseEntity<Map<String, Object>> uploadResponse = uploadFile(file, profileDir, "profile");
+        
+        if (uploadResponse.getStatusCode() == HttpStatus.OK) {
+            try {
+                Map<String, Object> responseBody = uploadResponse.getBody();
+                Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+                String savedFilename = (String) data.get("filename");
+                
+                // DB에 이미지 경로 업데이트
+                int result = userService.updateProfileImage(userId, "/images/profiles/" + savedFilename);
+                
+                if (result > 0) {
+                    return uploadResponse;
+                } else {
+                    return createResponse(false, "DB 업데이트 실패", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            } catch (Exception e) {
+                log.error("DB 업데이트 실패", e);
+                return createResponse(false, "DB 업데이트 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
+        
+        return uploadResponse;
     }
     
     @Operation(summary = "리뷰 이미지 업로드", description = "리뷰에 첨부될 이미지 업로드 (필수: reviewId, file)")
@@ -58,28 +90,29 @@ public class FileController {
                 file.getOriginalFilename(),
                 file.getContentType());
         
-        try {
-            if (file.isEmpty()) {
-                return createResponse(false, "파일이 비어있습니다", HttpStatus.BAD_REQUEST);
+        ResponseEntity<Map<String, Object>> uploadResponse = uploadFile(file, reviewDir, "review");
+        
+        if (uploadResponse.getStatusCode() == HttpStatus.OK) {
+            try {
+                // 업로드된 파일의 정보를 가져옴
+                Map<String, Object> responseBody = uploadResponse.getBody();
+                Map<String, Object> data = (Map<String, Object>) responseBody.get("data");
+                String savedFilename = (String) data.get("filename");
+                
+                // 이미지 URL 생성 (예: /images/reviews/{filename})
+                String imageUrl = "/images/reviews/" + savedFilename;
+                
+                // DB에 이미지 URL 업데이트
+                reviewService.updateReviewImage(reviewId, imageUrl);
+                
+                return uploadResponse;
+            } catch (Exception e) {
+                log.error("DB 업데이트 실패", e);
+                return createResponse(false, "DB 업데이트 실패: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
             }
-            
-            String originalFilename = file.getOriginalFilename();
-            String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String savedFilename = UUID.randomUUID().toString() + extension;
-            
-            Path targetPath = Paths.get(reviewDir).resolve(savedFilename);
-            Files.copy(file.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            
-            log.info("파일 업로드 성공: {}", savedFilename);
-            
-            Map<String, Object> data = new HashMap<>();
-            data.put("filename", savedFilename);
-            return createResponse(true, "리뷰 이미지 업로드 성공", data, HttpStatus.OK);
-            
-        } catch (Exception e) {
-            log.error("파일 업로드 실패", e);
-            return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        
+        return uploadResponse;
     }
     
     private ResponseEntity<Map<String, Object>> uploadFile(MultipartFile file, String directory, String type) {

@@ -3,6 +3,7 @@ package com.ssafy.edu.review.model.Service;
 import com.ssafy.edu.review.model.dao.ReviewDao;
 import com.ssafy.edu.review.model.dto.Review;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -89,5 +90,17 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public int getTitleSearchCountInPlace(Map<String, Object> params) {
         return reviewDao.getTitleSearchCountInPlace(params);
+    }
+    
+    @Override
+    @Transactional
+    public int updateReviewImage(int reviewId, String images) {
+        Review review = reviewDao.reviewDetail(reviewId);
+        if (review == null) {
+            throw new RuntimeException("Review not found with id: " + reviewId);
+        }
+        
+        review.setImages(images);
+        return reviewDao.updateReviewImage(reviewId, images);
     }
 }

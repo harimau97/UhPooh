@@ -23,4 +23,5 @@ public class User {
   private String regTime;
   private String updTime;
   private int isLogin;
+  
 }

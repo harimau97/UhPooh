@@ -126,4 +126,16 @@ public class UserServiceImpl implements UserService {
   public int checkLoginStatus(User user) {
     return userDao.checkLoginStatus(user);
   }
+  
+  @Override
+  @Transactional
+  public int updateProfileImage(int userId, String imageUrl) {
+    User user = userDao.userDetail(userId);
+    if (user == null) {
+      throw new RuntimeException("User not found with id: " + userId);
+    }
+    
+    user.setPImage(imageUrl);
+    return userDao.updateProfileImage(userId, imageUrl);
+  }
 }

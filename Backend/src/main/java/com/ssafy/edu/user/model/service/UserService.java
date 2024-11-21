@@ -41,5 +41,7 @@ public interface UserService {
   List<User> searchByAdminStatus(Map<String, Object> params);
 
   int getAdminSearchCount(Map<String, Object> params);
+  
+  int updateProfileImage(int userId, String pImage);
 
 }

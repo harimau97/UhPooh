@@ -43,4 +43,6 @@ public interface UserDao {
   public List<User> searchByAdminStatus(Map<String, Object> params);
 
   public int getAdminSearchCount(Map<String, Object> params);
+  
+  public int updateProfileImage(int userId, String pImage);
 }

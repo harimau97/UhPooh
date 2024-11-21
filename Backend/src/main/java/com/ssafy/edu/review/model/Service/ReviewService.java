@@ -36,4 +36,6 @@ public interface ReviewService {
     List<Review> searchByTitleInPlace(Map<String, Object> params);
     
     int getTitleSearchCountInPlace(Map<String, Object> params);
+    
+    int updateReviewImage(int reviewId, String imageUrl);
 }
