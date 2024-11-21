@@ -122,14 +122,13 @@ function handleKeyPress(event) {
 }
 </script>
 
-
 <template>
-  <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-    <div class="p-4 md:p-8">
+  <div class="h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+    <div class="p-4 flex-1 flex flex-col">
       <!-- Search Container -->
-      <div class="relative max-w-3xl mx-auto mb-6">
+      <div class="relative max-w-3xl mx-auto w-full mb-4">
         <input
-          class="w-full h-14 px-6 text-lg text-gray-700 placeholder-gray-400 border-2 border-gray-200 rounded-full
+          class="w-full h-12 px-6 text-lg text-gray-700 placeholder-gray-400 border-2 border-gray-200 rounded-full
                  shadow-sm transition duration-200 ease-in-out
                  focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
           type="text"
@@ -152,12 +151,12 @@ function handleKeyPress(event) {
       </div>
 
       <!-- Loading Indicator -->
-      <div v-if="isLoading" class="flex justify-center py-4">
+      <div v-if="isLoading" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
 
       <!-- Content Container -->
-      <div :class="['transition-all duration-500 ease-in-out', hasSearched ? 'content-container-searched' : 'content-container']">
+      <div :class="['flex-1 transition-all duration-500 ease-in-out', hasSearched ? 'content-container-searched' : 'content-container']">
         <!-- Map Container -->
         <div :class="['map-container transition-all duration-500 ease-in-out', hasSearched ? 'map-container-searched' : '']">
           <div
@@ -181,13 +180,13 @@ function handleKeyPress(event) {
 <style>
 .content-container {
   width: 100%;
-  height: calc(100vh - 160px);
+  height: 100%;
   position: relative;
 }
 
 .content-container-searched {
   width: 100%;
-  height: calc(100vh - 160px);
+  height: 100%;
   display: flex;
   gap: 1rem;
   position: relative;
@@ -311,18 +310,17 @@ function handleKeyPress(event) {
 @media (max-width: 768px) {
   .content-container-searched {
     flex-direction: column;
-    height: auto;
-    gap: 1rem;
+    height: calc(100vh - 80px);
   }
 
   .map-container-searched {
     width: 100%;
-    height: 400px;
+    height: 50%;
   }
 
   .results-container {
     width: 100%;
-    height: 400px;
+    height: 50%;
   }
 }
 </style>
