@@ -1,0 +1,30 @@
+# Maven
+target/
+*.war
+*.jar
+*.ear
+.settings/
+.project
+.classpath
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+logs/
+
+# Build
+build/
+out/
+
+# Properties
+application-*.properties
+!application-example.properties

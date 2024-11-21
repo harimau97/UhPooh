@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.edu.user.model.dao.UserDao">
+
+
+    <!-- 전체 회원 목록 조회 -->
+    <select id="userList" resultType="User">
+        SELECT *
+        FROM users
+    </select>
+
+    <!-- 로그인 -->
+    <select id="userLogin" parameterType="User" resultType="User">
+        SELECT userId, userEmail, userName, isAdmin, isLogin
+        FROM users
+        WHERE userEmail = #{userEmail} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+    </select>
+
+    <!-- 회원가입 -->
+    <insert id="userSignup" parameterType="User">
+        INSERT INTO users (userEmail, password, userName, userAddress)
+        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName}, #{userAddress})
+    </insert>
+
+    <!-- 회원정보 수정 -->
+    <update id="userUpdate" parameterType="User">
+        UPDATE users
+        SET userName = #{userName},
+        userAddress = #{userAddress},
+        pImage = #{pImage},
+        updTime = now()
+        WHERE userId = #{userId}
+    </update>
+
+    <!-- 회원 삭제 -->
+    <delete id="userDelete" parameterType="int">
+        DELETE FROM users
+        WHERE userId = #{userId}
+    </delete>
+
+    <!-- 회원 상세 정보 -->
+    <select id="userDetail" parameterType="int" resultType="User">
+        SELECT userEmail, userName, isAdmin
+        FROM users
+        WHERE userId = #{userId}
+    </select>
+
+    <!-- 이메일 중복 체크 -->
+    <select id="userIdCheck" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userEmail = #{userEmail}
+    </select>
+
+    <!-- 닉네임 중복 체크 -->
+    <select id="userNameCheck" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userName = #{userName}
+    </select>
+
+    <!-- 현재 비밀번호 확인 -->
+    <select id="checkPassword" parameterType="User" resultType="boolean">
+        SELECT EXISTS (
+        SELECT 1
+        FROM users
+        WHERE userId = #{userId}
+        AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+        )
+    </select>
+
+    <!-- 비밀번호 수정 -->
+    <update id="updatePassword" parameterType="User">
+        UPDATE users
+        SET password = AES_ENCRYPT(#{password}, 'REDACTED'),
+        updTime = now()
+        WHERE userId = #{userId}
+    </update>
+
+    <!-- 로그인 상태 변경 -->
+    <update id="updateLoginStatus" >
+        UPDATE users
+        SET isLogin = #{isLogin},
+        updTime = now()
+        WHERE userId = #{userId}
+    </update>
+    
+    <!-- 로그인 상태 조회 -->
+    <select id="checkLoginStatus">
+        SELECT isLogin
+        FROM users
+        WHERE userId=#{userId}
+    </select>
+
+    <!-- 이메일로 회원 검색 -->
+    <select id="searchByEmail" parameterType="map" resultType="User">
+        SELECT *
+        FROM users
+        WHERE userEmail LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY userId DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <select id="getEmailSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userEmail LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 닉네임으로 회원 검색 -->
+    <select id="searchByName" parameterType="map" resultType="User">
+        SELECT *
+        FROM users
+        WHERE userName LIKE CONCAT('%', #{keyword}, '%')
+        ORDER BY userId DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <select id="getNameSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userName LIKE CONCAT('%', #{keyword}, '%')
+    </select>
+
+    <!-- 관리자 여부로 회원 검색 -->
+    <select id="searchByAdminStatus" parameterType="map" resultType="User">
+        SELECT *
+        FROM users
+        WHERE isAdmin = #{isAdmin}
+        ORDER BY userId DESC
+        LIMIT #{start}, #{size}
+    </select>
+
+    <select id="getAdminSearchCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE isAdmin = #{isAdmin}
+    </select>
+
+
+
+</mapper>

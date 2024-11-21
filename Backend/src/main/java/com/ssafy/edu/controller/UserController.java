@@ -291,13 +291,16 @@ public class UserController {
       return createResponse(false, "로그아웃 처리 중 오류가 발생했습니다: " + e.getMessage(),
           HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+
+
   }
 
   // 로그아웃 api 충돌 방지
-  @GetMapping("/logout/{userId}")
-  public ResponseEntity<?> handleInvalidMethod() {
-    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("로그아웃은 POST 메서드로만 지원됩니다.");
-  }
+  // @GetMapping("/logout/{userId}")
+  // public ResponseEntity<?> handleInvalidMethod() {
+  // return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body("로그아웃은 POST 메서드로만 지원됩니다.");
+  // }
 
   @Operation(summary = "회원 탈퇴", description = "회원 정보 삭제 (일반 회원은 자신만, 관리자는 모든 회원 삭제 가능)")
   @DeleteMapping("/{userId}")
