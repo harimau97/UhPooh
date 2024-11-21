@@ -48,6 +48,8 @@ const getUserInfo = async () => {
     localStorage.setItem("userName", response.data.data.userName);
     localStorage.setItem("userAddress", response.data.data.userAddress);
     localStorage.setItem("pImage", response.data.data.pImage);
+    localStorage.setItem("isAdmin", response.data.data.isAdmin);
+    localStorage.setItem("userEmail", response.data.data.userEmail);
   } catch (error) {
     console.log(error);
   }

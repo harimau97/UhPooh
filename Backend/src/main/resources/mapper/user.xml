@@ -42,7 +42,7 @@
 
     <!-- 회원 상세 정보 -->
     <select id="userDetail" parameterType="int" resultType="User">
-        SELECT userEmail, userName, isAdmin
+        SELECT *
         FROM users
         WHERE userId = #{userId}
     </select>

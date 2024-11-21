@@ -3,6 +3,7 @@ package com.ssafy.edu.user.model.service;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.ssafy.edu.user.model.dao.UserDao;
 import com.ssafy.edu.user.model.dto.User;
 
@@ -15,8 +16,8 @@ public class UserServiceImpl implements UserService {
 
     this.userDao = userDao;
   }
-  
-  
+
+
   @Override
   public List<User> userList() {
     return userDao.userList();
@@ -115,7 +116,7 @@ public class UserServiceImpl implements UserService {
   public int checkLoginStatus(User user) {
     return userDao.checkLoginStatus(user);
   }
-  
+
   @Override
   @Transactional
   public int updateProfileImage(int userId, String imageUrl) {
@@ -123,22 +124,22 @@ public class UserServiceImpl implements UserService {
     if (user == null) {
       throw new RuntimeException("User not found with id: " + userId);
     }
-    
+
     user.setPImage(imageUrl);
     return userDao.updateProfileImage(userId, imageUrl);
   }
-  
+
   @Override
   public int getTotalUserCount() {
     return userDao.getTotalUserCount();
   }
-  
+
   // 전체 검색 메서드 구현
   @Override
   public List<User> searchEverything(Map<String, Object> params) {
     return userDao.searchEverything(params);
   }
-  
+
   @Override
   public int getTotalEverythingCount(Map<String, Object> params) {
     return userDao.getTotalEverythingCount(params);

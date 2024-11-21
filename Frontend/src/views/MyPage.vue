@@ -16,7 +16,7 @@ import {
 } from "lucide-vue-next";
 import axios from "axios";
 import { inject } from "vue";
-
+const imgPath = ref("");
 const router = useRouter();
 const user = ref({
   name: "",
@@ -36,6 +36,10 @@ const fileInput = ref(null);
 
 // 사용자 데이터 로드
 onMounted(async () => {
+  console.log(localStorage.getItem("pImage"));
+  if (localStorage.getItem("pImage") === "undefined") {
+    imgPath.value = "http://localhost:5173/src/assets/default-profile.png";
+  }
   const userId = localStorage.getItem("userId");
   const isAdmin = localStorage.getItem("isAdmin");
 
@@ -193,7 +197,7 @@ const handleLogout = () => {
       <div class="flex gap-6 items-center">
         <div class="relative">
           <img
-            :src="user.profileImage"
+            :src="imgPath"
             alt="Profile"
             class="object-cover w-24 h-24 rounded-full border-4 border-blue-100"
           />
@@ -220,9 +224,9 @@ const handleLogout = () => {
             <span
               :class="[
                 'px-3 py-1 text-sm rounded-full',
-                user.membershipLevel === 'Admin' 
-                  ? 'text-red-600 bg-red-100' 
-                  : 'text-blue-600 bg-blue-100'
+                user.membershipLevel === 'Admin'
+                  ? 'text-red-600 bg-red-100'
+                  : 'text-blue-600 bg-blue-100',
               ]"
             >
               {{ user.membershipLevel }}
@@ -262,15 +266,15 @@ const handleLogout = () => {
           <div
             :class="[
               'flex justify-center items-center w-10 h-10 rounded-full',
-              item.adminStyle ? 'bg-red-50' : 'bg-blue-50'
+              item.adminStyle ? 'bg-red-50' : 'bg-blue-50',
             ]"
           >
-            <component 
-              :is="item.icon" 
+            <component
+              :is="item.icon"
               :class="[
                 'w-5 h-5',
-                item.adminStyle ? 'text-red-600' : 'text-blue-600'
-              ]" 
+                item.adminStyle ? 'text-red-600' : 'text-blue-600',
+              ]"
             />
           </div>
           <div>
@@ -294,7 +298,7 @@ const handleLogout = () => {
           <LogOut class="w-5 h-5 text-red-600" />
         </div>
         <div>
-          <div class="font-medium">로그아웃</div>
+          <div class="font-medium justify-start flex">로그아웃</div>
           <div class="text-sm text-gray-600">안전하게 로그아웃합니다</div>
         </div>
       </div>

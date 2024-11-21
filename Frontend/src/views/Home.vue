@@ -134,6 +134,7 @@ onMounted(() => {
           preload="auto"
           @loadeddata="handleVideoLoad"
           class="object-cover w-full h-full"
+          disable-picture-in-picture="true"
         ></video>
         <div
           class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/60 backdrop-blur-[2px]"
@@ -339,100 +340,104 @@ onMounted(() => {
     </section>
 
     <!-- CTA Section -->
-  <section class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600">
-    <div class="container px-4 mx-auto text-center">
-      <h2 class="mb-6 text-4xl font-bold">지금 바로 시작하세요</h2>
-      <p class="mb-8 text-xl text-blue-100">
-        더 이상 고민하지 마세요. 지금 바로 당신 근처의 수영장을 찾아보세요.
-      </p>
-      <RouterLink
-        to="/around"
-        class="px-8 py-4 text-lg font-semibold text-blue-600 bg-white rounded-lg transition-colors hover:bg-blue-50"
-      >
-        수영장 찾기
-      </RouterLink>
-    </div>
-  </section>
+    <section
+      class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600"
+    >
+      <div class="container px-4 mx-auto text-center">
+        <h2 class="mb-6 text-4xl font-bold">지금 바로 시작하세요</h2>
+        <p class="mb-8 text-xl text-blue-100">
+          더 이상 고민하지 마세요. 지금 바로 당신 근처의 수영장을 찾아보세요.
+        </p>
+        <RouterLink
+          to="/around"
+          class="px-8 py-4 text-lg font-semibold text-blue-600 bg-white rounded-lg transition-colors hover:bg-blue-50"
+        >
+          수영장 찾기
+        </RouterLink>
+      </div>
+    </section>
 
-  <!-- Footer -->
-  <footer class="text-gray-400 bg-gray-900">
-    <div class="container px-4 py-12 mx-auto">
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
-        <!-- Company Info -->
-        <div>
-          <div class="mb-4 text-2xl font-bold text-white">어푸어푸</div>
-          <p class="mb-4">더 쉽고 스마트한<br />수영장 찾기 서비스</p>
-          <div class="flex gap-4">
-            <a
-              v-for="link in socialLinks"
-              :key="link.name"
-              :href="link.url"
-              class="text-gray-400 transition-colors hover:text-white"
-            >
-              <component :is="link.icon" class="w-6 h-6" />
-            </a>
-          </div>
-        </div>
-        <!-- Service Links -->
-        <div>
-          <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
-          <ul class="space-y-2">
-            <li v-for="link in serviceLinks" :key="link.name">
-              <RouterLink
-                :to="link.path"
-                class="transition-colors hover:text-white"
+    <!-- Footer -->
+    <footer class="text-gray-400 bg-gray-900">
+      <div class="container px-4 py-12 mx-auto">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+          <!-- Company Info -->
+          <div>
+            <div class="mb-4 text-2xl font-bold text-white">어푸어푸</div>
+            <p class="mb-4">더 쉽고 스마트한<br />수영장 찾기 서비스</p>
+            <div class="flex gap-4">
+              <a
+                v-for="link in socialLinks"
+                :key="link.name"
+                :href="link.url"
+                class="text-gray-400 transition-colors hover:text-white"
               >
-                {{ link.name }}
-              </RouterLink>
-            </li>
-          </ul>
+                <component :is="link.icon" class="w-6 h-6" />
+              </a>
+            </div>
+          </div>
+          <!-- Service Links -->
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
+            <ul class="space-y-2">
+              <li v-for="link in serviceLinks" :key="link.name">
+                <RouterLink
+                  :to="link.path"
+                  class="transition-colors hover:text-white"
+                >
+                  {{ link.name }}
+                </RouterLink>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Rest of the footer remains the same -->
+          <!-- Support Links -->
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
+            <ul class="space-y-2">
+              <li v-for="link in supportLinks" :key="link">
+                <a href="#" class="transition-colors hover:text-white">{{
+                  link
+                }}</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Customer Service -->
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-white">고객센터</h3>
+            <div class="space-y-4">
+              <div class="flex gap-2 items-center">
+                <Phone class="w-5 h-5" />
+                <span class="text-white">1234-5678</span>
+              </div>
+              <div>
+                <p>평일 09:00 - 18:00</p>
+                <p>주말 및 공휴일 휴무</p>
+              </div>
+              <button
+                class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700"
+              >
+                문의하기
+              </button>
+            </div>
+          </div>
         </div>
 
-        <!-- Rest of the footer remains the same -->
-        <!-- Support Links -->
-        <div>
-          <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
-          <ul class="space-y-2">
-            <li v-for="link in supportLinks" :key="link">
-              <a href="#" class="transition-colors hover:text-white">{{
-                link
-              }}</a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Customer Service -->
-        <div>
-          <h3 class="mb-4 text-lg font-semibold text-white">고객센터</h3>
-          <div class="space-y-4">
-            <div class="flex gap-2 items-center">
-              <Phone class="w-5 h-5" />
-              <span class="text-white">1234-5678</span>
-            </div>
-            <div>
-              <p>평일 09:00 - 18:00</p>
-              <p>주말 및 공휴일 휴무</p>
-            </div>
-            <button
-              class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700"
-            >
-              문의하기
-            </button>
+        <div class="pt-8 mt-12 border-t border-gray-800">
+          <div
+            class="flex flex-col gap-4 justify-between items-center md:flex-row"
+          >
+            <p>&copy; 2024 어푸어푸. All rights reserved.</p>
+            <address class="not-italic text-center md:text-right">
+              서울특별시 강남구 테헤란로 212 어푸어푸빌딩 501호<br />
+              사업자등록번호: 123-45-67890
+            </address>
           </div>
         </div>
       </div>
-
-      <div class="pt-8 mt-12 border-t border-gray-800">
-        <div class="flex flex-col gap-4 justify-between items-center md:flex-row">
-          <p>&copy; 2024 어푸어푸. All rights reserved.</p>
-          <address class="not-italic text-center md:text-right">
-            서울특별시 강남구 테헤란로 212 어푸어푸빌딩 501호<br />
-            사업자등록번호: 123-45-67890
-          </address>
-        </div>
-      </div>
-    </div>
-  </footer>
+    </footer>
   </main>
 </template>
 
