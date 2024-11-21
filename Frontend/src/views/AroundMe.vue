@@ -5,20 +5,15 @@ import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
 
-// const isLoggined = inject("isLoggedIn");
-// isAuthenticated();
-// getUserInfo();
-
 const userAddress = ref(localStorage.getItem("targetAddress"));
-console.log(userAddress.value);
 const keyword = ref(userAddress.value);
-
 const mapContainer = ref(null);
+const isLoading = ref(false);
+const hasSearched = ref(false);
 
 let map;
 userAddress.value = localStorage.getItem("userAddress");
-var iwContent =
-  '<div style="display:flex; justify-content:center; padding:10px;  color:#333; white-space:normal; max-width:200px;"></div>';
+var iwContent = '<div style="display:flex; justify-content:center; padding:10px; color:#333; white-space:normal; max-width:200px;"></div>';
 var infowindow = new kakao.maps.InfoWindow({
   content: iwContent,
   removable: true,
@@ -26,7 +21,7 @@ var infowindow = new kakao.maps.InfoWindow({
 
 onMounted(() => {
   const mapOptions = {
-    center: new kakao.maps.LatLng(37.5665, 126.978), // 서울 중심 좌표
+    center: new kakao.maps.LatLng(37.5665, 126.978),
     level: 3,
   };
   map = new kakao.maps.Map(mapContainer.value, mapOptions);
@@ -35,11 +30,22 @@ onMounted(() => {
   }
   localStorage.removeItem("targetAddress");
 });
+
+// 검색 함수는 동일하게 유지
 function searchPlaces() {
+  if (!keyword.value || keyword.value.trim() === '') {
+    alert('검색어를 입력해주세요.');
+    return;
+  }
+
+  isLoading.value = true;
   const ps = new kakao.maps.services.Places();
   const bounds = new kakao.maps.LatLngBounds();
 
   ps.keywordSearch(keyword.value + "+수영장", (data, status) => {
+    isLoading.value = false;
+    hasSearched.value = true;
+    
     if (status === kakao.maps.services.Status.OK) {
       const resultDiv = document.getElementById("results");
       resultDiv.innerHTML = "";
@@ -53,14 +59,25 @@ function searchPlaces() {
           marker.setMap(map);
           const itemEl = document.createElement("div");
           itemEl.id = "result-item";
-          itemEl.style = "width: 90%;";
+          itemEl.className = "result-card";
           itemEl.onclick = () => window.open(place.place_url, "_blank");
-          itemEl.innerHTML =
-            "<strong>" +
-            place.place_name +
-            "</strong><p>" +
-            place.road_address_name +
-            "</p>";
+          itemEl.innerHTML = `
+            <div class="flex items-start space-x-4">
+              <div class="flex-shrink-0">
+                <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-lg font-semibold text-gray-900">${place.place_name}</h3>
+                <p class="mt-1 text-sm text-gray-500">${place.road_address_name}</p>
+                <p class="mt-1 text-sm text-gray-500">📞 ${place.phone}</p>
+              </div>
+            </div>
+          `;
           resultDiv.appendChild(itemEl);
 
           kakao.maps.event.addListener(marker, "click", function () {
@@ -68,42 +85,19 @@ function searchPlaces() {
             map.panTo(pos);
             infowindow.open(map, marker);
             infowindow.setContent(`
-              <div style="
-                  font-size:14px; 
-                  display: flex; 
-                  flex-direction: column; 
-                  align-items: center;
-                  background-color: white; 
-                  padding: 10px; 
-                  border-radius: 8px; 
-                  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
-                  max-width: 200px;
-                  text-align: center;
-                  position: relative;
-                  z-index: 0;
-              ">
-                <a 
-                  style="color: #007BFF; font-weight: bold; text-decoration: none; margin-bottom: 5px;" 
-                  target="_blank" 
-                  href="${place.place_url}"
-                >
-                  ${place.place_name}
-                </a>
-                <p style="margin: 0; color: #333; font-size: 12px;"><svg aria-hidden="true" focusable="false" class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="1em" height="1em"><!-- Font Awesome Free 5.15.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) --><path d="M493.4 24.6l-104-24c-11.3-2.6-22.9 3.3-27.5 13.9l-48 112c-4.2 9.8-1.4 21.3 6.9 28l60.6 49.6c-36 76.7-98.9 140.5-177.2 177.2l-49.6-60.6c-6.8-8.3-18.2-11.1-28-6.9l-112 48C3.9 366.5-2 378.1.6 389.4l24 104C27.1 504.2 36.7 512 48 512c256.1 0 464-207.5 464-464 0-11.2-7.7-20.9-18.6-23.4z"/></svg>
-	              </svg>${place.phone}</p>
-                <!-- 아래 삼각형 화살표 -->
-                <div style="
-                    width: 0; 
-                    height: 0; 
-                    border-left: 10px solid transparent;
-                    border-right: 10px solid transparent;
-                    border-top: 10px solid white;
-                    position: absolute;
-                    bottom: -10px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-                "></div>
+              <div class="map-info-window">
+                <div class="info-content">
+                  <a class="place-name" target="_blank" href="${place.place_url}">
+                    ${place.place_name}
+                  </a>
+                  <p class="place-phone">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                    </svg>
+                    ${place.phone}
+                  </p>
+                </div>
+                <div class="info-arrow"></div>
               </div>
             `);
           });
@@ -115,71 +109,220 @@ function searchPlaces() {
       map.setBounds(bounds);
     } else {
       alert("검색 결과가 없습니다.");
+      hasSearched.value = false;
     }
   });
 }
+
+// 엔터키 처리를 위한 함수
+function handleKeyPress(event) {
+  if (event.key === 'Enter') {
+    searchPlaces();
+  }
+}
 </script>
 
+
 <template>
-  <body
-    class="flex flex-col items-center p-0 m-0 min-h-screen font-sans text-gray-800 bg-gray-50"
-  >
-    <!-- Search Container -->
-    <div class="flex items-center mb-5 w-[90%] mt-6" id="search-container">
-      <input
-        class="p-4 w-full text-lg text-gray-600 text-center rounded-full border border-gray-200 shadow-lg bg-white outline-none transition-all duration-200 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-        type="text"
-        id="search-input"
-        placeholder="수영장 주변 지하철역을 검색해주세요."
-        v-model="keyword"
-        @change="searchPlaces"
-      />
+  <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
+    <div class="p-4 md:p-8">
+      <!-- Search Container -->
+      <div class="relative max-w-3xl mx-auto mb-6">
+        <input
+          class="w-full h-14 px-6 text-lg text-gray-700 placeholder-gray-400 border-2 border-gray-200 rounded-full
+                 shadow-sm transition duration-200 ease-in-out
+                 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          type="text"
+          id="search-input"
+          placeholder="수영장 주변 지하철역을 검색해주세요"
+          v-model="keyword"
+          @keypress="handleKeyPress"
+          @input="keyword = $event.target.value"
+        />
+        <button 
+          class="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-blue-500
+                 transition duration-200 ease-in-out"
+          @click="searchPlaces"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Loading Indicator -->
+      <div v-if="isLoading" class="flex justify-center py-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+      </div>
+
+      <!-- Content Container -->
+      <div :class="['transition-all duration-500 ease-in-out', hasSearched ? 'content-container-searched' : 'content-container']">
+        <!-- Map Container -->
+        <div :class="['map-container transition-all duration-500 ease-in-out', hasSearched ? 'map-container-searched' : '']">
+          <div
+            class="w-full h-full"
+            id="map"
+            ref="mapContainer"
+          ></div>
+        </div>
+
+        <!-- Results Container -->
+        <div 
+          v-if="hasSearched"
+          id="results"
+          class="results-container"
+        ></div>
+      </div>
     </div>
-
-    <!-- Map Container -->
-    <div
-      class="w-[90%] h-[400px] rounded-lg shadow-lg bg-gray-100 border border-gray-200 overflow-hidden mb-6"
-      id="map"
-      ref="mapContainer"
-    ></div>
-
-    <!-- Results Container -->
-    <div
-      id="results"
-      class="w-[90%] max-h-[400px] bg-white rounded-lg shadow-lg border border-gray-200 overflow-y-scroll overflow-x-hidden flex flex-col gap-3 p-4"
-    ></div>
-  </body>
+  </div>
 </template>
 
 <style>
-#results {
-  scroll-behavior: smooth;
+.content-container {
+  width: 100%;
+  height: calc(100vh - 160px);
+  position: relative;
 }
 
-#result-item {
-  background-color: #f9f9f9;
-  border: solid #e0e0e0 1px;
-  border-radius: 12px;
-  padding: 16px;
-  transition: transform 0.2s, box-shadow 0.2s;
+.content-container-searched {
+  width: 100%;
+  height: calc(100vh - 160px);
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: width 0.5s ease;
+}
+
+.map-container-searched {
+  width: 60%;
+}
+
+.results-container {
+  width: 40%;
+  background: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  height: 100%;
+  opacity: 0;
+  animation: slideIn 0.5s ease forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.result-card {
+  padding: 1rem;
+  border-bottom: 1px solid #f1f1f1;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-#result-item:hover {
-  transform: scale(1.05);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+.result-card:last-child {
+  border-bottom: none;
 }
 
-#result-item strong {
-  color: #2d3748;
-  font-size: 18px;
-  font-weight: 700;
+.result-card:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.01);
+}
+
+.map-info-window {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  position: relative;
+  min-width: 200px;
+}
+
+.info-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.place-name {
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 1.125rem;
   display: block;
+  text-decoration: none;
 }
 
-#result-item p {
-  color: #718096;
-  font-size: 14px;
-  margin-top: 5px;
+.place-name:hover {
+  color: #1d4ed8;
+}
+
+.place-phone {
+  color: #4b5563;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.info-arrow {
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 1rem;
+  height: 1rem;
+  background-color: white;
+}
+
+#results::-webkit-scrollbar {
+  width: 0.5rem;
+}
+
+#results::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+  border-radius: 9999px;
+}
+
+#results::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 9999px;
+}
+
+#results::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
+
+@media (max-width: 768px) {
+  .content-container-searched {
+    flex-direction: column;
+    height: auto;
+    gap: 1rem;
+  }
+
+  .map-container-searched {
+    width: 100%;
+    height: 400px;
+  }
+
+  .results-container {
+    width: 100%;
+    height: 400px;
+  }
 }
 </style>
