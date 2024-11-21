@@ -6,8 +6,6 @@ import {
   userAuthenticated,
 } from "../composables/userAuth";
 
-// 인증 확인 함수
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -20,7 +18,7 @@ const router = createRouter({
       path: "/around",
       name: "around",
       component: () => import("../views/AroundMe.vue"),
-      meta: { requiresAuth: false }, // 인증 필요
+      meta: { requiresAuth: false },
     },
     {
       path: "/login",
@@ -32,7 +30,33 @@ const router = createRouter({
       name: "signup",
       component: () => import("../views/SignUp.vue"),
     },
+    {
+      path: '/mypage',
+      name: 'MyPage',
+      component: () => import('@/views/MyPage.vue')
+    }
   ],
+  // 페이지 이동시 스크롤 동작 정의
+  scrollBehavior(to, from, savedPosition) {
+    // 브라우저의 뒤로/앞으로 버튼을 사용할 경우
+    if (savedPosition) {
+      return savedPosition;
+    }
+    
+    // 해시 링크(#)로 이동할 경우
+    if (to.hash) {
+      return {
+        el: to.hash,
+        behavior: 'smooth'
+      };
+    }
+    
+    // 기본적으로 페이지 최상단으로 스크롤
+    return { 
+      top: 0,
+      behavior: 'smooth'
+    };
+  }
 });
 
 // 전역 라우터 가드 설정
