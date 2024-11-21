@@ -1,10 +1,23 @@
 <script setup>
 import { ref } from "vue";
+import { onMounted } from "vue";
+import axios from "axios";
+import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
+import { inject } from "vue";
 
 // 좋아요 버튼 상태
 const isLiked = ref(false);
 const likeCount = ref(123);
-
+const currentPlace = ref("");
+const placeName = ref("");
+const addressName = ref("");
+const placeUrl = ref("");
+const phone = ref("");
+const categoryGroupName = ref("");
+const mapContainer = ref(null);
+const isLoading = ref(false);
+const hasSearched = ref(false);
+let map;
 // 사진 업로드
 const uploadedImages = ref([]);
 const handleFileUpload = (event) => {
@@ -18,17 +31,50 @@ const handleFileUpload = (event) => {
   }
 };
 
+function searchPlaces() {
+  isLoading.value = true;
+  const ps = new kakao.maps.services.Places();
+  const bounds = new kakao.maps.LatLngBounds();
+
+  ps.keywordSearch(currentPlace.value + "+수영장", (data, status) => {
+    isLoading.value = false;
+    hasSearched.value = true;
+    console.log(data[0]);
+    if (status === kakao.maps.services.Status.OK) {
+      const marker = new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(data[0].y, data[0].x),
+      });
+      marker.setMap(map);
+
+      bounds.extend(marker.getPosition());
+
+      // map.setBounds(bounds);
+      placeName.value = data[0].place_name;
+      addressName.value = data[0].address_name;
+      placeUrl.value = data[0].place_url;
+      phone.value = data[0].phone;
+    } else {
+      alert("오류가 발생했습니다.");
+      hasSearched.value = false;
+    }
+  });
+}
+
+onMounted(async () => {
+  // Get the current place from localStorage
+  currentPlace.value = localStorage.getItem("currentPlace");
+
+  // Only search if we have a valid place name
+  if (currentPlace.value) {
+    searchPlaces();
+  } else {
+    console.warn("No place name found in localStorage");
+  }
+});
+
 // 글 작성
-const content = ref("");
 
 // 장소 정보
-const placeInfo = {
-  name: "강남구 올림픽 수영장",
-  address: "서울특별시 강남구 테헤란로 123",
-  phone: "02-123-4567",
-  description:
-    "올림픽 수영장은 최신 시설과 넓은 공간을 자랑합니다. 성인 수영 강습, 어린이 수영 강습 등 다양한 프로그램을 제공합니다.",
-};
 
 // 좋아요 버튼 클릭 핸들러
 const toggleLike = () => {
@@ -41,10 +87,11 @@ const toggleLike = () => {
   <div class="p-6 min-h-screen bg-gray-50">
     <!-- 장소 정보 -->
     <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
-      <h1 class="mb-4 text-3xl font-bold">{{ placeInfo.name }}</h1>
-      <p class="mb-2 text-gray-600">주소: {{ placeInfo.address }}</p>
-      <p class="mb-2 text-gray-600">전화번호: {{ placeInfo.phone }}</p>
-      <p class="text-gray-700">{{ placeInfo.description }}</p>
+      <h1 class="mb-4 text-3xl font-bold">{{ placeName }}</h1>
+      <p class="mb-2 text-gray-600">주소:{{ addressName }}</p>
+      <p class="mb-2 text-gray-600">전화번호:{{ phone }}</p>
+      <p class="mb-2 text-gray-600">상세정보:{{ placeUrl }}</p>
+      <p class="text-gray-700"></p>
     </div>
 
     <!-- 좋아요 버튼 -->
