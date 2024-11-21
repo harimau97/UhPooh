@@ -91,6 +91,10 @@ const logout = () => {
   localStorage.removeItem("userName");
   localStorage.removeItem("userAddress");
   localStorage.removeItem("pImage");
+  localStorage.removeItem("chatId");
+  localStorage.removeItem("isAdmin");
+  localStorage.removeItem("regTime");
+  localStorage.removeItem("userEmail");
   isLoggined.value = false; // 로그인 상태 변경
 
   location.replace("/"); // 메인 페이지로 이동;
@@ -99,7 +103,7 @@ const logout = () => {
 const navigationLinks = [
   { text: "수영장 찾기", path: "/around" },
   { text: "이용 가이드", path: "/guide" },
-  { text: "파트너 등록", path: "/partner" },
+  { text: "마이페이지", path: "/mypage" },
 ];
 </script>
 
