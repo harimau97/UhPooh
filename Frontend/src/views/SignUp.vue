@@ -1,471 +1,289 @@
 <template>
-  <div>
-    <div class="container">
-      <h1>회원 가입</h1>
+  <div class="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-gray-50 to-white">
+    <!-- Title -->
+    <h1 class="text-sm font-bold text-gray-700 mb-4">회원가입</h1>
+    
+    <!-- Signup Container -->
+    <div class="relative w-full max-w-xl mx-4">
+      <div class="bg-white/80 backdrop-blur-lg rounded-md shadow-2xl border border-gray-100">
+        <div class="p-8">
+          <form class="space-y-6">
+            <!-- Nickname Input -->
+            <div class="space-y-1">
+              <label for="userName" class="block text-sm font-bold text-gray-700">
+                닉네임
+              </label>
+              <input
+                type="text"
+                id="userName"
+                name="userName"
+                v-model="userName"
+                @input="checkForm()"
+                placeholder="닉네임을 입력해주세요"
+                required="required"
+                maxlength="20"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="userName && !validName ? 'border-red-300' : ''"
+              />
+              <p v-if="userName && !validName" class="text-sm text-red-500 mt-1">
+                닉네임은 2~20자의 한글, 영문, 숫자, 특수문자(_,-)만 사용 가능합니다.
+              </p>
+            </div>
 
-      <form action="#">
-        <div class="form-group">
-          <label for="memberId">이름</label>
-          <input
-            type="text"
-            class="form-control"
-            id="userName"
-            name="userName"
-            placeholder="이름을 입력하세요"
-            title="3글자 이상 입력하세요."
-            minlength="3"
-            maxlength="10"
-            required="required"
-            v-model="userName"
-            @input="checkForm()"
-          />
-          <br />
-        </div>
-        <div class="form-group">
-          <label for="email">이메일</label>
-          <input
-            type="email"
-            id="userEmail"
-            name="userEmail"
-            class="form-control"
-            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)"
-            title="이메일 형식이 맞지 않습니다."
-            placeholder="이메일을 입력하세요"
-            required="required"
-            v-model="userEmail"
-            @input="checkForm"
-          />
-        </div>
-        <div class="mt-4">
-          <button
-            type="button"
-            id="checkIdBtn"
-            @click="checkId"
-            :disabled="!validEmail"
-            :class="[
-              'inline-block px-8 py-3 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg border-2',
-              validEmail
-                ? 'bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800'
-                : 'bg-gray-400 border-gray-400 cursor-not-allowed',
-            ]"
-          >
-            이메일 중복 확인
-          </button>
-        </div>
-        <div class="form-group">
-          <label for="password">비밀번호</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            class="form-control"
-            placeholder="비밀번호를 입력하세요"
-            title="숫자,영어 소문자, 대문자, 특수문자(~!@#$%)가 하나 이상 필요합니다."
-            minlength="8"
-            required="required"
-            v-model="password"
-            @input="checkForm"
-          />
-        </div>
-        <div class="form-group">
-          <label for="memberId">기본 주소</label>
-          <input
-            type="text"
-            class="form-control"
-            id="userAddress"
-            name="userAddress"
-            placeholder="기본으로 사용할 주소를 입력하세요"
-            minlength="10"
-            maxlength="100"
-            required="required"
-            v-model="userAddress"
-            @input="checkForm()"
-          />
-          <br />
-        </div>
+            <!-- Email Input -->
+            <div class="space-y-1">
+              <label for="userEmail" class="block text-sm font-bold text-gray-700">
+                이메일
+              </label>
+              <input
+                type="email"
+                id="userEmail"
+                name="userEmail"
+                v-model="userEmail"
+                @input="checkEmailValidity"
+                placeholder="이메일을 입력해주세요"
+                required="required"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="userEmail && ((!validEmail || emailExists) ? 'border-red-300' : '')"
+              />
+              <p v-if="userEmail && !validEmail" class="text-sm text-red-500 mt-1">
+                이메일 형식만 가능합니다.
+              </p>
+              <p v-if="userEmail && validEmail && emailExists" class="text-sm text-red-500 mt-1">
+                이미 사용중인 이메일입니다.
+              </p>
+              <p v-if="userEmail && validEmail && !emailExists && emailChecked" class="text-sm text-blue-500 mt-1">
+                사용 가능한 이메일입니다.
+              </p>
+            </div>
 
-        <div class="form-group">
-          <button
-            type="submit"
-            @click="signUp"
-            :disabled="!activeSignUP"
-            :class="[
-              'inline-block px-8 py-3 rounded-full text-white font-bold uppercase tracking-wide transition-all duration-400 shadow-lg border-2',
-              activeSignUP
-                ? 'bg-gradient-to-br from-blue-600 via-blue-500 to-blue-700 hover:from-blue-700 hover:via-blue-600 hover:to-blue-800'
-                : 'bg-gray-400 border-gray-400 cursor-not-allowed',
-            ]"
-          >
-            회원 가입
-          </button>
-        </div>
-      </form>
-      <ul>
-        <li class="flex">
-          <svg
-            v-show="validName"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="green"
-              stroke-width="15"
-              fill="none"
-            />
-          </svg>
-          <svg
-            v-show="!validName"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <line
-              x1="20"
-              y1="20"
-              x2="80"
-              y2="80"
-              stroke="red"
-              stroke-width="15"
-            />
-            <line
-              x1="20"
-              y1="80"
-              x2="80"
-              y2="20"
-              stroke="red"
-              stroke-width="15"
-            /></svg
-          >이름은 3글자 이상 10글자 이하인가요?
-        </li>
-        <li class="flex">
-          <svg
-            v-show="validEmail"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="green"
-              stroke-width="15"
-              fill="none"
-            /></svg
-          ><svg
-            v-show="!validEmail"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <line
-              x1="20"
-              y1="20"
-              x2="80"
-              y2="80"
-              stroke="red"
-              stroke-width="15"
-            />
-            <line
-              x1="20"
-              y1="80"
-              x2="80"
-              y2="20"
-              stroke="red"
-              stroke-width="15"
-            /></svg
-          >이메일 형식을 충족하셨나요?
-        </li>
+            <!-- Password Input -->
+            <div class="space-y-1">
+              <label for="password" class="block text-sm font-bold text-gray-700">
+                비밀번호
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                v-model="password"
+                @input="checkForm"
+                placeholder="비밀번호를 입력해주세요"
+                required="required"
+                minlength="8"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="password && !validPassword ? 'border-red-300' : ''"
+              />
+              <p v-if="password && !validPassword" class="text-sm text-red-500 mt-1">
+                비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.
+              </p>
+            </div>
 
-        <li class="flex pr-2">
-          <svg
-            v-show="validPassword"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="green"
-              stroke-width="15"
-              fill="none"
-            />
-          </svg>
-          <svg
-            v-show="!validPassword"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <line
-              x1="20"
-              y1="20"
-              x2="80"
-              y2="80"
-              stroke="red"
-              stroke-width="15"
-            />
-            <line
-              x1="20"
-              y1="80"
-              x2="80"
-              y2="20"
-              stroke="red"
-              stroke-width="15"
-            />
-          </svg>
-          비밀번호는 숫자, 영어 소문자 및 대문자, 특수문자(!@#$%^&*)가 하나 이상
-          필요합니다.
-        </li>
-        <li class="flex pr-2">
-          <svg
-            v-show="validAddress"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <circle
-              cx="50"
-              cy="50"
-              r="40"
-              stroke="green"
-              stroke-width="15"
-              fill="none"
-            />
-          </svg>
-          <svg
-            v-show="!validAddress"
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 100 100"
-          >
-            <line
-              x1="20"
-              y1="20"
-              x2="80"
-              y2="80"
-              stroke="red"
-              stroke-width="15"
-            />
-            <line
-              x1="20"
-              y1="80"
-              x2="80"
-              y2="20"
-              stroke="red"
-              stroke-width="15"
-            />
-          </svg>
-          주소를 입력하셨나요?
-        </li>
-      </ul>
+            <!-- Confirm Password Input -->
+            <div class="space-y-1">
+              <label for="confirmPassword" class="block text-sm font-bold text-gray-700">
+                비밀번호 확인
+              </label>
+              <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                v-model="confirmPassword"
+                @input="checkForm"
+                placeholder="비밀번호를 다시 입력해주세요"
+                required="required"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="confirmPassword && !validConfirmPassword ? 'border-red-300' : ''"
+              />
+              <p v-if="confirmPassword && !validConfirmPassword" class="text-sm text-red-500 mt-1">
+                비밀번호가 일치하지 않습니다.
+              </p>
+            </div>
+
+            <!-- Address Input -->
+            <div class="space-y-1">
+              <label for="userAddress" class="block text-sm font-bold text-gray-700">
+                기본 주소
+              </label>
+              <input
+                type="text"
+                id="userAddress"
+                name="userAddress"
+                v-model="userAddress"
+                @input="checkForm()"
+                placeholder="기본으로 사용할 주소를 입력해주세요"
+                required="required"
+                minlength="10"
+                maxlength="100"
+                class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300 transition-all duration-300"
+                :class="userAddress && !validAddress ? 'border-red-300' : ''"
+              />
+              <p v-if="userAddress && !validAddress" class="text-sm text-red-500 mt-1">
+                주소는 10글자 이상 입력해주세요.
+              </p>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              @click="signUp"
+              class="w-full py-4 px-4 rounded-sm font-bold text-white transition-all duration-300 bg-gradient-to-r from-sky-500 to-blue-500 hover:from-sky-600 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-sky-300 mt-8"
+            >
+              회원 가입
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
-
-    <footer class="flex justify-center">
-      <p>&copy; 2024 Your Website. Made with ❤️</p>
-    </footer>
   </div>
 </template>
 
 <script setup>
 import axios from "axios";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
-const isChecked = ref(false);
+import { ref, watch } from "vue";
+
+// 라우터 및 기본 상태 설정
 const router = useRouter();
-const userEmail = ref("");
+const emailExists = ref(false);
+const emailChecked = ref(false);
+
+// 입력 필드 상태
 const userName = ref("");
+const userEmail = ref("");
 const password = ref("");
+const confirmPassword = ref("");
 const userAddress = ref("");
+
+// 유효성 검사 상태
 const validName = ref(false);
 const validEmail = ref(false);
 const validPassword = ref(false);
+const validConfirmPassword = ref(false);
 const validAddress = ref(false);
-const activeSignUP = ref(false);
-const checkForm = () => {
-  const hasUppercase = /[A-Z]/.test(password.value);
-  const hasLowercase = /[a-z]/.test(password.value);
-  const hasNumber = /[0-9]/.test(password.value);
-  const hasSpecialChar = /[!@#$%^&*]/.test(password.value);
-  const hasEmailFormat =
-    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/.test(
-      userEmail.value
-    );
-  const hasAddress = userAddress.value.length > 9;
 
-  // Name validation (3-10 characters)
-  validName.value = userName.value.length >= 2 && userName.value.length <= 10;
+// 닉네임 및 이메일 정규식
+const nicknameRegex = /^[a-zA-Z0-9가-힣_-]{2,20}$/;
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/;
 
-  // Email validation
-  validEmail.value = hasEmailFormat;
-
-  // Password validation
-  validPassword.value =
-    hasUppercase &&
-    hasLowercase &&
-    hasNumber &&
-    hasSpecialChar &&
-    password.value.length >= 8;
-
-  validAddress.value = hasAddress;
-
-  activeSignUP.value =
-    validName.value &&
-    validEmail.value &&
-    validPassword.value &&
-    validAddress.value &&
-    isChecked.value;
-
-  console.log(activeSignUP.value);
+// 디바운스 함수 구현
+const debounce = (fn, delay) => {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
 };
 
-const checkId = () => {
-  var email = userEmail.value;
-  console.log(isChecked.value);
-  console.log(email);
-  if (email === "") {
-    alert("이메일을 입력해주세요.");
+// 이메일 중복 확인 (디바운스 적용)
+const checkEmailDuplicate = debounce(async (email) => {
+  if (!email || !validEmail.value) return;
+  
+  try {
+    await axios.get(`http://localhost:8080/uhpooh/api/user/check/email/${email}`);
+    emailExists.value = false;
+    emailChecked.value = true;
+  } catch (error) {
+    emailExists.value = true;
+    emailChecked.value = true;
+  }
+}, 500);
+
+// 이메일 유효성 검사 및 중복 확인
+const checkEmailValidity = () => {
+  validEmail.value = emailRegex.test(userEmail.value);
+  emailChecked.value = false;
+  if (validEmail.value) {
+    checkEmailDuplicate(userEmail.value);
+  }
+};
+
+// 입력값 변경 감지
+watch([userName, password, confirmPassword, userAddress], () => {
+  checkForm();
+}, { deep: true });
+
+// 비밀번호 확인 감지
+watch([password, confirmPassword], () => {
+  if (confirmPassword.value) {
+    validConfirmPassword.value = confirmPassword.value === password.value;
+  }
+  checkForm();
+});
+
+// 폼 유효성 검사
+const checkForm = () => {
+  // 닉네임 검사 (2~20자, 완성된 한글/영문/숫자/_/- 만 허용)
+  const hasIncompleteKorean = /[ㄱ-ㅎㅏ-ㅣ]/.test(userName.value);
+  validName.value = nicknameRegex.test(userName.value) && !hasIncompleteKorean;
+
+  // 비밀번호 검사 (영문, 숫자, 특수문자 포함 8자 이상)
+  const hasLetter = /[a-zA-Z]/.test(password.value);
+  const hasNumber = /[0-9]/.test(password.value);
+  const hasSpecialChar = /[!@#$%^&*]/.test(password.value);
+  validPassword.value = password.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
+
+  // 비밀번호 확인 검사
+  validConfirmPassword.value = password.value === confirmPassword.value;
+
+  // 주소 검사 (10자 이상)
+  validAddress.value = userAddress.value.length >= 10;
+};
+
+// 회원가입 처리
+const signUp = async (event) => {
+  event.preventDefault();
+  
+  // 모든 필드의 유효성 검사
+  if (!userName.value || !userEmail.value || !password.value || !confirmPassword.value || !userAddress.value ||
+      !validName.value || !validEmail.value || !validPassword.value || !validConfirmPassword.value || !validAddress.value || emailExists.value) {
+    alert("입력하신 정보를 다시 확인해주세요.");
     return;
   }
 
-  const fetchData = async () => {
-    try {
-      const response = await axios.get(
-        "http://localhost:8080/uhpooh/api/user/check/email/" + email
-      );
-      console.log(response.data);
-      isChecked.value = true;
-      alert(response.data.message);
-    } catch (error) {
-      console.error(error);
-      alert("이미 사용중인 이메일입니다.");
-      userEmail.value = "";
-    }
-  };
-  fetchData();
-};
-
-const signUp = () => {
-  console.log("회원가입 시작");
-  event.preventDefault();
-  var uName = userName.value;
-  var uEmail = userEmail.value;
-  var uPassword = password.value;
-  var uAddress = userAddress.value;
-  if (isChecked.value === true) {
-    if (uName !== "" && uEmail !== "" && password !== "") {
-      const sendData = async () => {
-        await axios
-          .post("http://localhost:8080/uhpooh/api/user/signup", {
-            userName: uName,
-            userEmail: uEmail,
-            password: uPassword,
-            userAddress: uAddress,
-          })
-          .then((response) => {
-            alert("회원 가입 완료");
-          })
-          .catch((err) => {
-            alert(err);
-          });
-      };
-      sendData();
-      router.push("/");
-    }
+  // 회원가입 요청
+  try {
+    const response = await axios.post("http://localhost:8080/uhpooh/api/user/signup", {
+      userName: userName.value,
+      userEmail: userEmail.value,
+      password: password.value,
+      userAddress: userAddress.value,
+    });
+    
+    alert("회원 가입이 완료되었습니다.");
+    router.push("/");
+  } catch (error) {
+    console.error(error);
+    alert("입력하신 정보를 다시 확인해주세요.");
   }
 };
 </script>
 
 <style scoped>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.animate-blob {
+  animation: blob 7s infinite;
 }
 
-/* 메인 컨테이너 */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+.animation-delay-2000 {
+  animation-delay: 2s;
 }
 
-h1 {
-  font-size: 48px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 20px;
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
 
-p {
-  font-size: 18px;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-/* 폼 스타일 */
-.form-group {
-  margin-bottom: 10px;
-  text-align: left;
-}
-
-.form-group label {
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #333;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-/* 링크 스타일 */
-a {
-  color: #833ab4;
-  text-decoration: none;
-  font-weight: 600;
-}
-
-a:hover {
-  color: #fd1d1d;
-}
-
-/* 푸터 */
-footer {
-  margin-top: 50px;
-  color: #777;
-  font-size: 14px;
-}
-
-footer a {
-  color: #833ab4;
-  text-decoration: none;
-}
-
-footer a:hover {
-  color: #fd1d1d;
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
 }
 </style>
