@@ -79,3 +79,6 @@ CREATE TABLE payments (
     INDEX idxOrderId (paymentId),
     INDEX idxPaymentKey (tossPaymentKey)
 );
+
+ALTER TABLE places
+ADD COLUMN placeName VARCHAR(255) NOT NULL;
