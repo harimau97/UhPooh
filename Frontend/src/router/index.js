@@ -36,6 +36,11 @@ const router = createRouter({
       component: () => import("../views/placeBoard.vue"),
     },
     {
+      path: "/reviewBoard",
+      name: "reviewBoard",
+      component: () => import("../views/reviewBoard.vue"),
+    },
+    {
       path: "/mypage",
       name: "mypage",
       component: () => import("../views/MyPage.vue"),
@@ -66,7 +71,7 @@ router.beforeEach(async (to, from, next) => {
       alert("잘못된 접근입니다.");
       return next("/login");
     }
-    
+
     // Admin 페이지 접근 체크
     if (to.meta.requiresAdmin && localStorage.getItem("isAdmin") !== "1") {
       alert("관리자 권한이 필요합니다.");

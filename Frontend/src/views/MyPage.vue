@@ -5,7 +5,7 @@ import {
   User,
   Clock,
   Calendar,
-  Star,
+  Heart,
   Settings,
   LogOut,
   ChevronRight,
@@ -136,10 +136,10 @@ const menuItems = computed(() => {
       description: "수영장 예약 및 이용 기록",
     },
     {
-      icon: Star,
-      label: "즐겨찾기",
+      icon: Heart,
+      label: "좋아요한 수영장",
       path: "/favorites",
-      description: "자주 가는 수영장 모음",
+      description: "내가 좋아요한 수영장 모음",  // description 수정
     },
     {
       icon: Settings,
