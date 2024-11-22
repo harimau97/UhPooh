@@ -61,10 +61,10 @@
 
 <script>
 import { applyReactInVue, applyPureReactInVue } from "veaury";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import ChatReactComponent from "../react_app/Chat.jsx";
 import Header from "./Header.vue";
-import { inject, watch } from "vue";
+import { inject } from "vue";
 
 const isLoggined = inject("isLoggedIn");
 
@@ -83,6 +83,7 @@ const config = {
   NICKNAME: user_email.value,
   API_TOKEN: "insert your key here",
 };
+
 export default {
   data() {
     return {
@@ -92,7 +93,6 @@ export default {
   components: {
     Chat: applyPureReactInVue(ChatReactComponent),
   },
-
   computed: {
     classStyle() {
       switch (this.openChat) {
@@ -100,6 +100,18 @@ export default {
           return "animate-slide-up";
         case false:
           return "animate-slide-down";
+      }
+    },
+  },
+  watch: {
+    openChat(newValue) {
+      if (!newValue) {
+        // 모달을 닫을 때 Sendbird 로그아웃 처리
+        if (window.SendBirdInstance) {
+          window.SendBirdInstance.disconnect(() => {
+            console.log("Sendbird 로그아웃 완료");
+          });
+        }
       }
     },
   },

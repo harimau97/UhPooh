@@ -12,7 +12,7 @@ const isLoggined = inject("isLoggedIn");
 
 // 리뷰관련 변수
 const isLiked = ref(false);
-const likeCount = ref(123);
+const likeCount = ref(0);
 const currentPlace = ref("");
 const placeName = ref("");
 const addressName = ref("");
@@ -80,6 +80,11 @@ const addPlace = async () => {
     console.log(error);
   }
   await searchPlaceById();
+  const result = await axios.get(
+    "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
+  );
+  likeCount.value = result.data.data.likeCount;
+  console.log(result.data.data);
 };
 
 async function searchPlaces() {
@@ -98,6 +103,7 @@ async function searchPlaces() {
       phone.value = data[0].phone;
       placeId.value = data[0].id;
       addPlace();
+
       // searchPlaceById();
       const position = new kakao.maps.LatLng(data[0].y, data[0].x);
 
@@ -175,6 +181,9 @@ const addReview = async () => {
         content: content.value,
       }
     );
+    console.log(response);
+    alert("리뷰가 성공적으로 작성되었습니다.");
+
     closeModal();
   } catch (error) {
     console.error(error);
@@ -263,8 +272,9 @@ onMounted(async () => {
 
 // 좋아요 버튼 클릭 핸들러
 const toggleLike = () => {
-  isLiked.value = !isLiked.value;
-  likeCount.value += isLiked.value ? 1 : -1;
+  const response = axios.put(
+    "http://localhost:8080/uhpooh/api/place/like/" + tableId.value
+  );
 };
 </script>
 
