@@ -496,5 +496,28 @@ public class UserController {
               HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-
+  
+  @Operation(summary = "현재 비밀번호 확인", description = "현재 비밀번호가 맞는지 확인 (필수: userId, password)")
+  @PostMapping("/verify-password")
+  public ResponseEntity<Map<String, Object>> verifyPassword(@RequestBody User user) {
+    logger.info("Password verification attempt for user ID: {}", user.getUserId());
+    try {
+      // confirmPassword를 사용하여 비밀번호 확인
+      User verifiedUser = userService.confirmPassword(user);
+      
+      if (verifiedUser != null) {
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("success", true);
+        responseData.put("message", "비밀번호가 확인되었습니다.");
+        
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+      } else {
+        return createResponse(false, "비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED);
+      }
+    } catch (Exception e) {
+      logger.error("Error in verifyPassword: ", e);
+      return createResponse(false, "비밀번호 확인 중 오류가 발생했습니다: " + e.getMessage(),
+              HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }

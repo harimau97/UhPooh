@@ -52,4 +52,6 @@ public interface UserDao {
     public List<User> userList();
     
     public int getTotalUserCount();
+    
+    public User confirmPassword(User user);
 }
