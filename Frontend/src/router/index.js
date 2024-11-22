@@ -35,11 +35,7 @@ const router = createRouter({
       name: "placeBoard",
       component: () => import("../views/placeBoard.vue"),
     },
-    {
-      path: "/reviewBoard",
-      name: "reviewBoard",
-      component: () => import("../views/reviewBoard.vue"),
-    },
+
     {
       path: "/mypage",
       name: "mypage",

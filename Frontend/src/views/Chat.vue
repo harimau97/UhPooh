@@ -71,10 +71,8 @@ const isLoggined = inject("isLoggedIn");
 const user_id = ref("");
 const user_email = ref("");
 
-onMounted(() => {
-  user_id.value = localStorage.getItem("userName");
-  user_email.value = localStorage.getItem("userEmail");
-});
+user_id.value = localStorage.getItem("userName");
+user_email.value = "hello";
 
 console.log(localStorage.getItem("userEmail"));
 console.log("유저 이메일");
