@@ -85,3 +85,14 @@ CREATE TABLE payments (
 
 ALTER TABLE places
 ADD COLUMN placeName VARCHAR(255) NOT NULL;
+
+ALTER TABLE reviews DROP COLUMN images;
+
+-- 리뷰 이미지를 저장할 새로운 테이블 생성
+CREATE TABLE reviewImages (
+    imageId INT AUTO_INCREMENT PRIMARY KEY,
+    reviewId INT NOT NULL,
+    imageUrl VARCHAR(255) NOT NULL,
+    FOREIGN KEY (reviewId) REFERENCES reviews(reviewId) ON DELETE CASCADE,
+    INDEX idx_review (reviewId)
+);
