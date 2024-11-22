@@ -80,6 +80,11 @@ const addPlace = async () => {
     console.log(error);
   }
   await searchPlaceById();
+  const result = await axios.get(
+    "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
+  );
+  likeCount.value = result.data.data.likeCount;
+  console.log(result.data.data);
 };
 
 async function searchPlaces() {
@@ -98,6 +103,7 @@ async function searchPlaces() {
       phone.value = data[0].phone;
       placeId.value = data[0].id;
       addPlace();
+
       // searchPlaceById();
       const position = new kakao.maps.LatLng(data[0].y, data[0].x);
 
@@ -266,8 +272,9 @@ onMounted(async () => {
 
 // 좋아요 버튼 클릭 핸들러
 const toggleLike = () => {
-  isLiked.value = !isLiked.value;
-  likeCount.value += isLiked.value ? 1 : -1;
+  const response = axios.put(
+    "http://localhost:8080/uhpooh/api/place/like/" + tableId.value
+  );
 };
 </script>
 
