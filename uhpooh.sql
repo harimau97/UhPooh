@@ -40,6 +40,9 @@ CREATE TABLE places (
     INDEX idxKakaoPlaceId (kakaoPlaceId)
 );
 
+ALTER TABLE places
+ADD COLUMN placeName VARCHAR(255) NOT NULL;
+
 -- Reviews table
 CREATE TABLE reviews (
     reviewId INT AUTO_INCREMENT PRIMARY KEY,
