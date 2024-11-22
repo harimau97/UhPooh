@@ -38,7 +38,6 @@
     </div>
   </transition>
   <button
-    v-show="isLoggined"
     @click="openChat = !openChat"
     class="fixed right-1 bottom-4 z-50 px-1 py-1 ml-4 text-white rounded-full hover:animate-bounce bg-slate-500"
   >
@@ -62,22 +61,29 @@
 
 <script>
 import { applyReactInVue, applyPureReactInVue } from "veaury";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ChatReactComponent from "../react_app/Chat.jsx";
 import Header from "./Header.vue";
 import { inject, watch } from "vue";
 
 const isLoggined = inject("isLoggedIn");
-watch(isLoggined, (newVal) => {
-  console.log("isLoggedIn 상태 변경:", newVal);
+
+const user_id = ref("");
+const user_email = ref("");
+
+onMounted(() => {
+  user_id.value = localStorage.getItem("userName");
+  user_email.value = localStorage.getItem("userEmail");
 });
 
-const config = {
-  APP_ID: "7D7B93DC-9263-4488-9841-B1C8F158E8B4",
-  USER_ID: "Bob_1",
-  NICKNAME: "Bob",
-};
+console.log(localStorage.getItem("userEmail"));
+console.log("유저 이메일");
 
+const config = {
+  APP_ID: "6A037C15-9101-4B13-9733-0A335320499D",
+  USER_ID: user_id.value,
+  NICKNAME: user_email.value,
+};
 export default {
   data() {
     return {
