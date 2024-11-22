@@ -72,15 +72,16 @@ const user_id = ref("");
 const user_email = ref("");
 
 user_id.value = localStorage.getItem("userName");
-user_email.value = "hello";
+user_email.value = localStorage.getItem("userEmail");
 
-console.log(localStorage.getItem("userEmail"));
-console.log("유저 이메일");
+console.log(localStorage.setItem("채팅 확인", user_email.value));
+console.log("");
 
 const config = {
   APP_ID: "6A037C15-9101-4B13-9733-0A335320499D",
   USER_ID: user_id.value,
   NICKNAME: user_email.value,
+  API_TOKEN: "insert your key here",
 };
 export default {
   data() {
