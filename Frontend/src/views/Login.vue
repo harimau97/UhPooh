@@ -77,6 +77,47 @@
                 회원가입
               </RouterLink>
             </div>
+
+            <!-- Social Login Divider -->
+            <div class="mt-8 flex items-center">
+              <div class="flex-1 border-t border-gray-200"></div>
+              <div class="px-4 text-sm text-gray-500">또는</div>
+              <div class="flex-1 border-t border-gray-200"></div>
+            </div>
+
+            <!-- Social Login Buttons -->
+            <div class="mt-6 flex justify-center space-x-4">
+              <a
+                href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3001/oauth2/redirect"
+                class="transform transition-transform hover:scale-110 focus:outline-none"
+              >
+                <img
+                  class="w-12 h-12"
+                  :src="'/src/assets/google.png'"
+                  alt="Google Login"
+                />
+              </a>
+              <a
+                href="http://localhost:8080/oauth2/authorize/naver?redirect_uri=http://localhost:3001/oauth2/redirect"
+                class="transform transition-transform hover:scale-110 focus:outline-none"
+              >
+                <img
+                  class="w-12 h-12"
+                  :src="'/src/assets/naver.png'"
+                  alt="Naver Login"
+                />
+              </a>
+              <a
+                href="http://localhost:8080/oauth2/authorize/kakao?redirect_uri=http://localhost:3001/oauth2/redirect"
+                class="transform transition-transform hover:scale-110 focus:outline-none"
+              >
+                <img
+                  class="w-12 h-12"
+                  :src="'/src/assets/kakao.png'"
+                  alt="Kakao Login"
+                />
+              </a>
+            </div>
           </form>
         </div>
       </div>
