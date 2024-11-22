@@ -14,6 +14,24 @@ const Chat = (props) => {
     };
     getTotalUnreadMessageCount();
     props.setSbUserInfo(currentUser);
+    sdk.connect(props.config.USER_ID, (user, error) => {
+      if (error) {
+        console.error("Error connecting:", error);
+        return;
+      }
+
+      sdk.updateCurrentUserInfo(
+        props.config.NICKNAME,
+        null,
+        (response, error) => {
+          if (error) {
+            console.error("Error updating nickname:", error);
+            return;
+          }
+          console.log("Nickname updated successfully!");
+        }
+      );
+    });
   }
   return (
     <SendbirdApp
@@ -24,5 +42,6 @@ const Chat = (props) => {
     />
   );
 };
+
 const ChatWithSendbird = withSendbird(Chat);
 export default ChatWithSendbird;
