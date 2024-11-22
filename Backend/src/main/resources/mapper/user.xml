@@ -30,7 +30,6 @@
         SET userName = #{userName},
         userEmail = #{userEmail},
         userAddress = #{userAddress},
-        pImage = #{pImage},
         updTime = now()
         WHERE userId = #{userId}
     </update>

@@ -180,11 +180,16 @@ const handleImageUpload = async (event) => {
 const handleImageDelete = async () => {
   try {
     isLoading.value = true;
-    await axios.delete(
+    const response = await axios.delete(
       `http://localhost:8080/uhpooh/api/file/profile/user/${userId.value}`,
       { timeout: 5000 }
     );
+    
+    // 프로필 이미지 상태 및 localStorage 업데이트
     userForm.value.profileImageUrl = "";
+    localStorage.removeItem("userProfileImage");
+    localStorage.removeItem("pImage");
+    
     alert("이미지가 성공적으로 삭제되었습니다.");
   } catch (error) {
     console.error("프로필 이미지 삭제 실패:", error);

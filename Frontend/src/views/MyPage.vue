@@ -34,6 +34,8 @@ const user = ref({
 onMounted(async () => {
   const userId = localStorage.getItem("userId");
   const isAdmin = localStorage.getItem("isAdmin");
+  const pImage = localStorage.getItem("pImage");
+  const userProfileImage = localStorage.getItem("userProfileImage");
 
   if (!userId) {
     alert("로그인이 필요한 서비스입니다.");
@@ -41,13 +43,16 @@ onMounted(async () => {
     return;
   }
 
+  // 프로필 이미지 설정 로직 수정
+  user.value.profileImageUrl = userProfileImage || 
+    (pImage ? `http://localhost:8080/uhpooh/api/images/${pImage}` : "");
+
   // localStorage에서 기본 정보 가져오기
   user.value = {
     ...user.value,
     name: localStorage.getItem("userName") || "사용자",
     email: localStorage.getItem("userEmail") || "이메일 미설정",
     location: localStorage.getItem("userAddress") || "주소 미설정",
-    profileImageUrl: localStorage.getItem("userProfileImage") || "",
     membershipLevel: isAdmin === "1" ? "Admin" : "Member",
   };
 
@@ -67,6 +72,11 @@ onMounted(async () => {
     console.error("사용자 데이터 로딩 중 오류 발생:", error);
   }
 });
+
+const handleImageError = (event) => {
+  event.target.src = ''; // 기본 이미지를 표시하기 위해 src를 비움
+  user.value.profileImageUrl = ''; // 상태도 업데이트
+};
 
 const menuItems = computed(() => {
   const items = [
@@ -147,11 +157,12 @@ const handleLogout = async () => {
         <div class="relative">
           <div class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden">
             <img
-              v-if="user.profileImageUrl"
-              :src="user.profileImageUrl"
-              alt="Profile"
-              class="w-full h-full object-cover"
-            />
+  v-if="user.profileImageUrl"
+  :src="user.profileImageUrl"
+  alt="Profile"
+  class="w-full h-full object-cover"
+  @error="handleImageError"
+/>
             <div
               v-else
               class="w-full h-full bg-gray-200 flex items-center justify-center"
