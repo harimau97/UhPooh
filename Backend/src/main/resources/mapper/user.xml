@@ -28,6 +28,7 @@
     <update id="userUpdate" parameterType="User">
         UPDATE users
         SET userName = #{userName},
+        userEmail = #{userEmail},
         userAddress = #{userAddress},
         pImage = #{pImage},
         updTime = now()
@@ -163,6 +164,12 @@
         OR userEmail LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
+    <!-- 비밀번호 확인 -->
+    <select id="confirmPassword" parameterType="User" resultType="User">
+        SELECT userId, userEmail, userName, isAdmin, isLogin
+        FROM users
+        WHERE userId = #{userId} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+    </select>
 
 
 </mapper>

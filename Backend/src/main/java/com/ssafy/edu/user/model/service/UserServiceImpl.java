@@ -133,7 +133,12 @@ public class UserServiceImpl implements UserService {
   public int getTotalUserCount() {
     return userDao.getTotalUserCount();
   }
-
+  
+  @Override
+  public User confirmPassword(User user) {
+    return userDao.confirmPassword(user);
+  }
+  
   // 전체 검색 메서드 구현
   @Override
   public List<User> searchEverything(Map<String, Object> params) {

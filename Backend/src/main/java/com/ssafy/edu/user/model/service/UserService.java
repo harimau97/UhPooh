@@ -51,4 +51,6 @@ public interface UserService {
     
     int getTotalUserCount();
     
+    User confirmPassword(User user);;
+    
 }
