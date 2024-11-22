@@ -25,7 +25,7 @@
         class="rounded-md border border-gray-100 shadow-2xl backdrop-blur-lg bg-white/80 animate-slide-up"
       >
         <div class="px-8 py-12">
-          <form>
+          <form @submit.prevent="handleSubmit">
             <!-- Email Input -->
             <div class="space-y-3">
               <label for="fname" class="block text-sm font-bold text-gray-700">
@@ -35,9 +35,8 @@
                 type="text"
                 name="userEmail"
                 placeholder="이메일을 입력해주세요."
-                required="required"
                 v-model="userEmail"
-                class="px-4 py-4 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
+                class="px-4 py-4 w-full text-sm placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
               />
             </div>
 
@@ -50,17 +49,22 @@
                 type="password"
                 name="password"
                 placeholder="비밀번호를 입력해주세요."
-                required="required"
                 v-model="password"
-                class="px-4 py-4 w-full placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
+                class="px-4 py-4 w-full text-sm placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
               />
+              <!-- Error Message -->
+              <p v-if="loginError" class="text-sm text-red-500 mt-2">
+                아이디 또는 비밀번호를 잘못 입력했습니다.
+              </p>
+              <p v-if="validationError" class="text-sm text-red-500 mt-2">
+                {{ validationError }}
+              </p>
             </div>
 
             <!-- Action Buttons -->
             <div class="mt-12 space-y-4">
               <button
-                type="button"
-                @click="login"
+                type="submit"
                 class="w-full bg-gradient-to-r from-sky-500 to-blue-500 text-white rounded-sm px-4 py-4 font-bold transform transition-all duration-300 hover:from-sky-600 hover:to-blue-600 hover:scale-[1.02] hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-sky-300 active:scale-[0.98]"
               >
                 로그인
@@ -81,6 +85,7 @@
       <div class="mt-6 space-y-2 text-center animate-fade-in-delay">
         <a
           href="#"
+          @click.prevent="showPasswordReset"
           class="text-sm text-gray-600 transition-colors hover:text-gray-800"
           >비밀번호를 잊으셨나요?</a
         >
@@ -97,10 +102,29 @@ const router = useRouter();
 import axios from "axios";
 const userEmail = ref("");
 const password = ref("");
+const loginError = ref(false);
+const validationError = ref("");
+
+const showPasswordReset = () => {
+  alert("관리자에게 문의바랍니다.");
+};
+
+const handleSubmit = async () => {
+  // Reset error states
+  loginError.value = false;
+  validationError.value = "";
+
+  // Validation
+  if (!userEmail.value || !password.value) {
+    validationError.value = "아이디와 비밀번호를 모두 입력해주세요.";
+    return;
+  }
+
+  // Proceed with login
+  await login();
+};
 
 const login = async () => {
-  console.log(userEmail.value);
-  console.log(password.value);
   await axios
     .post("http://localhost:8080/uhpooh/api/user/login", {
       userEmail: userEmail.value,
@@ -120,7 +144,7 @@ const login = async () => {
       });
     })
     .catch((err) => {
-      alert("아이디 또는 비밀번호를 잘못 입력했습니다.");
+      loginError.value = true;
     });
 };
 </script>
@@ -154,15 +178,15 @@ const login = async () => {
 }
 
 .animate-fade-in {
-  animation: fadeIn 0.8s ease-out;
+  animation: fadeIn 0.6s ease-out;
 }
 
 .animate-fade-in-delay {
-  animation: fadeIn 0.8s ease-out 0.2s both;
+  animation: fadeIn 0.6s ease-out 0.2s both;
 }
 
 .animate-slide-up {
-  animation: slideUp 0.8s ease-out 0.2s both;
+  animation: slideUp 0.6s ease-out 0.2s both;
 }
 
 @keyframes fadeIn {
