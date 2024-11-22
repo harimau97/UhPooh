@@ -7,6 +7,7 @@ import { inject } from "vue";
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
+const isModalOpen = ref(false);
 // 좋아요 버튼 상태
 const isLiked = ref(false);
 const likeCount = ref(123);
@@ -21,9 +22,20 @@ const title = ref("");
 const content = ref("");
 const categoryGroupName = ref("");
 const mapContainer = ref(null);
+
 const isLoading = ref(false);
 const hasSearched = ref(false);
+
 let map;
+
+// 모달 열고 닫기
+const openModal = () => {
+  isModalOpen.value = true;
+};
+const closeModal = () => {
+  isModalOpen.value = false;
+};
+
 // 사진 업로드
 const uploadedImages = ref([]);
 const handleFileUpload = (event) => {
@@ -253,52 +265,109 @@ const toggleLike = () => {
       <span class="ml-4 text-gray-600">{{ likeCount }}명이 좋아합니다</span>
     </div>
 
-    <!-- 사진 업로드 -->
-    <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
-      <h2 class="mb-4 text-2xl font-bold">사진 업로드</h2>
-      <input
-        type="file"
-        accept="image/*"
-        multiple
-        @change="handleFileUpload"
-        class="mb-4"
-      />
-      <div class="grid grid-cols-3 gap-4">
-        <img
-          v-for="(image, index) in uploadedImages"
-          :key="index"
-          :src="image"
-          alt="Uploaded"
-          class="object-cover w-full h-32 rounded-lg shadow"
-        />
+    <!-- 후기 작성 -->
+    <div
+      v-if="isModalOpen"
+      class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50"
+    >
+      <div class="relative w-11/12 max-w-3xl bg-white rounded-lg shadow-lg">
+        <!-- 헤더 -->
+        <div
+          class="flex justify-between items-center px-6 py-4 border-b border-gray-200"
+        >
+          <h2 class="text-xl font-bold text-gray-700">
+            사진 업로드 및 후기 작성
+          </h2>
+          <button
+            @click="closeModal"
+            class="text-gray-500 hover:text-gray-800 focus:outline-none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- 내용 -->
+        <div class="px-6 py-4 space-y-6">
+          <!-- 사진 업로드 -->
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">
+              사진 업로드
+            </h3>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              @change="handleFileUpload"
+              class="p-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <div class="grid grid-cols-3 gap-4 mt-4">
+              <img
+                v-for="(image, index) in uploadedImages"
+                :key="index"
+                :src="image"
+                alt="Uploaded"
+                class="object-cover w-full h-32 rounded-lg shadow"
+              />
+            </div>
+          </div>
+
+          <!-- 후기 작성 -->
+          <div>
+            <h3 class="mb-4 text-lg font-semibold text-gray-700">후기 작성</h3>
+            <textarea
+              :disabled="!isLoggined"
+              v-model="title"
+              rows="1"
+              placeholder="제목을 작성해주세요."
+              class="p-4 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+            <textarea
+              :disabled="!isLoggined"
+              v-model="content"
+              rows="5"
+              placeholder="이 장소에 대한 후기를 작성해주세요."
+              class="p-4 mt-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            ></textarea>
+          </div>
+        </div>
+
+        <!-- 푸터 -->
+        <div class="flex justify-end px-6 py-4 border-t border-gray-200">
+          <button
+            @click="addReview"
+            class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow hover:bg-blue-600"
+          >
+            작성 완료
+          </button>
+          <button
+            @click="closeModal"
+            class="px-4 py-2 ml-2 text-gray-700 bg-gray-200 rounded-lg shadow hover:bg-gray-300"
+          >
+            취소
+          </button>
+        </div>
       </div>
     </div>
-
-    <!-- 글 작성 -->
-    <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
-      <h2 class="mb-4 text-2xl font-bold">후기 작성</h2>
-      <textarea
-        :disabled="!isLoggined"
-        v-model="title"
-        rows="1"
-        placeholder="제목을 작성해주세요."
-        class="p-4 w-full rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      ></textarea>
-      <textarea
-        :disabled="!isLoggined"
-        v-model="content"
-        rows="5"
-        placeholder="이 장소에 대한 후기를 작성해주세요."
-        class="p-4 w-full rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      ></textarea>
-      <button
-        @click="addReview"
-        class="px-6 py-2 mt-4 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-      >
-        작성 완료
-      </button>
-    </div>
   </div>
+  <button
+    @click="openModal"
+    class="fixed right-6 bottom-6 z-50 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
+  >
+    후기 작성
+  </button>
 </template>
 
 <style scoped>
@@ -327,4 +396,30 @@ const toggleLike = () => {
 }
 
 /* 기존 스타일 유지 */
+/* 모달 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  animation: fadeIn 0.3s ease-in-out, fadeOut 0.3s ease-in-out;
+}
 </style>
