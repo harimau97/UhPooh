@@ -12,7 +12,7 @@ const isLoggined = inject("isLoggedIn");
 
 // 리뷰관련 변수
 const isLiked = ref(false);
-const likeCount = ref(123);
+const likeCount = ref(0);
 const currentPlace = ref("");
 const placeName = ref("");
 const addressName = ref("");
@@ -175,6 +175,9 @@ const addReview = async () => {
         content: content.value,
       }
     );
+    console.log(response);
+    alert("리뷰가 성공적으로 작성되었습니다.");
+
     closeModal();
   } catch (error) {
     console.error(error);
