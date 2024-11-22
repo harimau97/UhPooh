@@ -16,8 +16,11 @@ import {
 } from "lucide-vue-next";
 import axios from "axios";
 import { inject } from "vue";
+
 const imgPath = ref("");
 const router = useRouter();
+const showLogoutModal = ref(false); // 모달 상태 추가
+
 const user = ref({
   name: "",
   email: "",
@@ -161,32 +164,42 @@ const menuItems = computed(() => {
 });
 
 const isLoggined = inject("isLoggedIn");
-const handleLogout = () => {
-  const uId = localStorage.getItem("userId");
-  const tryLogout = async () => {
-    try {
-      console.log("로그아웃 시작");
-      const response = await axios({
-        method: "post",
-        url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {},
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  tryLogout();
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("userAddress");
-  localStorage.removeItem("pImage");
-  isLoggined.value = false;
 
-  location.replace("/");
+// 로그아웃 확인 모달 처리
+const confirmLogout = () => {
+  showLogoutModal.value = false;
+  handleLogout();
+};
+
+const handleLogout = async () => {
+  const uId = localStorage.getItem("userId");
+  try {
+    console.log("로그아웃 시작");
+    await axios({
+      method: "post",
+      url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {},
+    });
+    
+    // 로컬 스토리지 클리어
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("userAddress");
+    localStorage.removeItem("pImage");
+    
+    // 로그인 상태 업데이트
+    isLoggined.value = false;
+    
+    // 홈으로 리다이렉트
+    location.replace("/");
+  } catch (error) {
+    console.error("로그아웃 중 오류 발생:", error);
+    alert("로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.");
+  }
 };
 </script>
 
@@ -286,9 +299,57 @@ const handleLogout = () => {
       </div>
     </div>
 
+    <!-- 로그아웃 모달 -->
+    <div v-if="showLogoutModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex min-h-full items-center justify-center p-4 text-center">
+        <!-- 배경 오버레이 -->
+        <div 
+          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+          @click="showLogoutModal = false"
+        ></div>
+
+        <!-- 모달 내용 -->
+        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+            <div class="sm:flex sm:items-start">
+              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                <LogOut class="h-6 w-6 text-red-600" />
+              </div>
+              <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                <h3 class="text-lg font-semibold leading-6 text-gray-900">
+                  로그아웃
+                </h3>
+                <div class="mt-2">
+                  <p class="text-sm text-gray-500">
+                    정말 로그아웃 하시겠습니까?
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+            <button
+              type="button"
+              class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+              @click="confirmLogout"
+            >
+              로그아웃
+            </button>
+            <button
+              type="button"
+              class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              @click="showLogoutModal = false"
+            >
+              취소
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 로그아웃 버튼 -->
     <button
-      @click="handleLogout"
+      @click="showLogoutModal = true"
       class="flex justify-between items-center p-4 w-full bg-white rounded-2xl shadow-sm hover:bg-gray-50"
     >
       <div class="flex gap-4 items-center">
