@@ -7,8 +7,10 @@ import { inject } from "vue";
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
-const isModalOpen = ref(false);
+
 // 좋아요 버튼 상태
+
+// 리뷰관련 변수
 const isLiked = ref(false);
 const likeCount = ref(123);
 const currentPlace = ref("");
@@ -20,20 +22,28 @@ const placeId = ref("");
 const tableId = ref("");
 const title = ref("");
 const content = ref("");
+const currentUser = ref(null);
+const isModalOpen = ref(false);
+const nowEditing = ref(false);
+const tempReviewId = ref("");
+//
+
+//로드뷰 관련 변수
 const categoryGroupName = ref("");
 const mapContainer = ref(null);
-
 const isLoading = ref(false);
 const hasSearched = ref(false);
-
 let map;
-
+//
 // 모달 열고 닫기
 const openModal = () => {
   isModalOpen.value = true;
 };
 const closeModal = () => {
   isModalOpen.value = false;
+  title.value = "";
+  content.value = "";
+  nowEditing.value = false;
 };
 
 // 사진 업로드
@@ -163,14 +173,28 @@ const addReview = async () => {
         placeId: tableId.value,
         title: title.value,
         content: content.value,
-        images: "testDir",
       }
     );
+    closeModal();
   } catch (error) {
     console.error(error);
   }
+  location.reload();
 };
 
+const confirmEdit = async (rId) => {
+  try {
+    const response = await axios.put(
+      "http://localhost:8080/uhpooh/api/review/edit/" + rId,
+      { title: title.value, content: content.value }
+    );
+    console.log(response);
+    closeModal();
+  } catch (error) {
+    console.log(error);
+  }
+  location.reload();
+};
 const searchPlaceById = async () => {
   console.log("Searching place by ID:", placeId.value);
   try {
@@ -182,11 +206,44 @@ const searchPlaceById = async () => {
   } catch (error) {
     console.error("Error in searchPlaceById:", error);
   }
+  await reviewList();
+};
+
+const reviews = ref([]);
+const reviewList = async () => {
+  console.log(tableId.value);
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/uhpooh/api/review/place/" + tableId.value
+    );
+    console.log(response.data.data.items);
+    reviews.value = response.data.data.items;
+    localStorage.setItem("tableId", tableId.value);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const editReview = async (rId) => {
+  console.log(rId);
+  const response = await axios.get(
+    "http://localhost:8080/uhpooh/api/review/detail/" + rId
+  );
+  const tempReview = response.data.data;
+  console.log(tempReview);
+  title.value = tempReview.title;
+  content.value = tempReview.content;
+  nowEditing.value = true;
+  tempReviewId.value = rId;
+  openModal();
 };
 
 onMounted(async () => {
   // Get the current place from localStorage
   currentPlace.value = localStorage.getItem("currentPlace");
+  currentUser.value = localStorage.getItem("userId");
+  console.log("Current place:", currentPlace.value);
+  console.log("Current user:", currentUser.value);
 
   roadviewClient = new kakao.maps.RoadviewClient();
   roadview = new kakao.maps.Roadview(roadviewContainer.value);
@@ -275,9 +332,7 @@ const toggleLike = () => {
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200"
         >
-          <h2 class="text-xl font-bold text-gray-700">
-            사진 업로드 및 후기 작성
-          </h2>
+          <h2 class="text-xl font-bold text-gray-700"></h2>
           <button
             @click="closeModal"
             class="text-gray-500 hover:text-gray-800 focus:outline-none"
@@ -332,6 +387,7 @@ const toggleLike = () => {
               v-model="title"
               rows="1"
               placeholder="제목을 작성해주세요."
+              required="required"
               class="p-4 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
             <textarea
@@ -339,6 +395,7 @@ const toggleLike = () => {
               v-model="content"
               rows="5"
               placeholder="이 장소에 대한 후기를 작성해주세요."
+              required="required"
               class="p-4 mt-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
           </div>
@@ -347,10 +404,18 @@ const toggleLike = () => {
         <!-- 푸터 -->
         <div class="flex justify-end px-6 py-4 border-t border-gray-200">
           <button
+            v-show="!nowEditing"
             @click="addReview"
             class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow hover:bg-blue-600"
           >
             작성 완료
+          </button>
+          <button
+            v-show="nowEditing"
+            @click="confirmEdit(tempReviewId)"
+            class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow hover:bg-blue-600"
+          >
+            수정 완료
           </button>
           <button
             @click="closeModal"
@@ -368,6 +433,31 @@ const toggleLike = () => {
   >
     후기 작성
   </button>
+  <!-- 리뷰 목록 -->
+  <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
+    <h2 class="mb-4 text-2xl font-bold text-gray-700">리뷰 목록</h2>
+    <div v-if="reviews.length === 0" class="text-gray-500">
+      작성된 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!
+    </div>
+    <div v-else class="space-y-4">
+      <div v-for="review in reviews" class="p-4 rounded-lg border shadow">
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="text-lg font-semibold text-gray-800">
+            {{ review.title }}
+          </h3>
+        </div>
+        <p class="text-gray-600">{{ review.content }}</p>
+
+        <div class="grid grid-cols-3 gap-2 mt-2"></div>
+        <button
+          v-show="review.userId == currentUser"
+          @click="editReview(review.reviewId)"
+        >
+          리뷰 수정
+        </button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
