@@ -16,6 +16,9 @@ import { inject } from "vue";
 
 const router = useRouter();
 const showLogoutModal = ref(false);
+const imageTrue = ref("");
+const imgName = ref("");
+const imgPath = ref("");
 
 const user = ref({
   name: "",
@@ -30,13 +33,26 @@ const user = ref({
   ],
 });
 
+//프로필이미지 캐싱
+const cacheImage = async (cat) => {
+  imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
+  const response = await axios.get(
+    imgPath.value,
+    { timeout: 5000 }
+  );
+  
+};
+
 // 사용자 데이터 로드
 onMounted(async () => {
   const userId = localStorage.getItem("userId");
   const isAdmin = localStorage.getItem("isAdmin");
   const pImage = localStorage.getItem("pImage");
   const userProfileImage = localStorage.getItem("userProfileImage");
-
+  imageTrue.value = pImage;
+  imgName.value = imageTrue.value.replace("/images/profiles/", "");
+  console.log(imgName.value);
+  if (imgName.value !== "") {await cacheImage("profiles");}
   if (!userId) {
     alert("로그인이 필요한 서비스입니다.");
     router.push("/login");
@@ -160,8 +176,8 @@ const handleLogout = async () => {
             class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden"
           >
             <img
-              v-if="user.profileImageUrl"
-              :src="user.profileImageUrl"
+              v-if="imageTrue"
+              :src="imgPath"
               alt="Profile"
               class="w-full h-full object-cover"
               @error="handleImageError"

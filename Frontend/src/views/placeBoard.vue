@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { onMounted } from "vue";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
@@ -53,7 +53,7 @@ const closeModal = () => {
 // 사진 업로드
 const uploadedImages = ref([]);
 const fileInput = ref(null);
-const handleFileUpload = (event) => {
+const handleFileUpload = (event, reviewId) => {
   const files = Array.from(event.target.files);
   const remainingSlots = 5 - uploadedImages.value.length;
   
@@ -63,7 +63,8 @@ const handleFileUpload = (event) => {
   }
 
   const newFiles = files.slice(0, remainingSlots);
-
+  
+  
   newFiles.forEach(file => {
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
@@ -81,6 +82,20 @@ const handleFileUpload = (event) => {
   if (fileInput.value) {
     fileInput.value.value = '';
   }
+};
+
+const sendImageData = async (reviewId) => {
+  const response = axios.post(
+    "http://localhost:8080/uhpooh/api/file/review/"+reviewId,
+    newFiles,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      timeout: 10000,
+    }
+  );
+
 };
 
 const removeImage = (index) => {
@@ -209,7 +224,8 @@ const addReview = async () => {
         content: content.value,
       }
     );
-    console.log(response);
+    console.log(response.data);
+    
     alert("리뷰가 성공적으로 작성되었습니다.");
 
     closeModal();
@@ -239,6 +255,7 @@ const confirmEdit = async (rId) => {
       { title: title.value, content: content.value }
     );
     console.log(response);
+    sendImageData(rId);
     closeModal();
   } catch (error) {
     console.log(error);
@@ -311,6 +328,11 @@ onMounted(async () => {
   } else {
     console.warn("No place name found in localStorage");
   }
+});
+
+// Form validation
+const isFormValid = computed(() => {
+  return title.value?.length > 0 && content.value?.length > 0;
 });
 
 // 글 작성
@@ -447,6 +469,7 @@ const toggleLike = () => {
                 type="text"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="제목을 입력하세요"
+                required
               />
             </div>
             <div>
@@ -458,6 +481,7 @@ const toggleLike = () => {
                 rows="4"
                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                 placeholder="내용을 입력하세요"
+                required
               ></textarea>
             </div>
             <div>
@@ -484,7 +508,7 @@ const toggleLike = () => {
                             rounded-lg p-4 hover:border-indigo-500 transition-colors duration-200">
                   <input
                     type="file"
-                    @change="handleFileUpload"
+                    @change="handleFileUpload($event, tempReview.reviewId)"
                     accept="image/*"
                     multiple
                     class="hidden"
@@ -505,9 +529,10 @@ const toggleLike = () => {
           <div class="mt-6 flex justify-end space-x-3">
             
             <button
-            v-show="!watchingDetails&& !nowEditing"
+            v-show="!watchingDetails && !nowEditing"
               @click="addReview"
-              class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+              :disabled="!isFormValid"
+              class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               작성하기
             </button>
@@ -515,7 +540,8 @@ const toggleLike = () => {
             <button
             v-show="watchingDetails && tempReview.userId == currentUser"
                   @click="confirmEdit(tempReviewId)"
-                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap"
+                  :disabled="!isFormValid"
+                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   수정
                 </button>

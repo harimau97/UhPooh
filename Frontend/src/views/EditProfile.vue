@@ -65,10 +65,10 @@ const loadUserData = async () => {
       return;
     }
 
-    userId.value = currentUserId;
+   
 
     const response = await axios.get(
-      `http://localhost:8080/uhpooh/api/user/${userId.value}`,
+      `http://localhost:8080/uhpooh/api/user/${userId}`,
       {
         timeout: 5000,
         validateStatus: (status) => status === 200,
@@ -176,7 +176,7 @@ const handleImageUpload = async (event) => {
     );
     userForm.value.profileImageUrl = response.data.imageUrl || response.data;
     imgName.value= response.data.data.filename;
-    // console.log(response.data.data.filename);
+    console.log(response.data.data.filename);
     cacheImage("profiles");
     alert("이미지가 성공적으로 업로드되었습니다.");
   } catch (error) {
@@ -223,11 +223,11 @@ const cacheImage = async (cat) => {
 
 // Daum 우편번호 스크립트 로드
 onMounted(async () => {
+  userId.value = localStorage.getItem("userId");
   imageTrue.value = localStorage.getItem("pImage");
   imgName.value = imageTrue.value.replace("/images/profiles/", "");
   console.log(imgName.value);
-  await cacheImage("profiles");
-  // console.log(imgName.value);
+  if (imgName.value !== "") {await cacheImage("profiles");}
   const script = document.createElement("script");
   script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
   document.head.appendChild(script);
@@ -453,7 +453,7 @@ const goBack = () => {
                 이미지 업로드
               </button>
               <button
-                v-if="userForm.profileImageUrl"
+                v-if="imageTrue"
                 type="button"
                 @click="handleImageDelete"
                 class="flex items-center px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700"
