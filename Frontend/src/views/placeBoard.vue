@@ -25,7 +25,9 @@ const content = ref("");
 const currentUser = ref(null);
 const isModalOpen = ref(false);
 const nowEditing = ref(false);
+const tempReview = ref({});
 const tempReviewId = ref("");
+const watchingDetails = ref(false);
 //
 
 //로드뷰 관련 변수
@@ -40,10 +42,12 @@ const openModal = () => {
   isModalOpen.value = true;
 };
 const closeModal = () => {
+
   isModalOpen.value = false;
   title.value = "";
   content.value = "";
   nowEditing.value = false;
+  watchingDetails.value = false;
 };
 
 // 사진 업로드
@@ -246,18 +250,24 @@ const reviewList = async () => {
   }
 };
 
-const editReview = async (rId) => {
-  console.log("리뷰를 수정합니다.", rId);
+const openDetail= async(rId) => {
+  watchingDetails.value = true;
+  console.log("리뷰를 상세조회합니다.", rId);
   const response = await axios.get(
     "http://localhost:8080/uhpooh/api/review/detail/" + rId
   );
-  const tempReview = response.data.data;
-  console.log(tempReview);
-  title.value = tempReview.title;
-  content.value = tempReview.content;
+  tempReview.value = response.data.data;
+  console.log(tempReview.value);
+  title.value = tempReview.value.title;
+  content.value = tempReview.value.content;
   nowEditing.value = true;
   tempReviewId.value = rId;
   openModal();
+ 
+};
+
+const editReview = async (rId) => {
+ openModal();
 };
 
 onMounted(async () => {
@@ -360,33 +370,24 @@ const toggleLike = () => {
         <div class="space-y-6 h-[550px] pr-2 overflow-y-scroll">
           <div
             v-for="review in reviews"
-            class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition-shadow duration-300"
+            @click="openDetail(review.reviewId)"
+            class="bg-gray-50  p-3 rounded-xl shadow hover:shadow-lg transition-shadow duration-300 h-12"
           >
-            <div class="flex justify-between items-start mb-4">
-              <div>
-                <h3 class="text-xl font-semibold text-gray-800">
+            <div class="flex justify-between items-center mb-4">
+              <div class="flex items-center space-x-4 flex-1 min-w-0">
+                <h3 class="text-xl font-semibold text-gray-800 whitespace-nowrap">
                   {{ review.title }}
                 </h3>
-                <p class="text-sm text-gray-500">작성자: {{ review.userId }}</p>
+                <p class="text-sm text-gray-500 whitespace-nowrap">작성자: {{ review.userId }}</p>
+                <p class="text-gray-700 truncate flex-1">{{ review.content }}</p>
               </div>
-              <div class="flex space-x-2" v-show="review.userId == currentUser">
-                <button
-                  @click="editReview(review.reviewId)"
-                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200"
-                >
-                  수정
-                </button>
-                <button
-                  @click="deleteReview(review.reviewId)"
-                  class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
-                >
-                  삭제
-                </button>
+              <div><p class="text-sm text-gray-500 whitespace-nowrap">{{ review.regTime }}</p></div>
+              <div class="flex space-x-2 ml-4" v-show="review.userId == currentUser">
+                
+                
               </div>
             </div>
-            <p class="text-gray-700 whitespace-pre-line">
-              {{ review.content }}
-            </p>
+            
           </div>
         </div>
       </div>
@@ -402,7 +403,7 @@ const toggleLike = () => {
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200"
         >
           <h2 class="text-2xl font-bold text-gray-800">
-            {{ nowEditing ? "리뷰 수정" : "리뷰 작성" }}
+            {{ nowEditing ? "나의 리뷰" : "리뷰 작성" }}
           </h2>
           <button
             @click="closeModal"
@@ -437,18 +438,30 @@ const toggleLike = () => {
             </div>
           </div>
           <div class="mt-6 flex justify-end space-x-3">
+            
             <button
-              @click="closeModal"
-              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
-            >
-              취소
-            </button>
-            <button
-              @click="nowEditing ? confirmEdit(tempReviewId) : addReview()"
+            v-show="!watchingDetails&& !nowEditing"
+              @click="addReview"
               class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
             >
-              {{ nowEditing ? "수정하기" : "작성하기" }}
+              작성하기
             </button>
+            
+            <button
+            v-show="watchingDetails && tempReview.userId == currentUser"
+                  @click="confirmEdit(tempReviewId)"
+                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap"
+                >
+                  수정
+                </button>
+            <button
+            v-show="watchingDetails && tempReview.userId == currentUser"
+                  @click="deleteReview(tempReviewId)"
+                  class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200 whitespace-nowrap"
+                >
+                  삭제
+                </button>
+
           </div>
         </div>
       </div>
