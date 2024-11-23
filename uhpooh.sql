@@ -40,8 +40,7 @@ CREATE TABLE places (
     INDEX idxKakaoPlaceId (kakaoPlaceId)
 );
 
-ALTER TABLE places
-ADD COLUMN placeName VARCHAR(255) NOT NULL;
+
 
 -- Reviews table
 CREATE TABLE reviews (
