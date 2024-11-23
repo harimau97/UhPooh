@@ -52,15 +52,39 @@ const closeModal = () => {
 
 // 사진 업로드
 const uploadedImages = ref([]);
+const fileInput = ref(null);
 const handleFileUpload = (event) => {
-  const files = event.target.files;
-  for (let i = 0; i < files.length; i++) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      uploadedImages.value.push(e.target.result);
-    };
-    reader.readAsDataURL(files[i]);
+  const files = Array.from(event.target.files);
+  const remainingSlots = 5 - uploadedImages.value.length;
+  
+  if (remainingSlots <= 0) {
+    alert('최대 5장까지만 업로드할 수 있습니다.');
+    return;
   }
+
+  const newFiles = files.slice(0, remainingSlots);
+
+  newFiles.forEach(file => {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        uploadedImages.value.push({
+          file: file,
+          preview: e.target.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  // Reset file input
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+};
+
+const removeImage = (index) => {
+  uploadedImages.value.splice(index, 1);
 };
 
 const roadviewContainer = ref(null);
@@ -415,26 +439,67 @@ const toggleLike = () => {
         <div class="p-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
+              <label class="block text-gray-700 text-sm font-semibold mb-2"
                 >제목</label
               >
               <input
                 v-model="title"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="제목을 입력하세요"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
+              <label class="block text-gray-700 text-sm font-semibold mb-2"
                 >내용</label
               >
               <textarea
                 v-model="content"
                 rows="4"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
                 placeholder="내용을 입력하세요"
               ></textarea>
+            </div>
+            <div>
+              <label class="block text-gray-700 text-sm font-semibold mb-2">
+                사진 첨부 (최대 5장)
+              </label>
+              <div class="space-y-4">
+                <!-- Image Preview -->
+                <div v-if="uploadedImages.length > 0" class="flex flex-wrap gap-2 mb-4">
+                  <div v-for="(image, index) in uploadedImages" :key="index" 
+                       class="relative group w-24 h-24">
+                    <img :src="image.preview" class="w-24 h-24 object-cover rounded-lg" />
+                    <button @click="removeImage(index)" 
+                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 
+                                   flex items-center justify-center opacity-0 group-hover:opacity-100 
+                                   transition-opacity duration-200">
+                      ×
+                    </button>
+                  </div>
+                </div>
+                <!-- Upload Button -->
+                <div v-if="uploadedImages.length < 5" 
+                     class="flex justify-center items-center border-2 border-dashed border-gray-300 
+                            rounded-lg p-4 hover:border-indigo-500 transition-colors duration-200">
+                  <input
+                    type="file"
+                    @change="handleFileUpload"
+                    accept="image/*"
+                    multiple
+                    class="hidden"
+                    ref="fileInput"
+                  />
+                  <button @click="$refs.fileInput.click()" 
+                          class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    <span>사진 추가하기</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
           <div class="mt-6 flex justify-end space-x-3">
