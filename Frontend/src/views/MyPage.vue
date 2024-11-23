@@ -44,7 +44,8 @@ onMounted(async () => {
   }
 
   // 프로필 이미지 설정 로직 수정
-  user.value.profileImageUrl = userProfileImage || 
+  user.value.profileImageUrl =
+    userProfileImage ||
     (pImage ? `http://localhost:8080/uhpooh/api/images/${pImage}` : "");
 
   // localStorage에서 기본 정보 가져오기
@@ -74,8 +75,8 @@ onMounted(async () => {
 });
 
 const handleImageError = (event) => {
-  event.target.src = ''; // 기본 이미지를 표시하기 위해 src를 비움
-  user.value.profileImageUrl = ''; // 상태도 업데이트
+  event.target.src = ""; // 기본 이미지를 표시하기 위해 src를 비움
+  user.value.profileImageUrl = ""; // 상태도 업데이트
 };
 
 const menuItems = computed(() => {
@@ -88,9 +89,9 @@ const menuItems = computed(() => {
     },
     {
       icon: Heart,
-      label: "좋아요한 수영장",
+      label: "My 수영장",
       path: "/favorites",
-      description: "내가 좋아요한 수영장 모음",
+      description: "좋아요 및 리뷰 조회",
     },
     {
       icon: Settings,
@@ -132,13 +133,13 @@ const handleLogout = async () => {
       },
       data: {},
     });
-    
+
     localStorage.removeItem("userToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
     localStorage.removeItem("userAddress");
     localStorage.removeItem("userProfileImage");
-    
+
     isLoggined.value = false;
     location.replace("/");
   } catch (error) {
@@ -155,14 +156,16 @@ const handleLogout = async () => {
       <div class="flex gap-6 items-center">
         <!-- 프로필 이미지 -->
         <div class="relative">
-          <div class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden">
+          <div
+            class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden"
+          >
             <img
-  v-if="user.profileImageUrl"
-  :src="user.profileImageUrl"
-  alt="Profile"
-  class="w-full h-full object-cover"
-  @error="handleImageError"
-/>
+              v-if="user.profileImageUrl"
+              :src="user.profileImageUrl"
+              alt="Profile"
+              class="w-full h-full object-cover"
+              @error="handleImageError"
+            />
             <div
               v-else
               class="w-full h-full bg-gray-200 flex items-center justify-center"
@@ -242,15 +245,19 @@ const handleLogout = async () => {
     <!-- 로그아웃 모달 -->
     <div v-if="showLogoutModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex min-h-full items-center justify-center p-4 text-center">
-        <div 
+        <div
           class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           @click="showLogoutModal = false"
         ></div>
 
-        <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        <div
+          class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+        >
           <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
-              <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+              <div
+                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+              >
                 <LogOut class="h-6 w-6 text-red-600" />
               </div>
               <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
@@ -291,7 +298,9 @@ const handleLogout = async () => {
       class="flex justify-between items-center p-4 w-full bg-white rounded-2xl shadow-sm hover:bg-gray-50"
     >
       <div class="flex gap-4 items-center">
-        <div class="flex justify-center items-center w-10 h-10 bg-red-50 rounded-full">
+        <div
+          class="flex justify-center items-center w-10 h-10 bg-red-50 rounded-full"
+        >
           <LogOut class="w-5 h-5 text-red-600" />
         </div>
         <div>

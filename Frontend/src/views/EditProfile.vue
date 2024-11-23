@@ -28,7 +28,8 @@ const userForm = ref({
   postcode: "",
   detailAddress: "",
 });
-//이미지 표시를 위한 이미지 실제 주소
+//이미지 표시를 위한 이미지 실제 파일명
+const imgName = ref("");
 const imgPath = ref("");
 
 // 유효성 검사 상태
@@ -154,6 +155,7 @@ const parseAddress = (fullAddress) => {
 // 이미지 업로드 처리
 const handleImageUpload = async (event) => {
   const file = event.target.files[0];
+  console.log(file);
   if (!file) return;
 
   const formData = new FormData();
@@ -172,6 +174,9 @@ const handleImageUpload = async (event) => {
       }
     );
     userForm.value.profileImageUrl = response.data.imageUrl || response.data;
+    imgName.value= response.data.data.filename;
+    // console.log(response.data.data.filename);
+    cacheImage("profiles");
     alert("이미지가 성공적으로 업로드되었습니다.");
   } catch (error) {
     console.error("프로필 이미지 업로드 실패:", error);
@@ -205,11 +210,21 @@ const handleImageDelete = async () => {
   location.reload();
 };
 
+// 이미지 캐싱 처리
+const cacheImage = async (cat) => {
+  imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
+  const response = await axios.get(
+    imgPath.value,
+    { timeout: 5000 }
+  );
+  
+};
+
 // Daum 우편번호 스크립트 로드
 onMounted(() => {
-  let rawPath = localStorage.getItem("pImage");
-  imgPath.value = rawPath.replace("static", "");
-  console.log(imgPath.value);
+  // let rawPath = localStorage.getItem("pImage");
+  // imgName.value = rawPath.replace("/images/profiles/", "");
+  // console.log(imgName.value);
   const script = document.createElement("script");
   script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
   document.head.appendChild(script);
@@ -406,8 +421,8 @@ const goBack = () => {
           <div class="flex flex-col items-center space-y-4">
             <div class="relative w-32 h-32">
               <img
-                v-if="imgPath"
-                :src="'http://localhost:8080/uhpooh' + imgPath"
+                v-if="imgName"
+                :src="imgPath"
                 alt="프로필 이미지"
                 class="object-cover w-full h-full rounded-full"
               />
