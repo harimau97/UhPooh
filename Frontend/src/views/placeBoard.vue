@@ -28,8 +28,7 @@ const nowEditing = ref(false);
 const tempReview = ref({});
 const tempReviewId = ref("");
 const watchingDetails = ref(false);
-const reviewImages = ref([]);  // Add this ref for storing cached image paths
-//
+const reviewMap = ref({});
 
 //로드뷰 관련 변수
 const isLoading = ref(false);
@@ -52,23 +51,24 @@ const uploadedImages = ref([]);
 const fileInput = ref(null);
 const handleFileUpload = (event, reviewId) => {
   const files = Array.from(event.target.files);
-  const remainingSlots = 5 - uploadedImages.value.length;
-  
+  const totalCurrentImages =
+    uploadedImages.value.length + Object.keys(reviewMap.value).length;
+  const remainingSlots = 5 - totalCurrentImages;
+
   if (remainingSlots <= 0) {
-    alert('최대 5장까지만 업로드할 수 있습니다.');
+    alert("최대 5장까지만 업로드할 수 있습니다.");
     return;
   }
 
   const newFiles = files.slice(0, remainingSlots);
-  
-  
-  newFiles.forEach(file => {
-    if (file.type.startsWith('image/')) {
+
+  newFiles.forEach((file) => {
+    if (file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         uploadedImages.value.push({
           file: file,
-          preview: e.target.result
+          preview: e.target.result,
         });
       };
       reader.readAsDataURL(file);
@@ -77,39 +77,44 @@ const handleFileUpload = (event, reviewId) => {
 
   // Reset file input
   if (fileInput.value) {
-    fileInput.value.value = '';
+    fileInput.value.value = "";
   }
 };
 
 const sendImageData = async (reviewId) => {
-  console.log("Uploading images:", uploadedImages.value);
-  const formData = new FormData();
-  for (let i = 0; i < uploadedImages.value.length; i++) {
-    formData.append('files', uploadedImages.value[i].file);
-  }
-  
-  const response = await axios.post(
-    "http://localhost:8080/uhpooh/api/file/review/"+reviewId,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-      timeout: 10000,
+  try {
+    console.log("Uploading images:", uploadedImages.value);
+    const formData = new FormData();
+    for (let i = 0; i < uploadedImages.value.length; i++) {
+      formData.append("files", uploadedImages.value[i].file);
     }
-  );
-  return response;
+
+    const response = await axios.post(
+      "http://localhost:8080/uhpooh/api/file/review/" + reviewId,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("Images uploaded successfully:", response);
+    // Clear uploaded images after successful upload
+    uploadedImages.value = [];
+    return response;
+  } catch (error) {
+    console.error("Error uploading images:", error);
+    throw error; // Propagate the error so confirmEdit can handle it
+  }
 };
 
 // 이미지 캐싱 처리
 const imgName = ref("");
 const imgPath = ref("");
 const cacheImage = async (cat) => {
-  imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
-  const response = await axios.get(
-    imgPath.value,
-    { timeout: 5000 }
-  );
+  imgPath.value =
+    "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;
+  const response = await axios.get(imgPath.value, { timeout: 5000 });
   console.log("이미지 캐싱");
 };
 
@@ -117,15 +122,18 @@ const removeImage = (index) => {
   uploadedImages.value.splice(index, 1);
 };
 
-const deleteReviewImage = async (imagePath, index) => {
+const deleteReviewImage = async (targetImageId) => {
   try {
-    // Extract filename from path
-    const filename = imagePath.split('/').pop();
     await axios.delete(
-      `http://localhost:8080/uhpooh/api/file/review/${tempReview.value.reviewId}/${filename}`
+      `http://localhost:8080/uhpooh/api/file/review/image/${targetImageId}`
     );
-    // Remove from local array
-    reviewImages.value.splice(index, 1);
+    // Find and remove the image from reviewMap
+    const imageKey = Object.keys(reviewMap.value).find(
+      (key) => reviewMap.value[key].id === targetImageId
+    );
+    if (imageKey) {
+      delete reviewMap.value[imageKey];
+    }
     console.log("Image deleted successfully");
   } catch (error) {
     console.error("Failed to delete image:", error);
@@ -255,7 +263,7 @@ const addReview = async () => {
         content: content.value,
       }
     );
-   
+
     await sendImageData(response.data.data.reviewId);
     await alert("리뷰가 성공적으로 작성되었습니다.");
 
@@ -281,17 +289,25 @@ const deleteReview = async (rId) => {
 
 const confirmEdit = async (rId) => {
   try {
+    // First update the review text
     const response = await axios.put(
       "http://localhost:8080/uhpooh/api/review/edit/" + rId,
       { title: title.value, content: content.value }
     );
     console.log(response);
-    sendImageData(rId);
+
+    // Wait for image upload to complete if there are new images
+    if (uploadedImages.value.length > 0) {
+      await sendImageData(rId);
+    }
+
+    // Only close and reload after everything is done
     closeModal();
+    location.reload();
   } catch (error) {
     console.log(error);
+    alert("리뷰 수정 중 오류가 발생했습니다.");
   }
-  location.reload();
 };
 const searchPlaceById = async () => {
   console.log("Searching place by ID:", placeId.value);
@@ -328,26 +344,34 @@ const openDetail = async (rId) => {
   const response = await axios.get(
     "http://localhost:8080/uhpooh/api/review/detail/" + rId
   );
+  console.log("Current user:", currentUser.value);
+  console.log("Review user:", response.data.data.userId);
   const imageArray = await axios.get(
     "http://localhost:8080/uhpooh/api/review/reviewimages/" + rId
   );
   console.log(imageArray.data);
-  
+
   // Clear previous images
-  reviewImages.value = [];
-  
+  reviewMap.value = {};
+
   // Process each image
   for (const reviewImage of imageArray.data) {
     const rawPath = reviewImage.imageUrl;
+    const rawImageId = reviewImage.imageId;
     console.log(rawPath);
-    const rawFileName = rawPath.replace("/images/reviews/", ""); 
+    const rawFileName = rawPath.replace("/images/reviews/", "");
     imgName.value = rawFileName;
     console.log(rawFileName);
     await cacheImage("reviews");
     // Store the image path
-    reviewImages.value.push(imgPath.value);
+    reviewMap.value[imgName.value] = {
+      id: rawImageId,
+      name: imgName.value,
+      path: rawPath,
+    };
+    console.log(reviewMap.value);
   }
-  
+
   tempReview.value = response.data.data;
   console.log(tempReview.value);
   title.value = tempReview.value.title;
@@ -355,11 +379,10 @@ const openDetail = async (rId) => {
   nowEditing.value = true;
   tempReviewId.value = rId;
   openModal();
- 
 };
 
 const editReview = async (rId) => {
- openModal();
+  openModal();
 };
 
 onMounted(async () => {
@@ -468,23 +491,32 @@ const toggleLike = () => {
           <div
             v-for="review in reviews"
             @click="openDetail(review.reviewId)"
-            class="bg-gray-50  p-3 rounded-xl shadow hover:shadow-lg transition-shadow duration-300 h-12"
+            class="bg-gray-50 p-3 rounded-xl shadow hover:shadow-lg transition-shadow duration-300 h-12"
           >
             <div class="flex justify-between items-center mb-4">
               <div class="flex items-center space-x-4 flex-1 min-w-0">
-                <h3 class="text-xl font-semibold text-gray-800 whitespace-nowrap">
+                <h3
+                  class="text-xl font-semibold text-gray-800 whitespace-nowrap"
+                >
                   {{ review.title }}
                 </h3>
-                <p class="text-sm text-gray-500 whitespace-nowrap">작성자: {{ review.userId }}</p>
-                <p class="text-gray-700 truncate flex-1">{{ review.content }}</p>
+                <p class="text-sm text-gray-500 whitespace-nowrap">
+                  작성자: {{ review.userId }}
+                </p>
+                <p class="text-gray-700 truncate flex-1">
+                  {{ review.content }}
+                </p>
               </div>
-              <div><p class="text-sm text-gray-500 whitespace-nowrap">{{ review.regTime }}</p></div>
-              <div class="flex space-x-2 ml-4" v-show="review.userId == currentUser">
-                
-                
+              <div>
+                <p class="text-sm text-gray-500 whitespace-nowrap">
+                  {{ review.regTime }}
+                </p>
               </div>
+              <div
+                class="flex space-x-2 ml-4"
+                v-show="review.userId == currentUser.value"
+              ></div>
             </div>
-            
           </div>
         </div>
       </div>
@@ -540,45 +572,72 @@ const toggleLike = () => {
                 사진 첨부 (최대 5장)
               </label>
               <div class="space-y-4">
-                <div class="flex">
-                <!-- Review Images Display -->
-<div v-if="watchingDetails && reviewImages.length > 0">
-  <label class="block text-gray-700 text-sm font-semibold mb-2">
-    첨부된 이미지
-  </label>
-  <div class="flex flex-wrap gap-2">
-    <div v-for="(imagePath, index) in reviewImages" :key="index" 
-         class="relative w-32 h-32 group">
-      <img :src="imagePath" 
-           class="w-full h-full object-cover rounded-lg" 
-           alt="Review image" />
-      <button @click="deleteReviewImage(imagePath, index)" 
-              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 
-                     flex items-center justify-center opacity-0 group-hover:opacity-100 
-                     transition-opacity duration-200">
-        ×
-      </button>
-    </div>
-      </div>
-    </div>
-                <!-- Image Preview -->
-                <div v-if="uploadedImages.length > 0" class="flex pt-7 ml-2 flex-wrap gap-2 mb-4">
-                  <div v-for="(image, index) in uploadedImages" :key="index" 
-                       class="relative w-32 h-32 group">
-                    <img :src="image.preview" class="w-full h-full object-cover rounded-lg" />
-                    <button @click="removeImage(index)" 
-                            class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 
-                     flex items-center justify-center opacity-0 group-hover:opacity-100 
-                     transition-opacity duration-200">
-                      ×
-                    </button>
+                <div class="flex overflow-x-scroll">
+                  <!-- Review Images Display -->
+                  <div
+                    v-if="watchingDetails && Object.keys(reviewMap).length > 0"
+                  >
+                    <label
+                      class="block text-gray-700 text-sm font-semibold mb-2"
+                    >
+                      첨부된 이미지
+                    </label>
+                    <div class="flex gap-2">
+                      <div
+                        v-for="(image, key) in reviewMap"
+                        :key="key"
+                        class="relative w-32 h-32 group"
+                      >
+                        <img
+                          :src="
+                            'http://localhost:8080/uhpooh/api/file' + image.path
+                          "
+                          class="w-full h-full object-cover rounded-lg"
+                          alt="Review image"
+                        />
+                        <button
+                          v-if="currentUser == tempReview.userId"
+                          @click="deleteReviewImage(image.id)"
+                          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Image Preview -->
+                  <div
+                    v-if="uploadedImages.length > 0"
+                    class="flex pt-7 ml-2 gap-2 mb-4"
+                  >
+                    <div
+                      v-for="(image, index) in uploadedImages"
+                      :key="index"
+                      class="relative w-32 h-32 group"
+                    >
+                      <img
+                        :src="image.preview"
+                        class="w-full h-full object-cover rounded-lg"
+                      />
+                      <button
+                        v-if="(!watchingDetails && !nowEditing) || (watchingDetails && currentUser == tempReview.userId)"
+                        @click="removeImage(index)"
+                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                 </div>
-                </div>
                 <!-- Upload Button -->
-                <div v-if="uploadedImages.length < 5" 
-                     class="flex justify-center items-center border-2 border-dashed border-gray-300 
-                            rounded-lg p-4 hover:border-indigo-500 transition-colors duration-200">
+                <div
+                  v-if="
+                    uploadedImages.length < 5 &&
+                    ((!watchingDetails && !nowEditing) ||
+                      (watchingDetails && currentUser == tempReview.userId))
+                  "
+                  class="flex justify-center items-center border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-indigo-500 transition-colors duration-200"
+                >
                   <input
                     type="file"
                     @change="handleFileUpload($event, tempReview.reviewId)"
@@ -587,11 +646,22 @@ const toggleLike = () => {
                     class="hidden"
                     ref="fileInput"
                   />
-                  <button @click="$refs.fileInput.click()" 
-                          class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                            d="M12 4v16m8-8H4"></path>
+                  <button
+                    @click="$refs.fileInput.click()"
+                    class="flex items-center space-x-2 text-gray-600 hover:text-indigo-600"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      ></path>
                     </svg>
                     <span>사진 추가하기</span>
                   </button>
@@ -600,32 +670,30 @@ const toggleLike = () => {
             </div>
           </div>
           <div class="mt-6 flex justify-end space-x-3">
-            
             <button
-            v-show="!watchingDetails && !nowEditing"
+              v-show="!watchingDetails && !nowEditing"
               @click="addReview"
               :disabled="!isFormValid"
               class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               작성하기
             </button>
-            
-            <button
-            v-show="watchingDetails && tempReview.userId == currentUser"
-                  @click="confirmEdit(tempReviewId)"
-                  :disabled="!isFormValid"
-                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  수정
-                </button>
-            <button
-            v-show="watchingDetails && tempReview.userId == currentUser"
-                  @click="deleteReview(tempReviewId)"
-                  class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200 whitespace-nowrap"
-                >
-                  삭제
-                </button>
 
+            <button
+              v-show="watchingDetails && currentUser == tempReview.userId"
+              @click="confirmEdit(tempReviewId)"
+              :disabled="!isFormValid"
+              class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              수정
+            </button>
+            <button
+              v-show="watchingDetails && currentUser == tempReview.userId"
+              @click="deleteReview(tempReviewId)"
+              class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200 whitespace-nowrap"
+            >
+              삭제
+            </button>
           </div>
         </div>
       </div>
