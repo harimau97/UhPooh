@@ -191,6 +191,19 @@ const addReview = async () => {
   location.reload();
 };
 
+const deleteReview = async (rId) => {
+  try {
+    const response = await axios.delete(
+      "http://localhost:8080/uhpooh/api/review/delete/" + rId
+    );
+    console.log(response);
+    alert("리뷰가 성공적으로 삭제되었습니다.");
+  } catch (error) {
+    console.error(error);
+  }
+  location.reload();
+};
+
 const confirmEdit = async (rId) => {
   try {
     const response = await axios.put(
@@ -234,7 +247,7 @@ const reviewList = async () => {
 };
 
 const editReview = async (rId) => {
-  console.log(rId);
+  console.log("리뷰를 수정합니다.", rId);
   const response = await axios.get(
     "http://localhost:8080/uhpooh/api/review/detail/" + rId
   );
@@ -279,192 +292,165 @@ const toggleLike = () => {
 </script>
 
 <template>
-  <div class="p-6 min-h-screen bg-gray-50">
-    <!-- 장소 정보 -->
-    <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
-      <h1 class="mb-4 text-3xl font-bold">{{ placeName }}</h1>
-
-      <!-- 로드뷰 컨테이너 추가 -->
-      <div class="overflow-hidden mb-6 rounded-lg shadow-lg">
+  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-10">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mx-6">
+      <div>
+        <!-- 장소 정보 -->
         <div
-          ref="roadviewContainer"
-          class="w-full h-[400px] transition-all duration-300 hover:shadow-xl"
-        ></div>
+          class="p-8 bg-white rounded-xl shadow-xl transform hover:shadow-2xl transition-all duration-300 mb-6"
+        >
+          <h1
+            class="mb-4 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600"
+          >
+            {{ placeName }}
+          </h1>
+          <div class="space-y-3">
+            <p class="text-gray-600 flex items-center">
+              <i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i>
+              {{ addressName }}
+            </p>
+            <p v-if="phone" class="text-gray-600 flex items-center">
+              <i class="fas fa-phone mr-2 text-indigo-500"></i>
+              {{ phone }}
+            </p>
+            <div class="flex items-center space-x-4">
+              <a
+                :href="placeUrl"
+                target="_blank"
+                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+              >
+                <i class="fas fa-external-link-alt mr-2"></i>
+                카카오맵에서 보기
+              </a>
+              <button
+                @click="openModal"
+                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+              >
+                <i class="fas fa-plus mr-2"></i>
+                리뷰 작성
+              </button>
+              <button
+                @click="toggleLike"
+                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200"
+                :class="[
+                  isLiked
+                    ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
+                ]"
+              >
+                <i
+                  class="fas fa-heart mr-2"
+                  :class="{ 'text-pink-600': isLiked }"
+                ></i>
+                좋아요 {{ likeCount }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 로드뷰 컨테이너 -->
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+          <div ref="roadviewContainer" class="w-full h-[400px]"></div>
+        </div>
       </div>
 
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <div class="space-y-2">
-          <div class="flex items-center space-x-2">
-            <i class="text-red-500 fas fa-map-marker-alt"></i>
-            <p class="text-gray-600">{{ addressName }}</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <i class="text-blue-500 fas fa-phone"></i>
-            <p class="text-gray-600">{{ phone }}</p>
-          </div>
-          <div class="flex items-center space-x-2">
-            <i class="text-green-500 fas fa-info-circle"></i>
-            <a
-              :href="placeUrl"
-              target="_blank"
-              class="text-blue-500 transition-colors hover:text-blue-700"
-            >
-              상세정보 보기
-            </a>
+      <!-- 리뷰 섹션 -->
+      <div class="bg-white rounded-xl shadow-xl p-6 h-[655px]">
+        <h2 class="text-2xl font-bold mb-6 text-indigo-800">리뷰</h2>
+        <div class="space-y-6 h-[550px] pr-2 overflow-y-scroll">
+          <div
+            v-for="review in reviews"
+            class="bg-gray-50 p-6 rounded-xl shadow hover:shadow-lg transition-shadow duration-300"
+          >
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-xl font-semibold text-gray-800">
+                  {{ review.title }}
+                </h3>
+                <p class="text-sm text-gray-500">작성자: {{ review.userId }}</p>
+              </div>
+              <div class="flex space-x-2" v-show="review.userId == currentUser">
+                <button
+                  @click="editReview(review.reviewId)"
+                  class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200"
+                >
+                  수정
+                </button>
+                <button
+                  @click="deleteReview(review.reviewId)"
+                  class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200"
+                >
+                  삭제
+                </button>
+              </div>
+            </div>
+            <p class="text-gray-700 whitespace-pre-line">
+              {{ review.content }}
+            </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 좋아요 버튼 -->
-    <div class="flex items-center mb-6">
-      <button
-        @click="toggleLike"
-        :class="[
-          'px-4 py-2 rounded-lg font-medium transition-all duration-300',
-          isLiked
-            ? 'bg-red-500 text-white hover:bg-red-600'
-            : 'bg-gray-200 text-gray-600 hover:bg-gray-300',
-        ]"
-      >
-        {{ isLiked ? "♥ 좋아요 취소" : "♡ 좋아요" }}
-      </button>
-      <span class="ml-4 text-gray-600">{{ likeCount }}명이 좋아합니다</span>
-    </div>
-
-    <!-- 후기 작성 -->
+    <!-- 리뷰 작성 모달 -->
     <div
       v-if="isModalOpen"
-      class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
     >
-      <div class="relative w-11/12 max-w-3xl bg-white rounded-lg shadow-lg">
-        <!-- 헤더 -->
+      <div class="relative w-11/12 max-w-3xl bg-white rounded-xl shadow-2xl">
         <div
           class="flex justify-between items-center px-6 py-4 border-b border-gray-200"
         >
-          <h2 class="text-xl font-bold text-gray-700"></h2>
+          <h2 class="text-2xl font-bold text-gray-800">
+            {{ nowEditing ? "리뷰 수정" : "리뷰 작성" }}
+          </h2>
           <button
             @click="closeModal"
-            class="text-gray-500 hover:text-gray-800 focus:outline-none"
+            class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              class="w-6 h-6"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
+            <i class="fas fa-times text-xl"></i>
           </button>
         </div>
-
-        <!-- 내용 -->
-        <div class="px-6 py-4 space-y-6">
-          <!-- 사진 업로드 -->
-          <div>
-            <h3 class="mb-4 text-lg font-semibold text-gray-700">
-              사진 업로드
-            </h3>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              @change="handleFileUpload"
-              class="p-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <div class="grid grid-cols-3 gap-4 mt-4">
-              <img
-                v-for="(image, index) in uploadedImages"
-                :key="index"
-                :src="image"
-                alt="Uploaded"
-                class="object-cover w-full h-32 rounded-lg shadow"
+        <div class="p-6">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >제목</label
+              >
+              <input
+                v-model="title"
+                type="text"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="제목을 입력하세요"
               />
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1"
+                >내용</label
+              >
+              <textarea
+                v-model="content"
+                rows="4"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="내용을 입력하세요"
+              ></textarea>
+            </div>
           </div>
-
-          <!-- 후기 작성 -->
-          <div>
-            <h3 class="mb-4 text-lg font-semibold text-gray-700">후기 작성</h3>
-            <textarea
-              :disabled="!isLoggined"
-              v-model="title"
-              rows="1"
-              placeholder="제목을 작성해주세요."
-              required="required"
-              class="p-4 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
-            <textarea
-              :disabled="!isLoggined"
-              v-model="content"
-              rows="5"
-              placeholder="이 장소에 대한 후기를 작성해주세요."
-              required="required"
-              class="p-4 mt-2 w-full rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            ></textarea>
+          <div class="mt-6 flex justify-end space-x-3">
+            <button
+              @click="closeModal"
+              class="px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors duration-200"
+            >
+              취소
+            </button>
+            <button
+              @click="nowEditing ? confirmEdit(tempReviewId) : addReview()"
+              class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+            >
+              {{ nowEditing ? "수정하기" : "작성하기" }}
+            </button>
           </div>
         </div>
-
-        <!-- 푸터 -->
-        <div class="flex justify-end px-6 py-4 border-t border-gray-200">
-          <button
-            v-show="!nowEditing"
-            @click="addReview"
-            class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow hover:bg-blue-600"
-          >
-            작성 완료
-          </button>
-          <button
-            v-show="nowEditing"
-            @click="confirmEdit(tempReviewId)"
-            class="px-4 py-2 text-white bg-blue-500 rounded-lg shadow hover:bg-blue-600"
-          >
-            수정 완료
-          </button>
-          <button
-            @click="closeModal"
-            class="px-4 py-2 ml-2 text-gray-700 bg-gray-200 rounded-lg shadow hover:bg-gray-300"
-          >
-            취소
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-  <button
-    @click="openModal"
-    class="fixed right-6 bottom-6 z-50 px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-  >
-    후기 작성
-  </button>
-  <!-- 리뷰 목록 -->
-  <div class="p-6 mb-6 bg-white rounded-lg shadow-lg">
-    <h2 class="mb-4 text-2xl font-bold text-gray-700">리뷰 목록</h2>
-    <div v-if="reviews.length === 0" class="text-gray-500">
-      작성된 리뷰가 없습니다. 첫 번째 리뷰를 작성해보세요!
-    </div>
-    <div v-else class="space-y-4">
-      <div v-for="review in reviews" class="p-4 rounded-lg border shadow">
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="text-lg font-semibold text-gray-800">
-            {{ review.title }}
-          </h3>
-        </div>
-        <p class="text-gray-600">{{ review.content }}</p>
-
-        <div class="grid grid-cols-3 gap-2 mt-2"></div>
-        <button
-          v-show="review.userId == currentUser"
-          @click="editReview(review.reviewId)"
-        >
-          리뷰 수정
-        </button>
       </div>
     </div>
   </div>
@@ -473,53 +459,64 @@ const toggleLike = () => {
 <style scoped>
 /* 반응형 스타일 */
 @media (max-width: 768px) {
-  img {
-    height: auto !important;
-  }
-}
-.roadview-container {
-  position: relative;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.roadview-container::after {
-  content: "";
-  display: block;
-  padding-bottom: 56.25%;
-}
-
-@media (max-width: 768px) {
-  .roadview-container::after {
-    padding-bottom: 75%;
+  .modal-content {
+    width: 90%;
+    margin: 2rem auto;
   }
 }
 
-/* 기존 스타일 유지 */
-/* 모달 애니메이션 */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+/* 애니메이션 */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  animation: fadeIn 0.3s ease-in-out, fadeOut 0.3s ease-in-out;
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+
+/* 스크롤바 스타일링 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* 입력 필드 포커스 효과 */
+input:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* 버튼 호버 효과 */
+button {
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* 카드 호버 효과 */
+.review-card {
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-2px);
 }
 </style>
