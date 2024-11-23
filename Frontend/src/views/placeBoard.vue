@@ -18,8 +18,8 @@ const placeName = ref("");
 const addressName = ref("");
 const placeUrl = ref("");
 const phone = ref("");
-const placeId = ref("");
-const tableId = ref("");
+const placeId = ref(""); // 실제 장소 id
+const tableId = ref(""); // 테이블 상의 장소 id
 const title = ref("");
 const content = ref("");
 const currentUser = ref(null);
@@ -31,12 +31,9 @@ const watchingDetails = ref(false);
 //
 
 //로드뷰 관련 변수
-const categoryGroupName = ref("");
-const mapContainer = ref(null);
 const isLoading = ref(false);
 const hasSearched = ref(false);
-let map;
-//
+
 // 모달 열고 닫기
 const openModal = () => {
   isModalOpen.value = true;
@@ -85,9 +82,15 @@ const handleFileUpload = (event, reviewId) => {
 };
 
 const sendImageData = async (reviewId) => {
-  const response = axios.post(
+  console.log("Uploading images:", uploadedImages.value);
+  const formData = new FormData();
+  for (let i = 0; i < uploadedImages.value.length; i++) {
+    formData.append('files', uploadedImages.value[i].file);
+  }
+  
+  const response = await axios.post(
     "http://localhost:8080/uhpooh/api/file/review/"+reviewId,
-    newFiles,
+    formData,
     {
       headers: {
         "Content-Type": "multipart/form-data",
@@ -95,7 +98,7 @@ const sendImageData = async (reviewId) => {
       timeout: 10000,
     }
   );
-
+  return response;
 };
 
 const removeImage = (index) => {
@@ -224,9 +227,9 @@ const addReview = async () => {
         content: content.value,
       }
     );
-    console.log(response.data);
-    
-    alert("리뷰가 성공적으로 작성되었습니다.");
+   
+    await sendImageData(response.data.data.reviewId);
+    await alert("리뷰가 성공적으로 작성되었습니다.");
 
     closeModal();
   } catch (error) {

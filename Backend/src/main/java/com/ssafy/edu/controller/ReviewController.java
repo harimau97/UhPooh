@@ -100,9 +100,15 @@ public class ReviewController {
         review.getPlaceId());
     try {
       int result = reviewService.addReview(review);
-      System.out.println(result);
       if (result > 0) {
-        return createResponse(true, "리뷰가 작성되었습니다.", HttpStatus.CREATED);
+        Review newReview = reviewService.getReviewIdByTitleAndContent(review);
+        if (newReview != null) {
+          Map<String, Object> data = new HashMap<>();
+          data.put("reviewId", newReview.getReviewId());
+          return createResponse(true, "리뷰가 작성되었습니다.", data, HttpStatus.CREATED);
+        } else {
+          return createResponse(false, "리뷰 ID를 찾을 수 없습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
       } else {
         return createResponse(false, "리뷰 작성에 실패했습니다.", HttpStatus.BAD_REQUEST);
       }

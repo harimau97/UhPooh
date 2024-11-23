@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ssafy.edu.review.model.dao.ReviewDao">
 
+
     <!-- 전체 리뷰 목록 조회 -->
     <select id="reviewList" resultType="Review">
         SELECT
@@ -18,6 +19,7 @@
         FROM reviews r
         JOIN users u ON r.userId = u.userId
     </select>
+
 
     <!-- 리뷰 작성 -->
     <insert id="addReview" parameterType="Review">
@@ -36,6 +38,7 @@
         )
     </insert>
 
+
     <!-- 리뷰 수정 -->
     <update id="updateReview" parameterType="Review">
         UPDATE reviews
@@ -46,11 +49,13 @@
         WHERE reviewId = #{reviewId}
     </update>
 
+
     <!-- 리뷰 삭제 -->
     <delete id="deleteReview" parameterType="int">
         DELETE FROM reviews
         WHERE reviewId = #{reviewId}
     </delete>
+
 
     <!-- 리뷰 상세 조회 -->
     <select id="reviewDetail" parameterType="int" resultType="Review">
@@ -67,6 +72,7 @@
         JOIN users u ON r.userId = u.userId
         WHERE r.reviewId = #{reviewId}
     </select>
+
 
     <!-- 제목으로 리뷰 검색 -->
     <select id="searchByTitle" parameterType="map" resultType="Review">
@@ -86,12 +92,14 @@
         LIMIT #{start}, #{size}
     </select>
 
+
     <!-- 제목 검색 결과 총 개수 -->
     <select id="getTitleSearchCount" parameterType="map" resultType="int">
         SELECT COUNT(*)
         FROM reviews r
         WHERE r.title LIKE CONCAT('%', #{keyword}, '%')
     </select>
+
 
     <!-- 작성자로 리뷰 검색 -->
     <select id="searchByWriter" parameterType="map" resultType="Review">
@@ -111,6 +119,7 @@
         LIMIT #{start}, #{size}
     </select>
 
+
     <!-- 작성자 검색 결과 총 개수 -->
     <select id="getWriterSearchCount" parameterType="map" resultType="int">
         SELECT COUNT(*)
@@ -118,6 +127,7 @@
         JOIN users u ON r.userId = u.userId
         WHERE u.userName LIKE CONCAT('%', #{keyword}, '%')
     </select>
+
 
     <!-- 장소별 리뷰 목록 조회 -->
     <select id="getReviewsByPlace" parameterType="map" resultType="Review">
@@ -137,12 +147,14 @@
         LIMIT #{start}, #{size}
     </select>
 
+
     <!-- 장소별 리뷰 총 개수 -->
     <select id="getPlaceReviewCount" parameterType="int" resultType="int">
         SELECT COUNT(*)
         FROM reviews
         WHERE placeId = #{placeId}
     </select>
+
 
     <!-- 장소별 작성자 검색 -->
     <select id="searchByWriterInPlace" parameterType="map" resultType="Review">
@@ -163,6 +175,7 @@
         LIMIT #{start}, #{size}
     </select>
 
+
     <!-- 장소별 작성자 검색 총 개수 -->
     <select id="getWriterSearchCountInPlace" parameterType="map" resultType="int">
         SELECT COUNT(*)
@@ -171,6 +184,7 @@
         WHERE r.placeId = #{placeId}
         AND u.userName LIKE CONCAT('%', #{keyword}, '%')
     </select>
+
 
     <!-- 장소별 제목 검색 -->
     <select id="searchByTitleInPlace" parameterType="map" resultType="Review">
@@ -191,6 +205,7 @@
         LIMIT #{start}, #{size}
     </select>
 
+
     <!-- 장소별 제목 검색 총 개수 -->
     <select id="getTitleSearchCountInPlace" parameterType="map" resultType="int">
         SELECT COUNT(*)
@@ -198,6 +213,20 @@
         WHERE r.placeId = #{placeId}
         AND r.title LIKE CONCAT('%', #{keyword}, '%')
     </select>
+
+
+    <!-- title과 content로 reviewId 찾기 -->
+    <select id="getReviewIdByTitleAndContent" parameterType="Review" resultType="Review">
+        SELECT *
+        FROM reviews
+        WHERE title = #{title}
+        AND content = #{content}
+        AND userId = #{userId}
+        AND placeId = #{placeId}
+        ORDER BY reviewId DESC
+        LIMIT 1
+    </select>
+
 
     <!-- 리뷰 이미지 추가 -->
     <insert id="addReviewImage" parameterType="ReviewImage">
@@ -210,6 +239,7 @@
         )
     </insert>
 
+
     <!-- 리뷰의 모든 이미지 조회 -->
     <select id="getReviewImages" parameterType="int" resultType="ReviewImage">
         SELECT
@@ -220,11 +250,13 @@
         WHERE reviewId = #{reviewId}
     </select>
 
+
     <!-- 특정 이미지 삭제 -->
     <delete id="deleteReviewImage" parameterType="int">
         DELETE FROM reviewImages
         WHERE imageId = #{imageId}
     </delete>
+
 
     <!-- 특정 이미지 정보 조회 -->
     <select id="getReviewImageById" parameterType="int" resultType="ReviewImage">
@@ -235,5 +267,6 @@
         FROM reviewImages
         WHERE imageId = #{imageId}
     </select>
+
 
 </mapper>

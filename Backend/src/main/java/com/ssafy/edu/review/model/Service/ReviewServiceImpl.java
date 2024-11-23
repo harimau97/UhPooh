@@ -117,4 +117,9 @@ public class ReviewServiceImpl implements ReviewService {
     public int deleteReviewImage(int imageId) {
         return reviewDao.deleteReviewImage(imageId);
     }
+
+    @Override
+    public Review getReviewIdByTitleAndContent(Review review) {
+        return reviewDao.getReviewIdByTitleAndContent(review);
+    }
 }

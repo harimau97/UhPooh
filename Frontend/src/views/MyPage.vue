@@ -176,7 +176,7 @@ const handleLogout = async () => {
             class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden"
           >
             <img
-              v-if="imageTrue"
+              v-if="imageTrue !== 'null' && imageTrue !== ''"
               :src="imgPath"
               alt="Profile"
               class="w-full h-full object-cover"
