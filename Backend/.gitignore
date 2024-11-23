@@ -32,3 +32,5 @@ application-*.properties
 # Ignore image files
 *.jpg
 *.png
+
+!.gitkeep
