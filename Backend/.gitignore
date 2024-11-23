@@ -28,3 +28,7 @@ out/
 # Properties
 application-*.properties
 !application-example.properties
+
+# Ignore image files
+*.jpg
+*.png

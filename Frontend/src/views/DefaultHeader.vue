@@ -69,6 +69,7 @@ const logout = () => {
   localStorage.removeItem("userName");
   localStorage.removeItem("userAddress");
   localStorage.removeItem("pImage");
+  localStorage.removeItem("tempKeyword");
   isLoggined.value = false; // 로그인 상태 변경
 
   location.replace("/"); // 메인 페이지로 이동;
