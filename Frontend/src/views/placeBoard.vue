@@ -28,6 +28,7 @@ const nowEditing = ref(false);
 const tempReview = ref({});
 const tempReviewId = ref("");
 const watchingDetails = ref(false);
+const reviewImages = ref([]);  // Add this ref for storing cached image paths
 //
 
 //로드뷰 관련 변수
@@ -39,7 +40,6 @@ const openModal = () => {
   isModalOpen.value = true;
 };
 const closeModal = () => {
-
   isModalOpen.value = false;
   title.value = "";
   content.value = "";
@@ -101,8 +101,36 @@ const sendImageData = async (reviewId) => {
   return response;
 };
 
+// 이미지 캐싱 처리
+const imgName = ref("");
+const imgPath = ref("");
+const cacheImage = async (cat) => {
+  imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
+  const response = await axios.get(
+    imgPath.value,
+    { timeout: 5000 }
+  );
+  console.log("이미지 캐싱");
+};
+
 const removeImage = (index) => {
   uploadedImages.value.splice(index, 1);
+};
+
+const deleteReviewImage = async (imagePath, index) => {
+  try {
+    // Extract filename from path
+    const filename = imagePath.split('/').pop();
+    await axios.delete(
+      `http://localhost:8080/uhpooh/api/file/review/${tempReview.value.reviewId}/${filename}`
+    );
+    // Remove from local array
+    reviewImages.value.splice(index, 1);
+    console.log("Image deleted successfully");
+  } catch (error) {
+    console.error("Failed to delete image:", error);
+    alert("이미지 삭제에 실패했습니다.");
+  }
 };
 
 const roadviewContainer = ref(null);
@@ -294,12 +322,32 @@ const reviewList = async () => {
   }
 };
 
-const openDetail= async(rId) => {
+const openDetail = async (rId) => {
   watchingDetails.value = true;
   console.log("리뷰를 상세조회합니다.", rId);
   const response = await axios.get(
     "http://localhost:8080/uhpooh/api/review/detail/" + rId
   );
+  const imageArray = await axios.get(
+    "http://localhost:8080/uhpooh/api/review/reviewimages/" + rId
+  );
+  console.log(imageArray.data);
+  
+  // Clear previous images
+  reviewImages.value = [];
+  
+  // Process each image
+  for (const reviewImage of imageArray.data) {
+    const rawPath = reviewImage.imageUrl;
+    console.log(rawPath);
+    const rawFileName = rawPath.replace("/images/reviews/", ""); 
+    imgName.value = rawFileName;
+    console.log(rawFileName);
+    await cacheImage("reviews");
+    // Store the image path
+    reviewImages.value.push(imgPath.value);
+  }
+  
   tempReview.value = response.data.data;
   console.log(tempReview.value);
   title.value = tempReview.value.title;
@@ -492,18 +540,40 @@ const toggleLike = () => {
                 사진 첨부 (최대 5장)
               </label>
               <div class="space-y-4">
+                <div class="flex">
+                <!-- Review Images Display -->
+<div v-if="watchingDetails && reviewImages.length > 0">
+  <label class="block text-gray-700 text-sm font-semibold mb-2">
+    첨부된 이미지
+  </label>
+  <div class="flex flex-wrap gap-2">
+    <div v-for="(imagePath, index) in reviewImages" :key="index" 
+         class="relative w-32 h-32 group">
+      <img :src="imagePath" 
+           class="w-full h-full object-cover rounded-lg" 
+           alt="Review image" />
+      <button @click="deleteReviewImage(imagePath, index)" 
+              class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 
+                     flex items-center justify-center opacity-0 group-hover:opacity-100 
+                     transition-opacity duration-200">
+        ×
+      </button>
+    </div>
+      </div>
+    </div>
                 <!-- Image Preview -->
-                <div v-if="uploadedImages.length > 0" class="flex flex-wrap gap-2 mb-4">
+                <div v-if="uploadedImages.length > 0" class="flex pt-7 ml-2 flex-wrap gap-2 mb-4">
                   <div v-for="(image, index) in uploadedImages" :key="index" 
-                       class="relative group w-24 h-24">
-                    <img :src="image.preview" class="w-24 h-24 object-cover rounded-lg" />
+                       class="relative w-32 h-32 group">
+                    <img :src="image.preview" class="w-full h-full object-cover rounded-lg" />
                     <button @click="removeImage(index)" 
                             class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 
-                                   flex items-center justify-center opacity-0 group-hover:opacity-100 
-                                   transition-opacity duration-200">
+                     flex items-center justify-center opacity-0 group-hover:opacity-100 
+                     transition-opacity duration-200">
                       ×
                     </button>
                   </div>
+                </div>
                 </div>
                 <!-- Upload Button -->
                 <div v-if="uploadedImages.length < 5" 

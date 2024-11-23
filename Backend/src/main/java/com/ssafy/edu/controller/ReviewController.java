@@ -279,4 +279,21 @@ public class ReviewController {
       return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  @Operation(summary = "reviewId로 이미지 검색", description = "특정 리뷰에 속한 이미지 검색")
+  @GetMapping("/reviewimages/{reviewId}")
+  public ResponseEntity<?> getRevieimagesByReviewId(@PathVariable int reviewId) {
+    logger.info("Getting review images by reviewId");
+    
+    try {
+      return new ResponseEntity<>(reviewService.getReviewImages(reviewId), HttpStatus.OK);  
+    } catch (Exception e) {
+      return new ResponseEntity<>("이미지 목록 반환 실패",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    
+    
+  }
+
 }
