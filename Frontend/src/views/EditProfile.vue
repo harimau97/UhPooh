@@ -31,6 +31,7 @@ const userForm = ref({
 //이미지 표시를 위한 이미지 실제 파일명
 const imgName = ref("");
 const imgPath = ref("");
+const imageTrue = ref("");
 
 // 유효성 검사 상태
 const validName = ref(true);
@@ -221,9 +222,11 @@ const cacheImage = async (cat) => {
 };
 
 // Daum 우편번호 스크립트 로드
-onMounted(() => {
-  // let rawPath = localStorage.getItem("pImage");
-  // imgName.value = rawPath.replace("/images/profiles/", "");
+onMounted(async () => {
+  imageTrue.value = localStorage.getItem("pImage");
+  imgName.value = imageTrue.value.replace("/images/profiles/", "");
+  console.log(imgName.value);
+  await cacheImage("profiles");
   // console.log(imgName.value);
   const script = document.createElement("script");
   script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
@@ -421,7 +424,7 @@ const goBack = () => {
           <div class="flex flex-col items-center space-y-4">
             <div class="relative w-32 h-32">
               <img
-                v-if="imgName"
+                v-if="imageTrue"
                 :src="imgPath"
                 alt="프로필 이미지"
                 class="object-cover w-full h-full rounded-full"
