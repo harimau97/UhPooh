@@ -2,7 +2,10 @@
   <header class="bg-white border-b border-gray-200">
     <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
-      <RouterLink to="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+      <RouterLink
+        to="/"
+        class="text-2xl font-bold text-blue-600 flex items-center gap-2"
+      >
         <img src="../assets/logo_text.png" style="width: 130px; height: auto" />
         <span class="text-2xl">🏊‍♂️</span>
       </RouterLink>
@@ -47,34 +50,36 @@ const isLoggined = inject("isLoggedIn");
 console.log(isLoggined.value);
 console.log(localStorage.getItem("userId"));
 
-const logout = () => {
+const logout = async () => {
   const uId = localStorage.getItem("userId");
-  const tryLogout = async () => {
-    try {
-      console.log("로그아웃 시작");
-      const response = await axios({
-        method: "post", // 강제로 POST로 설정
-        url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        data: {}, // POST 요청에 필요한 데이터
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  tryLogout();
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("userAddress");
-  localStorage.removeItem("pImage");
-  localStorage.removeItem("tempKeyword");
-  isLoggined.value = false; // 로그인 상태 변경
-
-  location.replace("/"); // 메인 페이지로 이동;
+  try {
+    console.log("로그아웃 시작");
+    await axios({
+      method: "post",
+      url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      data: {},
+    });
+    
+    // Clear all localStorage items
+    localStorage.clear();
+    
+    // Update login state
+    isLoggined.value = false;
+    
+    // Force reload and redirect to home
+    window.location.href = "/";
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+    // Even if the API call fails, clear local state
+    localStorage.clear();
+    isLoggined.value = false;
+    window.location.href = "/";
+  }
 };
+
 const navigationLinks = [
   { text: "수영장 찾기", path: "/around" },
   { text: "이용 가이드", path: "/guide" },

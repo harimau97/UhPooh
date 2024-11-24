@@ -1,10 +1,12 @@
 <template>
   <div class="my-pools">
     <div class="header-section">
-      <h1> My 수영장🏊‍♂️</h1>
-      <p class="subtitle">내가 찜한 수영장과 작성한 리뷰를 한눈에 확인해보세요</p>
+      <h1>My 수영장🏊‍♂️</h1>
+      <p class="subtitle">
+        내가 찜한 수영장과 작성한 리뷰를 한눈에 확인해보세요
+      </p>
     </div>
-    
+
     <!-- Liked Places Section -->
     <div class="section liked-places">
       <div class="section-header">
@@ -12,15 +14,19 @@
         <span class="count-badge">{{ likedPlaces.length }}개</span>
       </div>
       <div class="places-grid" v-if="likedPlaces.length > 0">
-        <div v-for="place in likedPlaces" :key="place.id" class="place-card">
+        <div v-for="place in likedPlaces" class="place-card">
           <div class="image-container">
-            <img :src="place.image" :alt="place.name" class="place-image">
+            <img
+              :src="place.image"
+              :alt="place.placeName"
+              class="place-image"
+            />
             <div class="overlay">
               <button class="view-details">자세히 보기</button>
             </div>
           </div>
           <div class="place-info">
-            <h3>{{ place.name }}</h3>
+            <h3>{{ place.placeName }}</h3>
             <p class="address">📍 {{ place.address }}</p>
             <div class="tags">
               <span class="tag">{{ place.type }}</span>
@@ -28,7 +34,12 @@
             </div>
             <div class="rating">
               <div class="stars">
-                <span v-for="n in Math.floor(place.rating)" :key="n" class="star">⭐</span>
+                <span
+                  v-for="n in Math.floor(place.rating)"
+                  :key="n"
+                  class="star"
+                  >⭐</span
+                >
               </div>
               <span class="rating-text">{{ place.rating }}/5.0</span>
             </div>
@@ -36,9 +47,11 @@
         </div>
       </div>
       <div v-else class="empty-state">
-        <img src="@/assets/empty-heart.svg" alt="빈 하트" class="empty-icon">
+        <img src="@/assets/empty-heart.svg" alt="빈 하트" class="empty-icon" />
         <p>아직 찜한 수영장이 없어요</p>
-        <router-link to="/around" class="browse-button">수영장 둘러보기</router-link>
+        <router-link to="/around" class="browse-button"
+          >수영장 둘러보기</router-link
+        >
       </div>
     </div>
 
@@ -69,8 +82,8 @@
           </div>
         </div>
       </div>
-      <div v-else class="empty-state ">
-        <img src="@/assets/empty-review.svg" alt="빈 리뷰" class="empty-icon">
+      <div v-else class="empty-state">
+        <img src="@/assets/empty-review.svg" alt="빈 리뷰" class="empty-icon" />
         <p>아직 작성한 리뷰가 없어요</p>
         <!-- <router-link to="/placeBoard" class="browse-button">리뷰 작성하러 가기</router-link> -->
       </div>
@@ -79,12 +92,13 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { ref, onMounted } from 'vue';
+import axios from "axios";
+import { ref, onMounted } from "vue";
 
 export default {
-  name: 'MyPools',
+  name: "MyPools",
   setup() {
+    const likedPlacesId = ref([]);
     const likedPlaces = ref([]);
     const myReviews = ref([]);
 
@@ -92,18 +106,20 @@ export default {
       try {
         const userId = localStorage.getItem("userId");
         if (!userId) {
-          console.error('User ID not found');
+          console.error("User ID not found");
           return;
         }
-        const response = await axios.get(`http://localhost:8080/uhpooh/api/user/${userId}/reviews`);
+        const response = await axios.get(
+          `http://localhost:8080/uhpooh/api/user/${userId}/reviews`
+        );
         if (response.data && Array.isArray(response.data)) {
           myReviews.value = response.data;
         } else {
-          console.error('Invalid review data format');
+          console.error("Invalid review data format");
           myReviews.value = [];
         }
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error("Error fetching reviews:", error);
         myReviews.value = [];
       }
     };
@@ -112,38 +128,58 @@ export default {
       try {
         const userId = localStorage.getItem("userId");
         if (!userId) {
-          console.error('User ID not found');
+          console.error("User ID not found");
           return;
         }
-        const response = await axios.get(`http://localhost:8080/uhpooh/api/user/${userId}/liked-places`);
+        const response = await axios.get(
+          "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
+        );
         if (response.data && Array.isArray(response.data)) {
-          likedPlaces.value = response.data;
+          likedPlacesId.value = response.data;
+          console.log(likedPlacesId.value);
         } else {
-          console.error('Invalid liked places data format');
-          likedPlaces.value = [];
+          console.error("Invalid liked places data format");
+          likedPlacesId.value = [];
         }
       } catch (error) {
-        console.error('Error fetching liked places:', error);
-        likedPlaces.value = [];
+        console.error("Error fetching liked places:", error);
+        likedPlacesId.value = [];
       }
+
+      for (const placeId of likedPlacesId.value) {
+        try {
+          const response = await axios.get(
+            "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" +
+              placeId
+          );
+          if (response && response.data) {
+            likedPlaces.value.push(response.data);
+          }
+        } catch (error) {
+          console.error("Error fetching place", placeId, ":", error);
+        }
+      }
+      console.log("좋아요를 누른 장소들", likedPlaces.value);
     };
 
     const formatDate = (dateString) => {
       const date = new Date(dateString);
-      return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+      return `${date.getFullYear()}년 ${
+        date.getMonth() + 1
+      }월 ${date.getDate()}일`;
     };
 
-    onMounted(() => {
-      fetchLikedPlaces();
-      fetchMyReviews();
+    onMounted(async () => {
+      await fetchMyReviews();
+      await fetchLikedPlaces();
     });
 
     return {
       likedPlaces,
       myReviews,
-      formatDate
+      formatDate,
     };
-  }
+  },
 };
 </script>
 
@@ -365,7 +401,8 @@ h1 {
   margin-top: 1rem;
 }
 
-.edit-button, .delete-button {
+.edit-button,
+.delete-button {
   padding: 0.5rem 1rem;
   border-radius: 8px;
   border: none;

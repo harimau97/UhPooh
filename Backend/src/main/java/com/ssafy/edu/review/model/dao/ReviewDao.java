@@ -49,4 +49,6 @@ public interface ReviewDao {
     public int deleteReviewImage(int imageId);
     
     public ReviewImage getReviewImageById(int imageId);
+
+    
 }

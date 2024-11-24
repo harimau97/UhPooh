@@ -17,5 +17,9 @@ public interface PlaceDao {
     public int minusLike(int placeId);
     
     public int updateReviewCount(int placeId);
+
+    public int[] getPlaceIdByUserId(int userId);
+
+    public Place getPlaceByPlaceId(int placeId);
     
 }

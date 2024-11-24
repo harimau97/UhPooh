@@ -15,4 +15,8 @@ public interface PlaceService {
     int minusLike(int placeId);
     
     int updateReviewCount(int placeId);
+
+    int[] getPlaceIdByUserId(int userId);
+
+    Place getPlaceByPlaceId(int placeId);
 }

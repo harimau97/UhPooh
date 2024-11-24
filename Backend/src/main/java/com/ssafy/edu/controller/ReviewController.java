@@ -290,10 +290,8 @@ public class ReviewController {
     } catch (Exception e) {
       return new ResponseEntity<>("이미지 목록 반환 실패",HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
-    
-    
   }
+
+  
 
 }

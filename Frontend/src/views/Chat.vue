@@ -38,6 +38,7 @@
     </div>
   </transition>
   <button
+    v-show="isLoggined"
     @click="openChat = !openChat"
     class="fixed right-1 bottom-4 z-50 px-1 py-1 ml-4 text-white rounded-full hover:animate-bounce bg-slate-500"
   >
@@ -65,8 +66,12 @@ import { onMounted, ref, watch } from "vue";
 import ChatReactComponent from "../react_app/Chat.jsx";
 import Header from "./Header.vue";
 import { inject } from "vue";
+const isLoggined = ref(false);
+onMounted(async () => {
+  isLoggined.value = await inject("isLoggedIn");
+});
 
-const isLoggined = inject("isLoggedIn");
+console.log("채팅 가능 여부", isLoggined.value);
 
 const user_id = ref("");
 const user_email = ref("");
@@ -78,9 +83,9 @@ console.log(localStorage.setItem("채팅 확인", user_email.value));
 console.log("");
 
 const config = {
-  APP_ID: "6A037C15-9101-4B13-9733-0A335320499D",
+  APP_ID: "D9BD6203-D932-4BF8-857C-DBB90EB40BE3",
   USER_ID: user_id.value,
-  NICKNAME: user_email.value,
+  NICKNAME: "asdfasdf",
   API_TOKEN: "insert your key here",
 };
 

@@ -12,7 +12,7 @@ import MainHeader from "./views/Header.vue";
 import DefaultHeader from "./views/DefaultHeader.vue";
 
 const isLoggedIn = computed(() => userAuthenticated.value);
-console.log(isLoggedIn.value);
+console.log("로그인 상태", isLoggedIn.value);
 provide("isLoggedIn", isLoggedIn);
 
 onMounted(async () => {
