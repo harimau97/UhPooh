@@ -1,4 +1,4 @@
-package com.ssafy.edu.jwt.util;
+package com.ssafy.edu.jwt.model.util;
 
 import java.util.Date;
 import org.springframework.stereotype.Component;

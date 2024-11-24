@@ -1,9 +1,9 @@
-package com.ssafy.edu.jwt.service;
+package com.ssafy.edu.jwt.model.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.ssafy.edu.jwt.dao.tokenDao;
-import com.ssafy.edu.jwt.util.JwtTokenUtil;
+import com.ssafy.edu.jwt.model.dao.tokenDao;
+import com.ssafy.edu.jwt.model.util.JwtTokenUtil;
 
 @Service
 public class CustomUserService {

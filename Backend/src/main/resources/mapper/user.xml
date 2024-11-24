@@ -163,12 +163,30 @@
         OR userEmail LIKE CONCAT('%', #{keyword}, '%')
     </select>
 
-    <!-- 비밀번호 확인 -->
-    <select id="confirmPassword" parameterType="User" resultType="User">
-        SELECT userId, userEmail, userName, isAdmin, isLogin
-        FROM users
-        WHERE userId = #{userId} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+    <!-- OAuth2 로그인을 위한 새로운 쿼리들 -->
+    <select id="findByUserEmail" parameterType="string" resultType="User">
+        SELECT userId, userEmail, userName, userAddress, pImage,
+        isAdmin, regTime, updTime, isLogin, provider
+        FROM user
+        WHERE userEmail = #{email}
     </select>
+
+    <update id="updateOAuth2User" parameterType="User">
+        UPDATE user
+        SET userName = #{userName},
+        pImage = #{pImage},
+        isLogin = 1,
+        provider = #{provider},
+        updTime = NOW()
+        WHERE userEmail = #{userEmail}
+    </update>
+
+    <insert id="saveOAuth2User" parameterType="User">
+        INSERT INTO user
+        (userEmail, userName, pImage, provider, isLogin)
+        VALUES
+        (#{userEmail}, #{userName}, #{pImage}, #{provider}, 1)
+    </insert>
 
 
 </mapper>

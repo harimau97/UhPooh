@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ssafy.edu.jwt.service.CustomUserService;
+import com.ssafy.edu.jwt.model.service.CustomUserService;
 import com.ssafy.edu.user.model.dto.User;
 import com.ssafy.edu.user.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

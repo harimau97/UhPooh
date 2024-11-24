@@ -1,4 +1,4 @@
-package com.ssafy.edu.jwt.filter;
+package com.ssafy.edu.jwt.model.filter;
 
 import java.io.IOException;
 import jakarta.servlet.Filter;
