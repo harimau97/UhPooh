@@ -49,22 +49,14 @@ onMounted(async () => {
   const isAdmin = localStorage.getItem("isAdmin");
   const pImage = localStorage.getItem("pImage");
   const userProfileImage = localStorage.getItem("userProfileImage");
-  imageTrue.value = pImage;
-  imgName.value = imageTrue.value.replace("/images/profiles/", "");
-  console.log(imgName.value);
-  if (imgName.value !== "") {await cacheImage("profiles");}
+
   if (!userId) {
     alert("로그인이 필요한 서비스입니다.");
     router.push("/login");
     return;
   }
 
-  // 프로필 이미지 설정 로직 수정
-  user.value.profileImageUrl =
-    userProfileImage ||
-    (pImage ? `http://localhost:8080/uhpooh/api/images/${pImage}` : "");
-
-  // localStorage에서 기본 정보 가져오기
+  // 기본 사용자 정보 설정
   user.value = {
     ...user.value,
     name: localStorage.getItem("userName") || "사용자",
@@ -73,6 +65,15 @@ onMounted(async () => {
     membershipLevel: isAdmin === "1" ? "Admin" : "Member",
   };
 
+  // 프로필 이미지 처리
+  imageTrue.value = pImage || "";
+  if (pImage && pImage !== "null") {
+    imgName.value = imageTrue.value.replace("/images/profiles/", "");
+    await cacheImage("profiles");
+    user.value.profileImageUrl = userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
+  }
+
+  // 사용자 통계 데이터 로드
   try {
     const response = await fetch(
       `http://localhost:8080/uhpooh/api/user/${userId}`

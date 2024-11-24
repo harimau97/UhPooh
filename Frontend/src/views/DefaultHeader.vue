@@ -2,8 +2,9 @@
   <header class="bg-white border-b border-gray-200">
     <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
-      <RouterLink to="/" class="text-2xl font-bold text-blue-600">
+      <RouterLink to="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2">
         <img src="../assets/logo_text.png" style="width: 130px; height: auto" />
+        <span class="text-2xl">🏊‍♂️</span>
       </RouterLink>
 
       <!-- Navigation Links -->

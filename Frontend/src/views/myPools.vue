@@ -1,7 +1,7 @@
 <template>
   <div class="my-pools">
     <div class="header-section">
-      <h1> My 수영장✨</h1>
+      <h1> My 수영장🏊‍♂️</h1>
       <p class="subtitle">내가 찜한 수영장과 작성한 리뷰를 한눈에 확인해보세요</p>
     </div>
     
@@ -88,21 +88,43 @@ export default {
     const likedPlaces = ref([]);
     const myReviews = ref([]);
 
-    const fetchLikedPlaces = async () => {
+    const fetchMyReviews = async () => {
       try {
-        const response = await axios.get('/api/user/liked-places');
-        likedPlaces.value = response.data;
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          console.error('User ID not found');
+          return;
+        }
+        const response = await axios.get(`http://localhost:8080/uhpooh/api/user/${userId}/reviews`);
+        if (response.data && Array.isArray(response.data)) {
+          myReviews.value = response.data;
+        } else {
+          console.error('Invalid review data format');
+          myReviews.value = [];
+        }
       } catch (error) {
-        console.error('Error fetching liked places:', error);
+        console.error('Error fetching reviews:', error);
+        myReviews.value = [];
       }
     };
 
-    const fetchMyReviews = async () => {
+    const fetchLikedPlaces = async () => {
       try {
-        const response = await axios.get('/api/user/reviews');
-        myReviews.value = response.data;
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          console.error('User ID not found');
+          return;
+        }
+        const response = await axios.get(`http://localhost:8080/uhpooh/api/user/${userId}/liked-places`);
+        if (response.data && Array.isArray(response.data)) {
+          likedPlaces.value = response.data;
+        } else {
+          console.error('Invalid liked places data format');
+          likedPlaces.value = [];
+        }
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error('Error fetching liked places:', error);
+        likedPlaces.value = [];
       }
     };
 
