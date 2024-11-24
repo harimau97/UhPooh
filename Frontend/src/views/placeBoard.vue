@@ -4,6 +4,7 @@ import { onMounted } from "vue";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
+import { ThumbsUp } from "lucide-vue-next";
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
@@ -14,13 +15,14 @@ const checkLike = ref(false);
 // 리뷰관련 변수
 
 const likeCount = ref(0);
+const isLikeClicked = ref(false);
 const currentPlace = ref("");
 const placeName = ref("");
 const addressName = ref("");
 const placeUrl = ref("");
 const phone = ref("");
-const placeId = ref(""); // 실제 장소 id
-const tableId = ref(""); // 테이블 상의 장소 id
+const placeId = ref(0); // 실제 장소 id
+const tableId = ref(0); // 테이블 상의 장소 id
 const title = ref("");
 const content = ref("");
 const currentUser = ref(null);
@@ -141,7 +143,9 @@ const deleteReviewImage = async (targetImageId) => {
     alert("이미지 삭제에 실패했습니다.");
   }
 };
+// 이미지 캐싱 처리
 
+// 장소 관련 처리
 const roadviewContainer = ref(null);
 let roadview;
 let roadviewClient;
@@ -166,7 +170,8 @@ const addPlace = async () => {
   const result = await axios.get(
     "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
   );
-  likeCount.value = result.data.data.likeCount;
+  
+  tableId.value = result.data.data.placeId;
   console.log(result.data.data);
 };
 
@@ -187,7 +192,7 @@ async function searchPlaces() {
       placeId.value = data[0].id;
       addPlace();
 
-      // searchPlaceById();
+      
       const position = new kakao.maps.LatLng(data[0].y, data[0].x);
 
       roadviewClient.getNearestPanoId(position, 50, (panoId) => {
@@ -243,7 +248,9 @@ async function searchPlaces() {
     }
   });
 }
+// 장소 관련 처리
 
+// 리뷰 관리
 const addReview = async () => {
   console.log("Adding review with tableId:", tableId.value);
   console.log("Current placeId:", placeId.value);
@@ -318,6 +325,8 @@ const searchPlaceById = async () => {
     );
     tableId.value = response.data.data.placeId;
     console.log("Received tableId from API:", tableId.value);
+    await isLiked();
+    await getLikeCount();
   } catch (error) {
     console.error("Error in searchPlaceById:", error);
   }
@@ -385,7 +394,7 @@ const openDetail = async (rId) => {
 const editReview = async (rId) => {
   openModal();
 };
-
+// 리뷰 관리 //
 onMounted(async () => {
   // Get the current place from localStorage
 
@@ -396,10 +405,13 @@ onMounted(async () => {
 
   roadviewClient = new kakao.maps.RoadviewClient();
   roadview = new kakao.maps.Roadview(roadviewContainer.value);
+
+
   // Only search if we have a valid place name
   if (currentPlace.value) {
     await searchPlaces();
-    await isLiked();
+
+    
     // 로드뷰 초기화
   } else {
     console.warn("No place name found in localStorage");
@@ -415,26 +427,33 @@ const isFormValid = computed(() => {
 
 // 장소 정보
 
-// 좋아요 버튼 클릭 핸들러
-const toggleLike = () => {
-  const response = axios.put(
-    "http://localhost:8080/uhpooh/api/place/like/" + tableId.value
-  );
-};
+// 좋아요 버튼 처리
 
 const isLiked = async () => {
-  const checkResponse = await axios.get(
+  
+  try {
+     const checkResponse = await axios.get(
     "http://localhost:8080/uhpooh/api/like/checklike",
     {
       params: {
-        placeId: tableId,
-        userId: currentUser,
+        placeId: tableId.value,
+        userId: currentUser.value,
       },
     }
   );
 
   checkLike.value = checkResponse.data;
-  console.log(checkLike.value);
+  
+ 
+  await console.log("this is checkLike",checkResponse);
+  } catch (error) {
+    
+   console.log(error);
+  }
+
+
+
+ 
 };
 
 const addLike = async (placeId, userId) => {
@@ -448,28 +467,46 @@ const addLike = async (placeId, userId) => {
           userId: userId,
         }
       );
+      
       console.log(response);
-      location.reload();
+      checkLike.value = !checkLike.value;
+      likeCount.value = likeCount.value + 1;
     } catch (error) {
       console.error(error);
     }
   }
 };
 
-const deleteLike = async (placeId, userId) => {
+const deleteLike = async (tableId, userId) => {
+  console.log("Deleting like with tableId:", tableId,"and",userId);
   try {
     const response = await axios.delete(
       "http://localhost:8080/uhpooh/api/like/deletelike",
-      {
-        placeId: placeId,
+      { data: {
+        placeId: tableId,
         userId: userId,
-      }
+      } }
     );
     console.log(response);
+    checkLike.value = !checkLike.value;
+    likeCount.value = likeCount.value - 1;
   } catch (error) {
     console.error(error);
   }
 };
+
+const getLikeCount = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/uhpooh/api/like/getlikebyplaceid/" + tableId.value
+    );
+    likeCount.value = response.data.length;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// 좋아요 버튼 처리
 </script>
 
 <template>
@@ -510,22 +547,34 @@ const deleteLike = async (placeId, userId) => {
                 <i class="fas fa-plus mr-2"></i>
                 리뷰 작성
               </button>
-              <button
-                v-if="checkLike"
-                @click="addLike(tableId, currentUser)"
-                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200"
-              >
-                <i class="fas fa-heart mr-2"></i>
-                좋아요
-              </button>
-              <button
-                v-else
-                @click="deleteLike(tableId, currentUser)"
-                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200 bg-red-500 text-white hover:bg-red-400"
-              >
-                <i class="fas fa-heart mr-2"></i>
-                좋아요 취소
-              </button>
+              <div>
+    <!-- Unliked Button -->
+    <button
+      v-if="!checkLike"
+      @click="addLike(tableId, currentUser)"
+      class="relative flex items-center space-x-2 bg-gray-200 text-gray-600 px-4 py-2 rounded-full shadow-lg transition-all duration-300 active:scale-95"
+    >
+      <ThumbsUp class="w-5 h-5" />
+      <span>{{ likeCount }}</span>
+      <div
+        class="absolute inset-0 bg-gray-400 opacity-0 rounded-full transition-opacity duration-300 active:opacity-30"
+      ></div>
+    </button>
+
+    <!-- Liked Button -->
+    <button
+      v-else
+      @click="deleteLike(tableId, currentUser)"
+      class="relative flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-full shadow-lg transition-all duration-300 active:scale-95"
+    >
+      <ThumbsUp class="w-5 h-5" />
+      <span>{{ likeCount }}</span>
+      <div
+        class="absolute inset-0 bg-red-400 opacity-0 rounded-full transition-opacity duration-300 active:opacity-30"
+      ></div>
+    </button>
+  </div>
+              
             </div>
           </div>
         </div>
