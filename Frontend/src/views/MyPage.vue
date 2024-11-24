@@ -106,7 +106,7 @@ const menuItems = computed(() => {
     {
       icon: Heart,
       label: "My 수영장",
-      path: "/favorites",
+      path: "/mypools",
       description: "좋아요 및 리뷰 조회",
     },
     {
