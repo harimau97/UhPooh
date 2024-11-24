@@ -9,9 +9,10 @@ import { inject } from "vue";
 const isLoggined = inject("isLoggedIn");
 
 // 좋아요 버튼 상태
+const checkLike = ref(false);
 
 // 리뷰관련 변수
-const isLiked = ref(false);
+
 const likeCount = ref(0);
 const currentPlace = ref("");
 const placeName = ref("");
@@ -387,6 +388,7 @@ const editReview = async (rId) => {
 
 onMounted(async () => {
   // Get the current place from localStorage
+
   currentPlace.value = localStorage.getItem("currentPlace");
   currentUser.value = localStorage.getItem("userId");
   console.log("Current place:", currentPlace.value);
@@ -397,7 +399,7 @@ onMounted(async () => {
   // Only search if we have a valid place name
   if (currentPlace.value) {
     await searchPlaces();
-
+    await isLiked();
     // 로드뷰 초기화
   } else {
     console.warn("No place name found in localStorage");
@@ -418,6 +420,55 @@ const toggleLike = () => {
   const response = axios.put(
     "http://localhost:8080/uhpooh/api/place/like/" + tableId.value
   );
+};
+
+const isLiked = async () => {
+  const checkResponse = await axios.get(
+    "http://localhost:8080/uhpooh/api/like/checklike",
+    {
+      params: {
+        placeId: tableId,
+        userId: currentUser,
+      },
+    }
+  );
+
+  checkLike.value = checkResponse.data;
+  console.log(checkLike.value);
+};
+
+const addLike = async (placeId, userId) => {
+  console.log(checkLike.data);
+  if (!checkLike.data) {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/uhpooh/api/like/addlike",
+        {
+          placeId: placeId,
+          userId: userId,
+        }
+      );
+      console.log(response);
+      location.reload();
+    } catch (error) {
+      console.error(error);
+    }
+  }
+};
+
+const deleteLike = async (placeId, userId) => {
+  try {
+    const response = await axios.delete(
+      "http://localhost:8080/uhpooh/api/like/deletelike",
+      {
+        placeId: placeId,
+        userId: userId,
+      }
+    );
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
 };
 </script>
 
@@ -460,19 +511,20 @@ const toggleLike = () => {
                 리뷰 작성
               </button>
               <button
-                @click="toggleLike"
-                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200"
-                :class="[
-                  isLiked
-                    ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-                ]"
+                v-if="checkLike"
+                @click="addLike(tableId, currentUser)"
+                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200 bg-gray-100 text-gray-600 hover:bg-gray-200"
               >
-                <i
-                  class="fas fa-heart mr-2"
-                  :class="{ 'text-pink-600': isLiked }"
-                ></i>
-                좋아요 {{ likeCount }}
+                <i class="fas fa-heart mr-2"></i>
+                좋아요
+              </button>
+              <button
+                v-else
+                @click="deleteLike(tableId, currentUser)"
+                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200 bg-red-500 text-white hover:bg-red-400"
+              >
+                <i class="fas fa-heart mr-2"></i>
+                좋아요 취소
               </button>
             </div>
           </div>
@@ -620,7 +672,10 @@ const toggleLike = () => {
                         class="w-full h-full object-cover rounded-lg"
                       />
                       <button
-                        v-if="(!watchingDetails && !nowEditing) || (watchingDetails && currentUser == tempReview.userId)"
+                        v-if="
+                          (!watchingDetails && !nowEditing) ||
+                          (watchingDetails && currentUser == tempReview.userId)
+                        "
                         @click="removeImage(index)"
                         class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
                       >
