@@ -12,6 +12,10 @@ import {
 import router from "@/router";
 import ContactModal from "../components/ContactModal.vue";
 
+import 김수영Image from "../assets/김수영.png";
+import 이미란Image from "../assets/이미란.png";
+import 박지훈Image from "../assets/박지훈.png";
+
 const isVideoLoaded = ref(false);
 const searchInput = ref("");
 const activeTestimonial = ref(0);
@@ -22,8 +26,14 @@ const handleVideoLoad = () => {
 };
 
 const handleSearch = () => {
-  // Implement search functionality
-  console.log("Searching:", searchInput.value);
+  if (searchInput.value && searchInput.value.trim() !== "") {
+    localStorage.setItem("tempKeyword", searchInput.value);
+    router.push("/around");
+  }
+};
+
+const handleAreaSearch = (areaName) => {
+  localStorage.setItem("tempKeyword", areaName);
   router.push("/around");
 };
 
@@ -50,11 +60,11 @@ const features = [
     color: "bg-cyan-100",
   },
   {
-    icon: Users,
-    title: "실시간 혼잡도",
+    icon: Clock,
+    title: "빠른 예약",
     description:
-      "실시간으로 수영장의 혼잡도를 확인하고 여유로운 시간대를 선택하세요. 더 쾌적한 수영을 즐기실 수 있습니다.",
-    color: "bg-sky-100",
+      "원하는 수영장을 바로 예약할 수 있습니다. 번거로운 전화나 방문 없이 온라인으로 간편하게 예약하세요.",
+    color: "bg-indigo-100",
   },
 ];
 
@@ -64,21 +74,21 @@ const testimonials = [
     role: "수영 강사",
     content:
       "수영장 찾기가 이렇게 쉬울 줄 몰랐어요. 특히 실시간 혼잡도 기능이 정말 유용합니다.",
-    image: "/api/placeholder/64/64",
-  },
-  {
-    name: "박지훈",
-    role: "수영 동호회장",
-    content:
-      "동호회 활동을 위한 수영장을 고를 때 항상 사용합니다. 리뷰가 특히 도움이 되요.",
-    image: "/api/placeholder/64/64",
+    image: 김수영Image,
   },
   {
     name: "이미란",
+    role: "수영 동호회장",
+    content:
+      "동호회 활동을 위한 수영장을 고를 때 항상 사용합니다. 리뷰가 특히 도움이 되요.",
+    image: 이미란Image,
+  },
+  {
+    name: "박지훈",
     role: "수영장 운영자",
     content:
       "파트너로 등록한 후 방문객이 30% 증가했습니다. 관리 시스템도 너무 편리해요.",
-    image: "/api/placeholder/64/64",
+    image: 박지훈Image,
   },
 ];
 
@@ -191,10 +201,12 @@ onMounted(() => {
                 <RouterLink
                   to="/around"
                   @click="handleSearch"
-                  class="flex gap-2 items-center px-8 py-4 font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 rounded-md shadow-lg transition-all duration-200 transform hover:from-blue-700 hover:to-blue-600 shadow-blue-500/20 hover:-translate-y-0.5 hover:shadow-xl"
+                  class="group flex gap-2 items-center px-8 py-4 font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5"
                 >
-                  <Search class="w-5 h-5" />
-                  <span>찾아보기</span>
+                  <Search class="w-5 h-5 transition-transform group-hover:scale-110" />
+                  <span class="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
+                    찾아보기
+                  </span>
                 </RouterLink>
               </div>
 
@@ -207,13 +219,12 @@ onMounted(() => {
                   <button
                     v-for="area in popularAreas"
                     :key="area.name"
+                    @click="handleAreaSearch(area.name)"
                     class="flex gap-1 items-center px-4 py-1.5 text-sm text-gray-600 bg-white rounded-full border border-gray-100 shadow-sm transition-all duration-200 hover:border-blue-200 hover:shadow-md hover:text-blue-600"
                   >
                     <MapPin class="w-4 h-4" />
                     <span>{{ area.name }}</span>
-                    <span class="text-xs text-gray-400"
-                      >({{ area.count }})</span
-                    >
+                    <span class="text-xs text-gray-400">({{ area.count }})</span>
                   </button>
                 </div>
               </div>
@@ -258,43 +269,81 @@ onMounted(() => {
       </div>
     </section>
 
-    <!-- Stats Section -->
-    <section
-      class="overflow-hidden relative py-16 text-white bg-gradient-to-r from-blue-600 to-blue-700"
-    >
-      <!-- Background Pattern -->
-      <div class="absolute inset-0 opacity-10">
-        <div
-          class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"
-        ></div>
+    <!-- Benefits Section -->
+<section class="relative py-20 bg-gradient-to-r from-blue-600 to-blue-400 overflow-hidden">
+  <!-- Background Pattern -->
+  <div class="absolute inset-0 opacity-10">
+    <div
+      class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"
+    ></div>
+  </div>
+
+  <div class="container relative px-4 mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+      <!-- Text Content -->
+      <div class="md:col-span-1 text-white">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6">
+          건강한 수영 라이프를<br />시작해보세요
+        </h2>
+        <p class="text-blue-100 text-lg mb-8">
+          수영은 전신 운동으로 체력 향상과 스트레스 해소에 도움을 줍니다.
+          어푸어푸와 함께 즐거운 수영을 시작해보세요.
+        </p>
+        <RouterLink
+          to="/guide"
+          class="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-lg font-medium transition-all duration-200 hover:bg-blue-50 hover:shadow-lg"
+        >
+          이용가이드 보기
+          <ChevronRight class="w-5 h-5 ml-2" />
+        </RouterLink>
       </div>
 
-      <div class="container relative px-4 mx-auto">
-        <div class="grid grid-cols-1 gap-8 text-center md:grid-cols-3">
-          <div
-            v-for="stat in stats"
-            :key="stat.label"
-            class="p-6 rounded-lg backdrop-blur-sm transition-transform transform bg-white/10 hover:scale-105"
-          >
-            <div class="mb-2 text-4xl font-bold">{{ stat.value }}</div>
-            <div class="text-blue-200">{{ stat.label }}</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="py-24 bg-white">
-      <div class="container px-4 mx-auto">
-        <div class="mb-16 text-center">
-          <h2 class="mb-4 text-4xl font-bold">이용자 후기</h2>
-          <p class="text-xl text-gray-600">
-            실제 사용자들의 생생한 이야기를 들어보세요
+      <!-- Benefits Grid -->
+      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-4xl mb-2">🏊‍♂️</div>
+          <div class="text-2xl font-bold mb-2">체력 향상</div>
+          <p class="text-blue-100">
+            수영은 유산소 운동으로 심폐 기능을 강화하고 근력을 향상시킵니다
           </p>
         </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-4xl mb-2">🧘‍♀️</div>
+          <div class="text-2xl font-bold mb-2">스트레스 해소</div>
+          <p class="text-blue-100">
+            물속에서의 운동은 마음의 안정과 스트레스 해소에 도움이 됩니다
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-4xl mb-2">⚖️</div>
+          <div class="text-2xl font-bold mb-2">체중 관리</div>
+          <p class="text-blue-100">
+            부상 위험이 적으면서도 효과적인 체중 관리가 가능합니다
+          </p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
+          <div class="text-4xl mb-2">👥</div>
+          <div class="text-2xl font-bold mb-2">함께하는 즐거움</div>
+          <p class="text-blue-100">
+            수영 커뮤니티에서 같은 취미를 가진 사람들과 교류할 수 있습니다
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-        <div class="mx-auto max-w-4xl">
-          <div class="relative h-[300px]">
+    <!-- Testimonials Section -->
+    <section class="relative py-12">
+      <div class="container mx-auto px-4">
+        <div class="text-center mb-8">
+          <h2 class="text-3xl font-bold text-gray-900 mb-2">이용자 후기</h2>
+          <p class="text-gray-600">어푸어푸와 함께한 분들의 이야기를 들어보세요</p>
+        </div>
+
+        <!-- Testimonials Carousel -->
+        <div class="relative mx-auto max-w-4xl">
+          <div class="relative h-[280px]">
             <transition-group name="slide">
               <div
                 v-for="(testimonial, index) in testimonials"
@@ -303,22 +352,18 @@ onMounted(() => {
                 class="flex absolute inset-0 items-center"
               >
                 <div class="w-full">
-                  <div class="relative p-8 bg-gray-50 rounded-2xl">
-                    <div class="absolute -top-6 left-1/2 -translate-x-1/2">
-                      <img
-                        :src="testimonial.image"
-                        :alt="testimonial.name"
-                        class="w-16 h-16 rounded-full border-4 border-white shadow-lg"
-                      />
-                    </div>
-                    <div class="pt-8">
-                      <p class="mb-6 text-xl text-gray-600">
-                        {{ testimonial.content }}
-                      </p>
-                      <div class="font-semibold">{{ testimonial.name }}</div>
-                      <div class="text-sm text-gray-500">
-                        {{ testimonial.role }}
-                      </div>
+                  <div class="h-full flex flex-col items-center justify-center text-center px-4">
+                    <img
+                      :src="testimonial.image"
+                      :alt="testimonial.name"
+                      class="w-16 h-16 rounded-full object-cover mb-4"
+                    />
+                    <p class="text-gray-600 text-lg mb-6 max-w-2xl">
+                      "{{ testimonial.content }}"
+                    </p>
+                    <div class="text-center">
+                      <div class="font-semibold text-gray-900">{{ testimonial.name }}</div>
+                      <div class="text-sm text-gray-500">{{ testimonial.role }}</div>
                     </div>
                   </div>
                 </div>

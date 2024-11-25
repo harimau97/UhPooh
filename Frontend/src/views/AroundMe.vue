@@ -61,12 +61,18 @@ function searchPlaces() {
     if (status === kakao.maps.services.Status.OK) {
       const resultDiv = document.getElementById("results");
       resultDiv.innerHTML = "";
+      
+      // 모든 마커의 위치를 저장할 배열
+      const positions = [];
+      
       data.forEach((place) => {
         if (place.phone !== "") {
           console.log(place.id);
+          const position = new kakao.maps.LatLng(place.y, place.x);
+          positions.push(position);
 
           const marker = new kakao.maps.Marker({
-            position: new kakao.maps.LatLng(place.y, place.x),
+            position: position,
           });
           marker.setMap(map);
           const itemEl = document.createElement("div");
@@ -115,42 +121,21 @@ function searchPlaces() {
             `);
           });
           itemEl.addEventListener("click", () => handleClick(place.place_name));
-          bounds.extend(marker.getPosition());
         }
       });
       resultDiv.scrollTop = 0;
-      map.setBounds(bounds);
-
-      // 검색 결과가 표시된 후 지도 중심점 조정
-      setTimeout(() => {
-        const mapCenter = map.getCenter();
-        // 지도 컨테이너의 너비와 높이를 가져옵니다
-        const containerWidth = mapContainer.value.clientWidth;
-        const containerHeight = mapContainer.value.clientHeight;
-
-        // 검색결과 리스트의 너비를 고려하여 오프셋을 계산합니다
-        // 화면이 작을 때는 offset을 조정합니다
-        const offset = window.innerWidth <= 768 ? 0 : containerWidth * 0.2;
-
-        // 새로운 중심점을 계산합니다
-        const newCenter = new kakao.maps.LatLng(
-          mapCenter.getLat(),
-          mapCenter.getLng()
-        );
-
-        // 지도의 중심을 새로운 위치로 부드럽게 이동시킵니다
-        map.panTo(newCenter);
-
-        // 지도 레벨을 조정하여 모든 마커가 잘 보이도록 합니다
-        const currentLevel = map.getLevel();
-        if (currentLevel < 3) {
-          map.setLevel(3);
-        }
-      }, 100); // 약간의 지연을 줘서 검색 결과 표시 후 실행되도록 합니다
-
-      localStorage.setItem("tempData", data);
-      console.log(localStorage.getItem("tempData"));
-      console.log(localStorage.getItem("tempKeyword"));
+      
+      // 모든 마커가 보이도록 지도 범위 재설정
+      if (positions.length > 0) {
+        positions.forEach(position => bounds.extend(position));
+        map.setBounds(bounds);
+        
+        // 약간의 지연 후에 지도 리사이즈 실행
+        setTimeout(() => {
+          map.relayout();
+          map.setBounds(bounds);
+        }, 100);
+      }
     } else {
       alert("검색 결과가 없습니다.");
       hasSearched.value = false;
@@ -250,7 +235,7 @@ function handleKeyPress(event) {
 
 .content-container-searched {
   width: 100%;
-  height: 100%;
+  height: 80vh;
   display: flex;
   gap: 1rem;
   position: relative;
@@ -259,7 +244,7 @@ function handleKeyPress(event) {
 
 .map-container {
   width: 100%;
-  height: 100%;
+  height: 80vh;
   background: white;
   border-radius: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -275,12 +260,12 @@ function handleKeyPress(event) {
 
 .results-container {
   width: 40%;
+  height: 80vh;
   background: white;
   border-radius: 1rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   overflow-x: hidden;
-  height: 100%;
   opacity: 0;
   animation: slideIn 0.5s ease forwards;
 }
