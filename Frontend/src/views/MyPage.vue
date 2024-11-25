@@ -12,7 +12,6 @@ import {
   MapPin,
 } from "lucide-vue-next";
 import axios from "axios";
-import { logout } from "../composables/userAuth";
 
 const router = useRouter();
 const showLogoutModal = ref(false);
@@ -140,7 +139,6 @@ const handleLogout = async () => {
   showLogoutModal.value = false;
   logout();
 };
-
 </script>
 
 <template>

@@ -41,6 +41,7 @@ const loadAllUsers = async () => {
     const result = await response.json();
     if (result.success && result.data) {
       users.value = result.data; // 페이징된 사용자 목록
+      console.log(result.data);
       totalItems.value = result.data.totalItems; // 전체 사용자 수
       displayedTotal.value = result.data.length;
     }
@@ -151,9 +152,7 @@ const formatDate = (dateString) => {
 
 // 초기 데이터 로드
 onMounted(async () => {
-  if (localStorage.getItem("pImage") === "undefined") {
-    imgPath.value = "http://localhost:5173/src/assets/default-profile.png";
-  }
+  imgPath.value = "http://localhost:5173/src/assets/default-profile.png";
   const userId = localStorage.getItem("userId");
   const isAdmin = localStorage.getItem("isAdmin");
 
@@ -172,16 +171,16 @@ onMounted(async () => {
     <div class="bg-white rounded-2xl shadow-sm">
       <div class="p-6 border-b">
         <h1 class="text-2xl font-bold">전체 회원 관리</h1>
-        <p class="text-gray-600 mt-2">
+        <p class="mt-2 text-gray-600">
           총 {{ displayedTotal }}명의 회원이 검색되었습니다.
         </p>
 
         <!-- 검색 영역 -->
-        <div class="mt-4 flex gap-4">
+        <div class="flex gap-4 mt-4">
           <select
             v-model="searchType"
             @change="handleSearchTypeChange"
-            class="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-3 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option
               v-for="type in searchTypes"
@@ -192,11 +191,11 @@ onMounted(async () => {
             </option>
           </select>
 
-          <div class="flex-1 relative">
+          <div class="relative flex-1">
             <template v-if="searchType === 'admin'">
               <select
                 v-model="searchKeyword"
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="px-4 py-2 w-full rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
                 @change="handleSearch"
               >
                 <option value="">전체</option>
@@ -211,7 +210,7 @@ onMounted(async () => {
                 :placeholder="`${
                   searchTypes.find((t) => t.value === searchType)?.label
                 }으로 검색`"
-                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="px-4 py-2 w-full rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500"
                 @keyup.enter="handleSearch"
               />
             </template>
@@ -219,7 +218,7 @@ onMounted(async () => {
 
           <button
             @click="handleSearch"
-            class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="px-6 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             검색
           </button>
@@ -236,28 +235,28 @@ onMounted(async () => {
         <table class="w-full min-w-max">
           <thead>
             <tr class="bg-gray-50">
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 프로필
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 ID
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 이름
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 이메일
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 주소
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 권한
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 로그인 상태
               </th>
-              <th class="p-4 text-left text-sm font-medium text-gray-600">
+              <th class="p-4 text-sm font-medium text-left text-gray-600">
                 등록일
               </th>
             </tr>
@@ -272,9 +271,15 @@ onMounted(async () => {
               <!-- 프로필 이미지 -->
               <td class="p-4">
                 <img
+                  v-if="user.pimage === null"
                   :src="imgPath"
                   alt="Profile"
-                  class="w-12 h-12 rounded-full object-cover border border-gray-200"
+                  class="object-cover w-12 h-12 rounded-full border border-gray-200"
+                />
+                <img
+                  v-else
+                  src="http://localhost:8080/uhpooh/api/file/images/profiles/${user.pimage}"
+                  alt="Profile"
                 />
               </td>
 
@@ -300,7 +305,7 @@ onMounted(async () => {
                       ? 'bg-red-100 text-red-600'
                       : 'bg-blue-100 text-blue-600'
                   "
-                  class="px-2 py-1 rounded-full text-sm"
+                  class="px-2 py-1 text-sm rounded-full"
                 >
                   {{ user.isAdmin === 1 ? "Admin" : "Member" }}
                 </span>
@@ -314,7 +319,7 @@ onMounted(async () => {
                       ? 'bg-green-100 text-green-600'
                       : 'bg-gray-100 text-gray-600'
                   "
-                  class="px-2 py-1 rounded-full text-sm"
+                  class="px-2 py-1 text-sm rounded-full"
                 >
                   {{ user.isLogin === 1 ? "로그인" : "로그아웃" }}
                 </span>
@@ -329,7 +334,7 @@ onMounted(async () => {
         </table>
 
         <!-- 페이지네이션 -->
-        <div v-if="totalItems > pageSize" class="p-4 flex justify-center gap-2">
+        <div v-if="totalItems > pageSize" class="flex gap-2 justify-center p-4">
           <button
             v-for="page in Math.ceil(totalItems / pageSize)"
             :key="page"
