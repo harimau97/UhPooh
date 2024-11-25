@@ -115,15 +115,59 @@ const Chat = (props) => {
     props.setSbUserInfo(currentUser);
   }
 
+  useEffect(() => {
+    const initializeChannel = async () => {
+      if (sdk && props.config.USER_ID) {
+        try {
+          // Create user first
+          const createUserUrl = `https://api-${props.config.APP_ID}.sendbird.com/v3/users`;
+          const response = await fetch(createUserUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Api-Token": props.config.API_TOKEN,
+            },
+            body: JSON.stringify({
+              user_id: props.config.USER_ID,
+              nickname: props.config.USER_EMAIL,
+              profile_url: "",
+            }),
+          });
+
+          if (!response.ok) {
+            alert("User might already exist, proceeding with channel creation");
+          }
+
+          // Update user info
+          await sdk.updateCurrentUserInfo({
+            nickname: props.config.USER_EMAIL,
+            userId: props.config.USER_ID,
+          });
+
+          // Create channel (기존 코드)
+          const [channel] = await sdk.groupChannel.createChannel({
+            invitedUserIds: [props.config.USER_ID],
+            operatorUserIds: [props.config.USER_ID],
+            name: "General Channel",
+          });
+          console.log("Channel initialized:", channel);
+        } catch (error) {
+          console.error("Error initializing channel:", error);
+        }
+      }
+    };
+
+    initializeChannel();
+  }, [sdk, props.config.USER_ID]);
+
   // Sendbird UI Kit 컴포넌트 렌더링
   return (
     <div className="channel-wrap">
       <SendbirdApp
         appId={props.config.APP_ID}
         userId={props.config.USER_ID}
-        nickname={props.config.NICKNAME}
-        profileUrl={props.config.PROFILE_URL}
         breakpoint={true}
+        nickname={props.config.USER_EMAIL}
         stringSet={stringSet}
         colorSet={{
           "--sendbird-light-primary-500": "#4d2bf0",

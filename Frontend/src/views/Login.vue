@@ -187,6 +187,7 @@ const login = async () => {
       localStorage.setItem("userAddress", response.data.user.userAddress);
       localStorage.setItem("pImage", response.data.user.pImage);
       localStorage.setItem("userToken", response.data.userToken);
+      localStorage.setItem("userEmail", response.data.user.userEmail);
       console.log(response.data);
       console.log(localStorage.getItem("userToken"));
       location.replace("/");

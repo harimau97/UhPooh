@@ -87,23 +87,6 @@ onMounted(async () => {
 
 console.log("채팅 가능 여부", isLoggined.value);
 
-const user_id = ref("");
-const user_email = ref("");
-
-user_id.value = localStorage.getItem("userName");
-user_email.value = localStorage.getItem("userEmail");
-
-console.log(localStorage.setItem("채팅 확인", user_email.value));
-console.log("");
-
-const config = {
-  APP_ID: "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
-  USER_ID: user_id.value,
-  NICKNAME: user_email.value,
-  API_TOKEN: "insert your key here",
-  LANG: "ko",
-};
-
 export default {
   data() {
     return {
@@ -145,6 +128,27 @@ export default {
   setup() {
     const userRef = ref(null);
     const messageCountRef = ref(null);
+    const user_id = ref("");
+    const user_email = ref("");
+
+    // Initialize values from localStorage
+    user_id.value = localStorage.getItem("userName") || "";
+    user_email.value = localStorage.getItem("userEmail") || "";
+
+    console.log("Chat Config Values:", {
+      stored_email: localStorage.getItem("userEmail"),
+      user_email: user_email.value,
+      user_id: user_id.value,
+    });
+
+    const config = {
+      APP_ID: "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
+      USER_ID: user_id.value,
+      USER_EMAIL: localStorage.getItem("userEmail") || user_email.value,
+      API_TOKEN: "insert your key here",
+    };
+
+    console.log("Final Config:", config);
     return {
       config: config,
       setSbUserInfo: (user) => {
