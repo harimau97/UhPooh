@@ -1,4 +1,4 @@
-package com.ssafy.edu.jwt.filter;
+package com.ssafy.edu.jwt.model.filter;
 
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

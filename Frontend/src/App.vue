@@ -12,7 +12,7 @@ import MainHeader from "./views/Header.vue";
 import DefaultHeader from "./views/DefaultHeader.vue";
 
 const isLoggedIn = computed(() => userAuthenticated.value);
-console.log(isLoggedIn.value);
+console.log("로그인 상태", isLoggedIn.value);
 provide("isLoggedIn", isLoggedIn);
 
 onMounted(async () => {
@@ -28,10 +28,12 @@ const isMainPage = computed(() => route.path === "/");
 </script>
 
 <template>
-  <Chat />
   <MainHeader v-if="isMainPage" />
   <DefaultHeader v-else />
   <RouterView />
+  <div v-show="isLoggedIn">
+    <Chat />
+  </div>
 </template>
 
 <style scoped></style>

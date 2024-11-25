@@ -50,4 +50,15 @@ public class PlaceServiceImpl implements PlaceService{
     public int updateReviewCount(int placeId) {
         return placeDao.updateReviewCount(placeId);
     }
+
+    @Override
+    public int[] getPlaceIdByUserId(int userId) {
+        return placeDao.getPlaceIdByUserId(userId);
+    }
+
+    @Override
+    public Place getPlaceByPlaceId(int placeId) {
+        return placeDao.getPlaceByPlaceId(placeId);
+    }
+
 }

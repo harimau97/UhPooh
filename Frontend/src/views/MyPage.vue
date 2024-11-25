@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, inject } from "vue";
 import { useRouter } from "vue-router";
 import {
   UserCog,
@@ -12,7 +12,7 @@ import {
   MapPin,
 } from "lucide-vue-next";
 import axios from "axios";
-import { inject } from "vue";
+import { logout } from "../composables/userAuth";
 
 const router = useRouter();
 const showLogoutModal = ref(false);
@@ -35,12 +35,9 @@ const user = ref({
 
 //프로필이미지 캐싱
 const cacheImage = async (cat) => {
-  imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
-  const response = await axios.get(
-    imgPath.value,
-    { timeout: 5000 }
-  );
-  
+  imgPath.value =
+    "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;
+  const response = await axios.get(imgPath.value, { timeout: 5000 });
 };
 
 // 사용자 데이터 로드
@@ -49,22 +46,14 @@ onMounted(async () => {
   const isAdmin = localStorage.getItem("isAdmin");
   const pImage = localStorage.getItem("pImage");
   const userProfileImage = localStorage.getItem("userProfileImage");
-  imageTrue.value = pImage;
-  imgName.value = imageTrue.value.replace("/images/profiles/", "");
-  console.log(imgName.value);
-  if (imgName.value !== "") {await cacheImage("profiles");}
+
   if (!userId) {
     alert("로그인이 필요한 서비스입니다.");
     router.push("/login");
     return;
   }
 
-  // 프로필 이미지 설정 로직 수정
-  user.value.profileImageUrl =
-    userProfileImage ||
-    (pImage ? `http://localhost:8080/uhpooh/api/images/${pImage}` : "");
-
-  // localStorage에서 기본 정보 가져오기
+  // 기본 사용자 정보 설정
   user.value = {
     ...user.value,
     name: localStorage.getItem("userName") || "사용자",
@@ -73,6 +62,16 @@ onMounted(async () => {
     membershipLevel: isAdmin === "1" ? "Admin" : "Member",
   };
 
+  // 프로필 이미지 처리
+  imageTrue.value = pImage || "";
+  if (pImage && pImage !== "null") {
+    imgName.value = imageTrue.value.replace("/images/profiles/", "");
+    await cacheImage("profiles");
+    user.value.profileImageUrl =
+      userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
+  }
+
+  // 사용자 통계 데이터 로드
   try {
     const response = await fetch(
       `http://localhost:8080/uhpooh/api/user/${userId}`
@@ -106,7 +105,7 @@ const menuItems = computed(() => {
     {
       icon: Heart,
       label: "My 수영장",
-      path: "/favorites",
+      path: "/mypools",
       description: "좋아요 및 리뷰 조회",
     },
     {
@@ -138,31 +137,10 @@ const confirmLogout = () => {
 };
 
 const handleLogout = async () => {
-  const uId = localStorage.getItem("userId");
-  try {
-    console.log("로그아웃 시작");
-    await axios({
-      method: "post",
-      url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      data: {},
-    });
-
-    localStorage.removeItem("userToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("userAddress");
-    localStorage.removeItem("userProfileImage");
-
-    isLoggined.value = false;
-    location.replace("/");
-  } catch (error) {
-    console.error("로그아웃 중 오류 발생:", error);
-    alert("로그아웃 중 오류가 발생했습니다. 다시 시도해주세요.");
-  }
+  showLogoutModal.value = false;
+  logout();
 };
+
 </script>
 
 <template>
@@ -173,18 +151,18 @@ const handleLogout = async () => {
         <!-- 프로필 이미지 -->
         <div class="relative">
           <div
-            class="w-24 h-24 rounded-full border-4 border-blue-100 overflow-hidden"
+            class="overflow-hidden w-24 h-24 rounded-full border-4 border-blue-100"
           >
             <img
               v-if="imageTrue !== 'null' && imageTrue !== ''"
               :src="imgPath"
               alt="Profile"
-              class="w-full h-full object-cover"
+              class="object-cover w-full h-full"
               @error="handleImageError"
             />
             <div
               v-else
-              class="w-full h-full bg-gray-200 flex items-center justify-center"
+              class="flex justify-center items-center w-full h-full bg-gray-200"
             >
               <User class="w-12 h-12 text-gray-400" />
             </div>
@@ -259,22 +237,22 @@ const handleLogout = async () => {
     </div>
 
     <!-- 로그아웃 모달 -->
-    <div v-if="showLogoutModal" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex min-h-full items-center justify-center p-4 text-center">
+    <div v-if="showLogoutModal" class="overflow-y-auto fixed inset-0 z-50">
+      <div class="flex justify-center items-center p-4 min-h-full text-center">
         <div
           class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
           @click="showLogoutModal = false"
         ></div>
 
         <div
-          class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg"
+          class="overflow-hidden relative text-left bg-white rounded-lg shadow-xl transition-all transform sm:my-8 sm:w-full sm:max-w-lg"
         >
-          <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+          <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
             <div class="sm:flex sm:items-start">
               <div
-                class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10"
+                class="flex flex-shrink-0 justify-center items-center mx-auto w-12 h-12 bg-red-100 rounded-full sm:mx-0 sm:h-10 sm:w-10"
               >
-                <LogOut class="h-6 w-6 text-red-600" />
+                <LogOut class="w-6 h-6 text-red-600" />
               </div>
               <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                 <h3 class="text-lg font-semibold leading-6 text-gray-900">
@@ -288,17 +266,17 @@ const handleLogout = async () => {
               </div>
             </div>
           </div>
-          <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+          <div class="px-4 py-3 bg-gray-50 sm:flex sm:flex-row-reverse sm:px-6">
             <button
               type="button"
-              class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
+              class="inline-flex justify-center px-3 py-2 w-full text-sm font-semibold text-white bg-red-600 rounded-md shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto"
               @click="confirmLogout"
             >
               로그아웃
             </button>
             <button
               type="button"
-              class="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+              class="inline-flex justify-center px-3 py-2 mt-3 w-full text-sm font-semibold text-gray-900 bg-white rounded-md ring-1 ring-inset ring-gray-300 shadow-sm hover:bg-gray-50 sm:mt-0 sm:w-auto"
               @click="showLogoutModal = false"
             >
               취소
@@ -320,7 +298,7 @@ const handleLogout = async () => {
           <LogOut class="w-5 h-5 text-red-600" />
         </div>
         <div>
-          <div class="font-medium justify-start flex">로그아웃</div>
+          <div class="flex justify-start font-medium">로그아웃</div>
           <div class="text-sm text-gray-600">안전하게 로그아웃합니다</div>
         </div>
       </div>

@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ssafy.edu.jwt.service.CustomUserService;
+import com.ssafy.edu.jwt.model.service.CustomUserService;
 import com.ssafy.edu.user.model.dto.User;
 import com.ssafy.edu.user.model.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,7 +55,7 @@ public class UserController {
     response.put("data", data);
     return new ResponseEntity<>(response, status);
   }
-  
+
   @Operation(summary = "전체 사용자 목록 조회", description = "관리자만 전체 사용자 목록 조회 가능")
   @GetMapping("/list")
   public ResponseEntity<Map<String, Object>> userList(@RequestParam int requestUserId) {
@@ -65,13 +65,13 @@ public class UserController {
       if (requestUser == null || requestUser.getIsAdmin() == 0) {
         return createResponse(false, ADMIN_ONLY_MESSAGE, HttpStatus.FORBIDDEN);
       }
-      
+
       List<User> users = userService.userList();
       return createResponse(true, "사용자 목록 조회 성공", users, HttpStatus.OK);
     } catch (Exception e) {
       logger.error("Error in userList: ", e);
       return createResponse(false, "사용자 목록 조회 중 오류가 발생했습니다: " + e.getMessage(),
-              HttpStatus.INTERNAL_SERVER_ERROR);
+          HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -460,43 +460,41 @@ public class UserController {
   // customUserService.tokenProvider();
   // return new ResponseEntity<>("Success", HttpStatus.OK);
   // }
-  
+
   @Operation(summary = "회원 통합 검색", description = "이메일과 닉네임으로 회원 통합 검색")
   @GetMapping("/search/integrated")
-  public ResponseEntity<Map<String, Object>> searchEverything(
-          @RequestParam String keyword,
-          @RequestParam(defaultValue = "1") int page,
-          @RequestParam(defaultValue = "12") int size,
-          @RequestParam int requestUserId) {
+  public ResponseEntity<Map<String, Object>> searchEverything(@RequestParam String keyword,
+      @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "12") int size,
+      @RequestParam int requestUserId) {
     logger.info("Integrated search - keyword: {}, page: {}, size: {}", keyword, page, size);
     try {
       User requestUser = userService.userDetail(requestUserId);
       if (requestUser == null || requestUser.getIsAdmin() == 0) {
         return createResponse(false, ADMIN_ONLY_MESSAGE, HttpStatus.FORBIDDEN);
       }
-      
+
       Map<String, Object> searchParams = new HashMap<>();
       searchParams.put("keyword", keyword);
       searchParams.put("start", (page - 1) * size);
       searchParams.put("size", size);
-      
+
       List<User> users = userService.searchEverything(searchParams);
       int totalCount = userService.getTotalEverythingCount(searchParams);
-      
+
       Map<String, Object> data = new HashMap<>();
       data.put("users", users);
       data.put("currentPage", page);
       data.put("totalItems", totalCount);
       data.put("totalPages", (int) Math.ceil((double) totalCount / size));
-      
+
       return createResponse(true, "검색 성공", data, HttpStatus.OK);
     } catch (Exception e) {
       logger.error("Error in searchEverything: ", e);
       return createResponse(false, "회원 검색 중 오류가 발생했습니다: " + e.getMessage(),
-              HttpStatus.INTERNAL_SERVER_ERROR);
+          HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  
+
   @Operation(summary = "현재 비밀번호 확인", description = "현재 비밀번호가 맞는지 확인 (필수: userId, password)")
   @PostMapping("/verify-password")
   public ResponseEntity<Map<String, Object>> verifyPassword(@RequestBody User user) {
@@ -504,12 +502,12 @@ public class UserController {
     try {
       // confirmPassword를 사용하여 비밀번호 확인
       User verifiedUser = userService.confirmPassword(user);
-      
+
       if (verifiedUser != null) {
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("success", true);
         responseData.put("message", "비밀번호가 확인되었습니다.");
-        
+
         return new ResponseEntity<>(responseData, HttpStatus.OK);
       } else {
         return createResponse(false, "비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED);
@@ -517,7 +515,7 @@ public class UserController {
     } catch (Exception e) {
       logger.error("Error in verifyPassword: ", e);
       return createResponse(false, "비밀번호 확인 중 오류가 발생했습니다: " + e.getMessage(),
-              HttpStatus.INTERNAL_SERVER_ERROR);
+          HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 }

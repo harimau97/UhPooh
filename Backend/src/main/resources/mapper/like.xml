@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.edu.like.model.dao.LikeDao">
+
+    <insert id="addLike">
+        INSERT INTO likes (
+        userId,
+        placeId, regTime
+        )
+        VALUES (
+        #{userId},
+        #{placeId}, now()
+        )
+    </insert>
+
+    <delete id="deleteLike">
+        DELETE FROM likes
+        WHERE userId = #{userId} AND placeId = #{placeId}
+    </delete>
+
+    <select id="getLikeListByUserId" >
+        SELECT * FROM likes
+        WHERE placeId = #{userId}
+    </select>
+
+    <select id="getLikeListByPlaceId" >
+        SELECT * FROM likes
+        WHERE placeId = #{placeId}
+    </select>
+
+    <select id="checkLike" >
+        SELECT * FROM likes
+        WHERE userId = #{userId} AND placeId = #{placeId}
+    </select>
+</mapper>

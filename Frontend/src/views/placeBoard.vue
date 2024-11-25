@@ -4,22 +4,25 @@ import { onMounted } from "vue";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
+import { ThumbsUp } from "lucide-vue-next";
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
 
 // 좋아요 버튼 상태
+const checkLike = ref(false);
 
 // 리뷰관련 변수
-const isLiked = ref(false);
+
 const likeCount = ref(0);
+const isLikeClicked = ref(false);
 const currentPlace = ref("");
 const placeName = ref("");
 const addressName = ref("");
 const placeUrl = ref("");
 const phone = ref("");
-const placeId = ref(""); // 실제 장소 id
-const tableId = ref(""); // 테이블 상의 장소 id
+const placeId = ref(0); // 실제 장소 id
+const tableId = ref(0); // 테이블 상의 장소 id
 const title = ref("");
 const content = ref("");
 const currentUser = ref(null);
@@ -140,7 +143,9 @@ const deleteReviewImage = async (targetImageId) => {
     alert("이미지 삭제에 실패했습니다.");
   }
 };
+// 이미지 캐싱 처리
 
+// 장소 관련 처리
 const roadviewContainer = ref(null);
 let roadview;
 let roadviewClient;
@@ -165,7 +170,8 @@ const addPlace = async () => {
   const result = await axios.get(
     "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
   );
-  likeCount.value = result.data.data.likeCount;
+
+  tableId.value = result.data.data.placeId;
   console.log(result.data.data);
 };
 
@@ -186,7 +192,6 @@ async function searchPlaces() {
       placeId.value = data[0].id;
       addPlace();
 
-      // searchPlaceById();
       const position = new kakao.maps.LatLng(data[0].y, data[0].x);
 
       roadviewClient.getNearestPanoId(position, 50, (panoId) => {
@@ -242,7 +247,9 @@ async function searchPlaces() {
     }
   });
 }
+// 장소 관련 처리
 
+// 리뷰 관리
 const addReview = async () => {
   console.log("Adding review with tableId:", tableId.value);
   console.log("Current placeId:", placeId.value);
@@ -317,6 +324,8 @@ const searchPlaceById = async () => {
     );
     tableId.value = response.data.data.placeId;
     console.log("Received tableId from API:", tableId.value);
+    await isLiked();
+    await getLikeCount();
   } catch (error) {
     console.error("Error in searchPlaceById:", error);
   }
@@ -384,9 +393,10 @@ const openDetail = async (rId) => {
 const editReview = async (rId) => {
   openModal();
 };
-
+// 리뷰 관리 //
 onMounted(async () => {
   // Get the current place from localStorage
+
   currentPlace.value = localStorage.getItem("currentPlace");
   currentUser.value = localStorage.getItem("userId");
   console.log("Current place:", currentPlace.value);
@@ -394,6 +404,7 @@ onMounted(async () => {
 
   roadviewClient = new kakao.maps.RoadviewClient();
   roadview = new kakao.maps.Roadview(roadviewContainer.value);
+
   // Only search if we have a valid place name
   if (currentPlace.value) {
     await searchPlaces();
@@ -413,97 +424,178 @@ const isFormValid = computed(() => {
 
 // 장소 정보
 
-// 좋아요 버튼 클릭 핸들러
-const toggleLike = () => {
-  const response = axios.put(
-    "http://localhost:8080/uhpooh/api/place/like/" + tableId.value
-  );
+// 좋아요 버튼 처리
+
+const isLiked = async () => {
+  try {
+    const checkResponse = await axios.get(
+      "http://localhost:8080/uhpooh/api/like/checklike",
+      {
+        params: {
+          placeId: tableId.value,
+          userId: currentUser.value,
+        },
+      }
+    );
+
+    checkLike.value = checkResponse.data;
+
+    await console.log("this is checkLike", checkResponse);
+  } catch (error) {
+    console.log(error);
+  }
 };
+
+const addLike = async (placeId, userId) => {
+  console.log(checkLike.data);
+  if (!checkLike.data) {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/uhpooh/api/like/addlike",
+        {
+          placeId: placeId,
+          userId: userId,
+        }
+      );
+
+      console.log(response);
+      checkLike.value = !checkLike.value;
+      likeCount.value = likeCount.value + 1;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+};
+
+const deleteLike = async (tableId, userId) => {
+  console.log("Deleting like with tableId:", tableId, "and", userId);
+  try {
+    const response = await axios.delete(
+      "http://localhost:8080/uhpooh/api/like/deletelike",
+      {
+        data: {
+          placeId: tableId,
+          userId: userId,
+        },
+      }
+    );
+    console.log(response);
+    checkLike.value = !checkLike.value;
+    likeCount.value = likeCount.value - 1;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const getLikeCount = async () => {
+  try {
+    const response = await axios.get(
+      "http://localhost:8080/uhpooh/api/like/getlikebyplaceid/" + tableId.value
+    );
+    likeCount.value = response.data.length;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+// 좋아요 버튼 처리
 </script>
 
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 pt-10">
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mx-6">
+  <div class="pt-10 min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div class="grid grid-cols-1 gap-6 mx-6 lg:grid-cols-2">
       <div>
         <!-- 장소 정보 -->
         <div
-          class="p-8 bg-white rounded-xl shadow-xl transform hover:shadow-2xl transition-all duration-300 mb-6"
+          class="p-8 mb-6 bg-white rounded-xl shadow-xl transition-all duration-300 transform hover:shadow-2xl"
         >
           <h1
-            class="mb-4 text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600"
+            class="mb-4 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600"
           >
             {{ placeName }}
           </h1>
           <div class="space-y-3">
-            <p class="text-gray-600 flex items-center">
-              <i class="fas fa-map-marker-alt mr-2 text-indigo-500"></i>
+            <p class="flex items-center text-gray-600">
+              <i class="mr-2 text-indigo-500 fas fa-map-marker-alt"></i>
               {{ addressName }}
             </p>
-            <p v-if="phone" class="text-gray-600 flex items-center">
-              <i class="fas fa-phone mr-2 text-indigo-500"></i>
+            <p v-if="phone" class="flex items-center text-gray-600">
+              <i class="mr-2 text-indigo-500 fas fa-phone"></i>
               {{ phone }}
             </p>
             <div class="flex items-center space-x-4">
               <a
                 :href="placeUrl"
                 target="_blank"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                class="inline-flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg transition-colors duration-200 hover:bg-indigo-700"
               >
-                <i class="fas fa-external-link-alt mr-2"></i>
+                <i class="mr-2 fas fa-external-link-alt"></i>
                 카카오맵에서 보기
               </a>
               <button
                 @click="openModal"
-                class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
+                class="inline-flex items-center px-4 py-2 text-white bg-indigo-600 rounded-lg transition-colors duration-200 hover:bg-indigo-700"
               >
-                <i class="fas fa-plus mr-2"></i>
+                <i class="mr-2 fas fa-plus"></i>
                 리뷰 작성
               </button>
-              <button
-                @click="toggleLike"
-                class="inline-flex items-center px-4 py-2 rounded-lg transition-all duration-200"
-                :class="[
-                  isLiked
-                    ? 'bg-pink-100 text-pink-600 hover:bg-pink-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-                ]"
-              >
-                <i
-                  class="fas fa-heart mr-2"
-                  :class="{ 'text-pink-600': isLiked }"
-                ></i>
-                좋아요 {{ likeCount }}
-              </button>
+              <div>
+                <!-- Unliked Button -->
+                <button
+                  v-if="!checkLike"
+                  @click="addLike(tableId, currentUser)"
+                  class="flex relative items-center px-4 py-2 space-x-2 text-gray-600 bg-gray-200 rounded-full shadow-lg transition-all duration-300 active:scale-95"
+                >
+                  <ThumbsUp class="w-5 h-5" />
+                  <span>{{ likeCount }}</span>
+                  <div
+                    class="absolute inset-0 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300 active:opacity-30"
+                  ></div>
+                </button>
+
+                <!-- Liked Button -->
+                <button
+                  v-else
+                  @click="deleteLike(tableId, currentUser)"
+                  class="flex relative items-center px-4 py-2 space-x-2 text-white bg-red-600 rounded-full shadow-lg transition-all duration-300 active:scale-95"
+                >
+                  <ThumbsUp class="w-5 h-5" />
+                  <span>{{ likeCount }}</span>
+                  <div
+                    class="absolute inset-0 bg-red-400 rounded-full opacity-0 transition-opacity duration-300 active:opacity-30"
+                  ></div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 로드뷰 컨테이너 -->
-        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+        <div class="overflow-hidden bg-white rounded-xl shadow-xl">
           <div ref="roadviewContainer" class="w-full h-[400px]"></div>
         </div>
       </div>
 
       <!-- 리뷰 섹션 -->
       <div class="bg-white rounded-xl shadow-xl p-6 h-[655px]">
-        <h2 class="text-2xl font-bold mb-6 text-indigo-800">리뷰</h2>
+        <h2 class="mb-6 text-2xl font-bold text-indigo-800">리뷰</h2>
         <div class="space-y-6 h-[550px] pr-2 overflow-y-scroll">
           <div
             v-for="review in reviews"
             @click="openDetail(review.reviewId)"
-            class="bg-gray-50 p-3 rounded-xl shadow hover:shadow-lg transition-shadow duration-300 h-12"
+            class="p-3 h-12 bg-gray-50 rounded-xl shadow transition-shadow duration-300 hover:shadow-lg"
           >
             <div class="flex justify-between items-center mb-4">
-              <div class="flex items-center space-x-4 flex-1 min-w-0">
+              <div class="flex flex-1 items-center space-x-4 min-w-0">
                 <h3
                   class="text-xl font-semibold text-gray-800 whitespace-nowrap"
                 >
                   {{ review.title }}
                 </h3>
                 <p class="text-sm text-gray-500 whitespace-nowrap">
-                  작성자: {{ review.userId }}
+                  작성자: {{ review.userName }}
                 </p>
-                <p class="text-gray-700 truncate flex-1">
+                <p class="flex-1 text-gray-700 truncate">
                   {{ review.content }}
                 </p>
               </div>
@@ -513,7 +605,7 @@ const toggleLike = () => {
                 </p>
               </div>
               <div
-                class="flex space-x-2 ml-4"
+                class="flex ml-4 space-x-2"
                 v-show="review.userId == currentUser.value"
               ></div>
             </div>
@@ -525,7 +617,7 @@ const toggleLike = () => {
     <!-- 리뷰 작성 모달 -->
     <div
       v-if="isModalOpen"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      class="flex fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50"
     >
       <div class="relative w-11/12 max-w-3xl bg-white rounded-xl shadow-2xl">
         <div
@@ -536,39 +628,39 @@ const toggleLike = () => {
           </h2>
           <button
             @click="closeModal"
-            class="text-gray-500 hover:text-gray-700 transition-colors duration-200"
+            class="text-gray-500 transition-colors duration-200 hover:text-gray-700"
           >
-            <i class="fas fa-times text-xl"></i>
+            <i class="text-xl fas fa-times"></i>
           </button>
         </div>
         <div class="p-6">
           <div class="space-y-4">
             <div>
-              <label class="block text-gray-700 text-sm font-semibold mb-2"
+              <label class="block mb-2 text-sm font-semibold text-gray-700"
                 >제목</label
               >
               <input
                 v-model="title"
                 type="text"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="px-4 py-2 w-full rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="제목을 입력하세요"
                 required
               />
             </div>
             <div>
-              <label class="block text-gray-700 text-sm font-semibold mb-2"
+              <label class="block mb-2 text-sm font-semibold text-gray-700"
                 >내용</label
               >
               <textarea
                 v-model="content"
                 rows="4"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+                class="px-4 py-2 w-full rounded-lg border border-gray-300 resize-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="내용을 입력하세요"
                 required
               ></textarea>
             </div>
             <div>
-              <label class="block text-gray-700 text-sm font-semibold mb-2">
+              <label class="block mb-2 text-sm font-semibold text-gray-700">
                 사진 첨부 (최대 5장)
               </label>
               <div class="space-y-4">
@@ -578,7 +670,7 @@ const toggleLike = () => {
                     v-if="watchingDetails && Object.keys(reviewMap).length > 0"
                   >
                     <label
-                      class="block text-gray-700 text-sm font-semibold mb-2"
+                      class="block mb-2 text-sm font-semibold text-gray-700"
                     >
                       첨부된 이미지
                     </label>
@@ -592,13 +684,13 @@ const toggleLike = () => {
                           :src="
                             'http://localhost:8080/uhpooh/api/file' + image.path
                           "
-                          class="w-full h-full object-cover rounded-lg"
+                          class="object-cover w-full h-full rounded-lg"
                           alt="Review image"
                         />
                         <button
                           v-if="currentUser == tempReview.userId"
                           @click="deleteReviewImage(image.id)"
-                          class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                          class="flex absolute top-1 right-1 justify-center items-center w-6 h-6 text-white bg-red-500 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                         >
                           ×
                         </button>
@@ -608,7 +700,7 @@ const toggleLike = () => {
                   <!-- Image Preview -->
                   <div
                     v-if="uploadedImages.length > 0"
-                    class="flex pt-7 ml-2 gap-2 mb-4"
+                    class="flex gap-2 pt-7 mb-4 ml-2"
                   >
                     <div
                       v-for="(image, index) in uploadedImages"
@@ -617,12 +709,15 @@ const toggleLike = () => {
                     >
                       <img
                         :src="image.preview"
-                        class="w-full h-full object-cover rounded-lg"
+                        class="object-cover w-full h-full rounded-lg"
                       />
                       <button
-                        v-if="(!watchingDetails && !nowEditing) || (watchingDetails && currentUser == tempReview.userId)"
+                        v-if="
+                          (!watchingDetails && !nowEditing) ||
+                          (watchingDetails && currentUser == tempReview.userId)
+                        "
                         @click="removeImage(index)"
-                        class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        class="flex absolute top-1 right-1 justify-center items-center w-6 h-6 text-white bg-red-500 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100"
                       >
                         ×
                       </button>
@@ -636,7 +731,7 @@ const toggleLike = () => {
                     ((!watchingDetails && !nowEditing) ||
                       (watchingDetails && currentUser == tempReview.userId))
                   "
-                  class="flex justify-center items-center border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-indigo-500 transition-colors duration-200"
+                  class="flex justify-center items-center p-4 rounded-lg border-2 border-gray-300 border-dashed transition-colors duration-200 hover:border-indigo-500"
                 >
                   <input
                     type="file"
@@ -669,12 +764,12 @@ const toggleLike = () => {
               </div>
             </div>
           </div>
-          <div class="mt-6 flex justify-end space-x-3">
+          <div class="flex justify-end mt-6 space-x-3">
             <button
               v-show="!watchingDetails && !nowEditing"
               @click="addReview"
               :disabled="!isFormValid"
-              class="px-4 py-2 text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-4 py-2 text-white bg-indigo-600 rounded-lg transition-colors duration-200 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               작성하기
             </button>
@@ -683,14 +778,14 @@ const toggleLike = () => {
               v-show="watchingDetails && currentUser == tempReview.userId"
               @click="confirmEdit(tempReviewId)"
               :disabled="!isFormValid"
-              class="px-3 py-1 text-sm bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200 transition-colors duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+              class="px-3 py-1 text-sm text-indigo-600 whitespace-nowrap bg-indigo-100 rounded-lg transition-colors duration-200 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               수정
             </button>
             <button
               v-show="watchingDetails && currentUser == tempReview.userId"
               @click="deleteReview(tempReviewId)"
-              class="px-3 py-1 text-sm bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors duration-200 whitespace-nowrap"
+              class="px-3 py-1 text-sm text-red-600 whitespace-nowrap bg-red-100 rounded-lg transition-colors duration-200 hover:bg-red-200"
             >
               삭제
             </button>

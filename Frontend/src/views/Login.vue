@@ -53,10 +53,10 @@
                 class="px-4 py-4 w-full text-sm placeholder-gray-400 text-gray-800 bg-gray-50 rounded-sm border border-gray-200 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-300"
               />
               <!-- Error Message -->
-              <p v-if="loginError" class="text-sm text-red-500 mt-2">
+              <p v-if="loginError" class="mt-2 text-sm text-red-500">
                 아이디 또는 비밀번호를 잘못 입력했습니다.
               </p>
-              <p v-if="validationError" class="text-sm text-red-500 mt-2">
+              <p v-if="validationError" class="mt-2 text-sm text-red-500">
                 {{ validationError }}
               </p>
             </div>
@@ -79,44 +79,51 @@
             </div>
 
             <!-- Social Login Divider -->
-            <div class="mt-8 flex items-center">
+            <div class="flex items-center mt-8">
               <div class="flex-1 border-t border-gray-200"></div>
-              <div class="px-4 text-sm text-gray-500">또는</div>
+              <div class="px-4 text-sm text-gray-500">소셜 로그인</div>
               <div class="flex-1 border-t border-gray-200"></div>
             </div>
 
             <!-- Social Login Buttons -->
-            <div class="mt-6 flex justify-center space-x-4">
-              <a
-                href="http://localhost:8080/oauth2/authorize/google?redirect_uri=http://localhost:3001/oauth2/redirect"
-                class="transform transition-transform hover:scale-110 focus:outline-none"
+            <div class="flex justify-center mt-6 space-x-4">
+              <!-- 네이버 로그인 -->
+              <button
+                @click.prevent="handleNaverLogin"
+                :disabled="isLoading"
+                class="transition-transform transform hover:scale-110 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <img
                   class="w-12 h-12"
-                  :src="'/src/assets/google.png'"
-                  alt="Google Login"
-                />
-              </a>
-              <a
-                href="http://localhost:8080/oauth2/authorize/naver?redirect_uri=http://localhost:3001/oauth2/redirect"
-                class="transform transition-transform hover:scale-110 focus:outline-none"
-              >
-                <img
-                  class="w-12 h-12"
-                  :src="'/src/assets/naver.png'"
+                  src="/src/assets/naver.png"
                   alt="Naver Login"
                 />
-              </a>
-              <a
-                href="http://localhost:8080/oauth2/authorize/kakao?redirect_uri=http://localhost:3001/oauth2/redirect"
-                class="transform transition-transform hover:scale-110 focus:outline-none"
+              </button>
+
+              <!-- 구글 로그인 -->
+              <button
+                @click.prevent="handleGoogleLogin"
+                :disabled="isLoading"
+                class="transition-transform transform hover:scale-110 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <img
                   class="w-12 h-12"
-                  :src="'/src/assets/kakao.png'"
-                  alt="Kakao Login"
+                  src="/src/assets/google.png"
+                  alt="Google Login"
                 />
-              </a>
+              </button>
+              <!-- 깃허브 로그인 -->
+              <button
+                @click.prevent="handleGithubLogin"
+                :disabled="isLoading"
+                class="transition-transform transform hover:scale-110 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <img
+                  class="w-12 h-12"
+                  src="/src/assets/github.png"
+                  alt="Github Login"
+                />
+              </button>
             </div>
           </form>
         </div>
@@ -138,13 +145,15 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
-
 import axios from "axios";
+
+const router = useRouter();
 const userEmail = ref("");
 const password = ref("");
 const loginError = ref(false);
 const validationError = ref("");
+const isLoading = ref(false);
+const showPassword = ref(false);
 
 const showPasswordReset = () => {
   alert("관리자에게 문의바랍니다.");
@@ -172,7 +181,7 @@ const login = async () => {
       password: password.value,
     })
     .then((response) => {
-      console.log(response.data.user);
+      console.log("유저정보 입니다.", response.data);
       localStorage.setItem("userId", response.data.user.userId);
       localStorage.setItem("userName", response.data.user.userName);
       localStorage.setItem("userAddress", response.data.user.userAddress);
@@ -180,13 +189,28 @@ const login = async () => {
       localStorage.setItem("userToken", response.data.userToken);
       console.log(response.data);
       console.log(localStorage.getItem("userToken"));
-      router.push("/").then(() => {
-        location.reload();
-      });
+      location.replace("/");
     })
     .catch((err) => {
       loginError.value = true;
     });
+};
+
+const handleNaverLogin = () => {
+  window.location.href =
+    "http://localhost:8080/uhpooh/oauth2/authorization/naver";
+};
+
+const handleGithubLogin = () => {
+  console.log("GitHub Login Button Clicked");
+  window.location.href =
+    "http://localhost:8080/uhpooh/oauth2/authorization/github";
+  console.log("GitHub Login Redirected");
+};
+
+const handleGoogleLogin = () => {
+  window.location.href =
+    "http://localhost:8080/uhpooh/oauth2/authorization/google";
 };
 </script>
 

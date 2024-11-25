@@ -143,4 +143,26 @@ public class PlaceController {
             return createResponse(false, ERROR_PREFIX + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+@Operation(summary = "userId로 placeId 검색", description = "")
+  @GetMapping("/getplaceidbyuserid/{userId}")
+  public ResponseEntity<?> getPlaceIdByUserId(@PathVariable int userId) {
+    try {
+      return new ResponseEntity<>(placeService.getPlaceIdByUserId(userId), HttpStatus.OK);  
+    } catch (Exception e) {
+      return new ResponseEntity<>("장소 id 목록 반환 실패",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+  }
+
+  @Operation(summary = "placeId로 place 검색", description = "특정 사용자가 작성한 장소 검색")
+  @GetMapping("/getplacebyplaceid/{placeId}")
+  public ResponseEntity<?> getPlaceByPlaceId(@PathVariable int placeId) {
+    try {
+      return new ResponseEntity<>(placeService.getPlaceByPlaceId(placeId), HttpStatus.OK);  
+    } catch (Exception e) {
+      return new ResponseEntity<>("장소 목록 반환 실패",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+  }
 }

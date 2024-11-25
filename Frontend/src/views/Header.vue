@@ -19,13 +19,14 @@
       >
     </div> -->
   <header class="absolute top-0 right-0 left-0 z-50">
-    <nav class="container flex justify-between items-center px-4 py-6 mx-auto">
+    <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
-      <RouterLink to="/" class="text-2xl font-bold text-white">
+      <RouterLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
         <img
           src="../assets/logo_text.png"
-          style="filter: invert(100%); width: 130px; height: auto"
+          style="width: 130px; height: auto; filter: invert(100%)"
         />
+        <span class="text-2xl">🏊‍♂️</span>
       </RouterLink>
 
       <!-- Navigation Links -->

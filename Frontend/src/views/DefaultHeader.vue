@@ -2,8 +2,12 @@
   <header class="bg-white border-b border-gray-200">
     <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
-      <RouterLink to="/" class="text-2xl font-bold text-blue-600">
+      <RouterLink
+        to="/"
+        class="flex gap-2 items-center text-2xl font-bold text-blue-600"
+      >
         <img src="../assets/logo_text.png" style="width: 130px; height: auto" />
+        <span class="text-2xl">🏊‍♂️</span>
       </RouterLink>
 
       <!-- Navigation Links -->
@@ -46,6 +50,18 @@ const isLoggined = inject("isLoggedIn");
 console.log(isLoggined.value);
 console.log(localStorage.getItem("userId"));
 
+const navigationLinks = [
+  { text: "수영장 찾기", path: "/around" },
+  { text: "이용 가이드", path: "/guide" },
+  { text: "마이페이지", path: "/mypage" },
+];
+
+const clearTargetAddress = (path) => {
+  if (path === "/around") {
+    localStorage.removeItem("targetAddress"), location.replace("/around");
+  }
+};
+
 const logout = () => {
   const uId = localStorage.getItem("userId");
   const tryLogout = async () => {
@@ -69,21 +85,12 @@ const logout = () => {
   localStorage.removeItem("userName");
   localStorage.removeItem("userAddress");
   localStorage.removeItem("pImage");
+  localStorage.removeItem("isAdmin");
+  localStorage.removeItem("userEmail");
   localStorage.removeItem("tempKeyword");
   isLoggined.value = false; // 로그인 상태 변경
 
   location.replace("/"); // 메인 페이지로 이동;
-};
-const navigationLinks = [
-  { text: "수영장 찾기", path: "/around" },
-  { text: "이용 가이드", path: "/guide" },
-  { text: "마이페이지", path: "/mypage" },
-];
-
-const clearTargetAddress = (path) => {
-  if (path === "/around") {
-    localStorage.removeItem("targetAddress"), location.replace("/around");
-  }
 };
 </script>
 

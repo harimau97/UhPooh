@@ -62,4 +62,18 @@
         WHERE placeId = #{placeId}
     </update>
 
+    <!-- 리뷰를 작성한 장소를 조회-->
+    <select id="getPlaceIdByUserId">
+        SELECT DISTINCT placeId
+        FROM likes
+        WHERE userId = #{userId}
+    </select>
+
+    <!-- placeId 로 장소 정보 조회-->
+    <select id="getPlaceByPlaceId">
+        SELECT *
+        FROM places
+        WHERE placeId = #{placeId}
+    </select>
+
 </mapper>

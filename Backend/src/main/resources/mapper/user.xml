@@ -170,5 +170,29 @@
         WHERE userId = #{userId} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
     </select>
 
+    <!-- OAuth2 로그인을 위한 새로운 쿼리들 -->
+    <select id="findByUserEmail" parameterType="string" resultType="User">
+        SELECT userId, userEmail, userName, userAddress,
+        isAdmin, regTime, updTime, isLogin, provider
+        FROM users
+        WHERE userEmail = #{email}
+    </select>
+
+    <update id="updateOAuth2User" parameterType="User">
+        UPDATE users
+        SET userName = #{userName},
+        isLogin = 1,
+        provider = #{provider},
+        updTime = NOW()
+        WHERE userEmail = #{userEmail}
+    </update>
+
+    <insert id="saveOAuth2User" parameterType="User">
+        INSERT INTO users
+        (userEmail, userName, pImage, provider, isLogin)
+        VALUES
+        (#{userEmail}, #{userName}, #{pImage}, #{provider}, 1)
+    </insert>
+
 
 </mapper>
