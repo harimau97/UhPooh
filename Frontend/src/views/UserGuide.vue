@@ -7,7 +7,7 @@
       <section class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-2xl font-semibold mb-4 text-blue-600">서비스 소개</h2>
         <p class="text-gray-700 leading-relaxed">
-          어푸는 수영을 사랑하는 모든 분들을 위한 커뮤니티 플랫폼입니다. 
+          어푸어푸(UhPooh)는 수영을 사랑하는 모든 분들을 위한 커뮤니티 플랫폼입니다. 
           주변의 수영장을 쉽게 찾고, 다른 수영 애호가들과 소통하며, 
           수영과 관련된 다양한 정보를 공유할 수 있습니다.
         </p>
