@@ -59,6 +59,36 @@ const router = createRouter({
       meta: { requiresAuth: true, requiresAdmin: true },
     },
     {
+      path: "/guide",
+      name: "guide",
+      component: () => import("../views/UserGuide.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: "/faq",
+      name: "faq",
+      component: () => import("../views/FAQ.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: "/terms",
+      name: "terms",
+      component: () => import("../views/Terms.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: "/privacy",
+      name: "privacy",
+      component: () => import("../views/Privacy.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
+      path: "/location-terms",
+      name: "locationTerms",
+      component: () => import("../views/LocationTerms.vue"),
+      meta: { requiresAuth: false },
+    },
+    {
       path: "/:pathMatch(.*)*", // 404 페이지 추가
       name: "not-found",
       component: () => import("../views/NotFound.vue"), // 404 페이지 컴포넌트

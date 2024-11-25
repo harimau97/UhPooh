@@ -10,10 +10,12 @@ import {
   Phone,
 } from "lucide-vue-next";
 import router from "@/router";
+import ContactModal from "../components/ContactModal.vue";
 
 const isVideoLoaded = ref(false);
 const searchInput = ref("");
 const activeTestimonial = ref(0);
+const showContactModal = ref(false);
 
 const handleVideoLoad = () => {
   isVideoLoaded.value = true;
@@ -95,15 +97,15 @@ const socialLinks = [
 // Updated service links with router paths
 const serviceLinks = [
   { name: "수영장 찾기", path: "/around" },
-  { name: "이용 가이드", path: "#" },
+  { name: "이용 가이드", path: "/guide" },
   { name: "마이페이지", path: "/mypage" },
 ];
 
 const supportLinks = [
-  "자주 묻는 질문",
-  "이용약관",
-  "개인정보처리방침",
-  "위치기반서비스 이용약관",
+  { name: "자주 묻는 질문", path: "/faq" },
+  { name: "이용약관", path: "/terms" },
+  { name: "개인정보처리방침", path: "/privacy" },
+  { name: "위치기반서비스 이용약관", path: "/location-terms" },
 ];
 
 const changeTargetAddress = async () => {
@@ -391,15 +393,14 @@ onMounted(() => {
             </ul>
           </div>
 
-          <!-- Rest of the footer remains the same -->
           <!-- Support Links -->
           <div>
             <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
             <ul class="space-y-2">
-              <li v-for="link in supportLinks" :key="link">
-                <a href="#" class="transition-colors hover:text-white">{{
-                  link
-                }}</a>
+              <li v-for="link in supportLinks" :key="link.name">
+                <RouterLink :to="link.path" class="transition-colors hover:text-white">
+                  {{ link.name }}
+                </RouterLink>
               </li>
             </ul>
           </div>
@@ -412,12 +413,13 @@ onMounted(() => {
                 <Phone class="w-5 h-5" />
                 <span class="text-white">1234-5678</span>
               </div>
-              <div>
+              <div class="text-sm text-gray-400">
                 <p>평일 09:00 - 18:00</p>
                 <p>주말 및 공휴일 휴무</p>
               </div>
               <button
-                class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700"
+                @click="showContactModal = true"
+                class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
               >
                 문의하기
               </button>
@@ -431,7 +433,7 @@ onMounted(() => {
           >
             <p>&copy; 2024 어푸어푸. All rights reserved.</p>
             <address class="not-italic text-center md:text-right">
-              서울특별시 강남구 테헤란로 212 어푸어푸빌딩 501호<br />
+              서울특별시 강남구 테헤란로 212 멀티캠퍼스 501호<br />
               사업자등록번호: 123-45-67890
             </address>
           </div>
@@ -439,6 +441,10 @@ onMounted(() => {
       </div>
     </footer>
   </main>
+  <ContactModal
+    :is-open="showContactModal"
+    @close="showContactModal = false"
+  />
 </template>
 
 <style scoped>
