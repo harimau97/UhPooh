@@ -2,61 +2,75 @@
   <transition name="slide">
     <div
       v-show="openChat"
-      :class="[
-        'fixed inset-0 flex items-center justify-center z-50',
-        classStyle,
-      ]"
+      class="fixed inset-0 flex items-end justify-end z-50"
     >
       <div
-        class="absolute right-5 bottom-5 p-2 w-80 max-w-screen-md h-1/2 bg-blue-500 bg-opacity-60 rounded-lg shadow-lg"
+        class="flex flex-col h-[600px] w-[400px] mr-4 mb-20 bg-white rounded-lg shadow-2xl overflow-hidden border border-indigo-100"
       >
-        <button
-          @click="openChat = false"
-          class="flex absolute top-1 right-1 z-50 justify-center items-center w-6 h-6 text-gray-300 bg-indigo-800 rounded-full shadow-md transition-colors duration-300 hover:text-gray-100 hover:bg-indigo-600 hover:invert"
+        <!-- Chat header -->
+        <div
+          class="flex justify-between items-center px-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            class="w-5 h-5"
+          <h3 class="text-lg font-semibold text-white">채팅</h3>
+          <button
+            @click="closeChat"
+            class="p-1 text-white hover:text-gray-200 transition-colors"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M6 18L18 6M6 6l12 12"
-            />
-          </svg>
-        </button>
-        <Chat
-          :config="config"
-          :setSbUserInfo="setSbUserInfo"
-          :setUnreadMessageCount="setUnreadMessageCount"
-        />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Chat content -->
+        <div class="flex-1 bg-white">
+          <Chat
+            :config="config"
+            :setSbUserInfo="setSbUserInfo"
+            :setUnreadMessageCount="setUnreadMessageCount"
+            :onRef="handleChatRef"
+          />
+        </div>
       </div>
     </div>
   </transition>
+
+  <!-- Chat button -->
   <button
-    v-show="isLoggined"
     @click="openChat = !openChat"
-    class="fixed right-1 bottom-4 z-50 px-1 py-1 ml-4 text-white rounded-full hover:animate-bounce bg-slate-500"
+    class="fixed right-4 bottom-4 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
   >
     <svg
-      width="40px"
-      height="40px"
-      viewBox="0 0 20 20"
       xmlns="http://www.w3.org/2000/svg"
+      class="w-7 h-7"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
     >
       <path
-        d="M11 12H9v-.148c0-.876.306-1.499 1-1.852.385-.195 1-.568 1-1a1.001 1.001 0 00-2 0H7c0-1.654 1.346-3 3-3s3 1 3 3-2 2.165-2 3zm-2 3h2v-2H9v2z"
-        fill="#FFFFFF"
-      />
-      <path
-        d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1116 0 8 8 0 01-16 0z"
-        fill="#FFFFFF"
+        d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"
       />
     </svg>
+    <div
+      v-if="messageCount > 0"
+      class="absolute -top-1 -right-1 flex items-center justify-center min-w-[20px] h-5 px-1 bg-red-500 text-white text-xs font-bold rounded-full"
+    >
+      {{ messageCount }}
+    </div>
   </button>
 </template>
 
@@ -83,16 +97,18 @@ console.log(localStorage.setItem("채팅 확인", user_email.value));
 console.log("");
 
 const config = {
-  APP_ID: "D9BD6203-D932-4BF8-857C-DBB90EB40BE3",
+  APP_ID: "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
   USER_ID: user_id.value,
-  NICKNAME: "asdfasdf",
+  NICKNAME: user_email.value,
   API_TOKEN: "insert your key here",
+  LANG: "ko",
 };
 
 export default {
   data() {
     return {
       openChat: false, // 모달을 열고 닫기 위한 상태 변수
+      chatRef: null,
     };
   },
   components: {
@@ -108,15 +124,21 @@ export default {
       }
     },
   },
+  methods: {
+    handleChatRef(ref) {
+      this.chatRef = ref;
+    },
+    async closeChat() {
+      if (this.chatRef && this.chatRef.disconnect) {
+        await this.chatRef.disconnect();
+      }
+      this.openChat = false;
+    },
+  },
   watch: {
     openChat(newValue) {
-      if (!newValue) {
-        // 모달을 닫을 때 Sendbird 로그아웃 처리
-        if (window.SendBirdInstance) {
-          window.SendBirdInstance.disconnect(() => {
-            console.log("Sendbird 로그아웃 완료");
-          });
-        }
+      if (!newValue && this.chatRef && this.chatRef.disconnect) {
+        this.chatRef.disconnect();
       }
     },
   },
@@ -139,33 +161,21 @@ export default {
 </script>
 
 <style scoped>
-.message-count {
-  position: relative;
-}
-.nickname {
-  color: #006d77; /* 녹청색 */
-} /* App.vue 또는 전역 CSS 파일에 추가 */
-
-/* 전체 채팅 UI 크기 */
-.sb-chat {
-  width: 700px !important;
-  height: 800px !important;
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* 메시지 버블 스타일 */
-.sb-message {
-  background-color: #e0f7fa !important;
-  color: #006d77 !important;
-  border-radius: 8px;
-  padding: 10px;
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(100%);
+  opacity: 0;
 }
 
-/* 내가 보낸 메시지와 상대방 메시지 색상 구분 */
-.sb-message--incoming {
-  background-color: #e0f7fa !important;
-}
-.sb-message--outgoing {
-  background-color: #a7ffeb !important;
+.slide-enter-to,
+.slide-leave-from {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 /* 전체 폰트 */

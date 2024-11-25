@@ -114,7 +114,7 @@
         u.userName
         FROM reviews r
         JOIN users u ON r.userId = u.userId
-        WHERE u.userName LIKE CONCAT('%', #{keyword}, '%')
+        WHERE u.userId LIKE CONCAT('%', #{keyword}, '%')
         ORDER BY r.regTime DESC
         LIMIT #{start}, #{size}
     </select>

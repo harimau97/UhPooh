@@ -185,13 +185,13 @@ public class ReviewController {
 
   @Operation(summary = "작성자로 리뷰 검색, 페이징", description = "리뷰 작성자로 검색")
   @GetMapping("/search/writer")
-  public ResponseEntity<Map<String, Object>> searchByWriter(@RequestParam String keyword,
+  public ResponseEntity<Map<String, Object>> searchByWriter(@RequestParam String userId,
       @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "10") int size) {
-    logger.info("Searching reviews by writer - keyword: {}, page: {}, size: {}", keyword, page,
+    logger.info("Searching reviews by writer - keyword: {}, page: {}, size: {}", userId, page,
         size);
     try {
       Map<String, Object> searchParams = new HashMap<>();
-      searchParams.put("keyword", keyword);
+      searchParams.put("keyword", userId);
       searchParams.put("start", (page - 1) * size);
       searchParams.put("size", size);
 

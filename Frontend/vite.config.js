@@ -9,6 +9,10 @@ export default defineConfig({
       type: "vue",
     }),
   ],
+  optimizeDeps: {
+    include: ["veaury"],
+    include: ["dayjs"],
+  },
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),

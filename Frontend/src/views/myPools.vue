@@ -8,41 +8,49 @@
     </div>
 
     <!-- Liked Places Section -->
-    <div class="section liked-places">
+    <div v-if="isLoading">
+      <!-- Show a loading indicator -->
+      데이터를 불러오는 중입니다...
+    </div>
+
+    <div v-else class="section liked-places">
       <div class="section-header">
         <h2>❤️ 찜한 수영장</h2>
-        <span class="count-badge">{{ likedPlaces.length }}개</span>
+        <span class="count-badge">{{ likedPlacesLength }}개</span>
       </div>
-      <div class="places-grid" v-if="likedPlaces.length > 0">
-        <div v-for="place in likedPlaces" class="place-card">
+      <div class="places-grid" v-if="likedPlacesLength > 0">
+        <div
+          v-for="place in likedPlaces"
+          :key="place.placeId"
+          class="place-card"
+        >
           <div class="image-container">
             <img
+              v-if="place.image"
               :src="place.image"
               :alt="place.placeName"
               class="place-image"
             />
+            <img
+              v-else
+              src="/public/default-pool.jpg"
+              alt="빈 수영장"
+              class="place-image"
+            />
             <div class="overlay">
-              <button class="view-details">자세히 보기</button>
+              <button @click="goPlaceBoard(place.placeId)" class="view-details">
+                자세히 보기
+              </button>
             </div>
           </div>
           <div class="place-info">
             <h3>{{ place.placeName }}</h3>
-            <p class="address">📍 {{ place.address }}</p>
-            <div class="tags">
+            <!-- <p class="address">📍 {{ place.address }}</p> -->
+            <!-- <div class="tags">
               <span class="tag">{{ place.type }}</span>
               <span class="tag">{{ place.price }}</span>
-            </div>
-            <div class="rating">
-              <div class="stars">
-                <span
-                  v-for="n in Math.floor(place.rating)"
-                  :key="n"
-                  class="star"
-                  >⭐</span
-                >
-              </div>
-              <span class="rating-text">{{ place.rating }}/5.0</span>
-            </div>
+            </div> -->
+            <div class="rating"></div>
           </div>
         </div>
       </div>
@@ -56,29 +64,38 @@
     </div>
 
     <!-- My Reviews Section -->
-    <div class="section my-reviews">
+    <div v-if="isLoadingReviews">
+      <!-- Show a loading indicator -->
+      데이터를 불러오는 중입니다...
+    </div>
+    <div v-else class="section my-reviews">
       <div class="section-header">
         <h2>✏️ 내가 쓴 리뷰</h2>
-        <span class="count-badge">{{ myReviews.length }}개</span>
+        <span class="count-badge">{{ myReviewsLength }}개</span>
       </div>
-      <div class="reviews-list" v-if="myReviews.length > 0">
-        <div v-for="review in myReviews" :key="review.id" class="review-card">
+      <div class="reviews-list" v-if="myReviewsLength > 0">
+        <div
+          v-for="review in myReviews"
+          :key="review.reviewId"
+          class="review-card"
+        >
           <div class="review-header">
             <div class="place-details">
-              <h3>{{ review.placeName }}</h3>
-              <p class="review-date">{{ formatDate(review.createdAt) }}</p>
+              <h3>{{ review.title }}</h3>
+              <p class="review-date">{{ formatDate(review.regTime) }}</p>
             </div>
             <div class="review-rating">
               <div class="stars">
-                <span v-for="n in review.rating" :key="n" class="star">⭐</span>
+                <!-- <span v-for="n in review.rating" :key="n" class="star">⭐</span> -->
               </div>
-              <span class="rating-text">{{ review.rating }}/5.0</span>
+              <!-- <span class="rating-text">{{ review.rating }}/5.0</span> -->
             </div>
           </div>
           <p class="review-content">{{ review.content }}</p>
           <div class="review-footer">
-            <button class="edit-button">수정하기</button>
-            <button class="delete-button">삭제하기</button>
+            <button @click="goPlaceBoard(review.placeId)" class="edit-button">
+              보러가기
+            </button>
           </div>
         </div>
       </div>
@@ -91,96 +108,162 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import axios from "axios";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
 
-export default {
-  name: "MyPools",
-  setup() {
-    const likedPlacesId = ref([]);
-    const likedPlaces = ref([]);
-    const myReviews = ref([]);
+const likedPlacesId = ref([]);
+const likedPlaces = ref([]);
+const myReviews = ref([]);
+const myReviewsLength = computed(() => myReviews.value.length);
+const likedPlacesLength = computed(() => likedPlaces.value.length);
+const isLoading = ref(true);
+const isLoadingReviews = ref(true);
+const imgPath = ref("");
 
-    const fetchMyReviews = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          console.error("User ID not found");
-          return;
-        }
-        const response = await axios.get(
-          `http://localhost:8080/uhpooh/api/user/${userId}/reviews`
-        );
-        if (response.data && Array.isArray(response.data)) {
-          myReviews.value = response.data;
-        } else {
-          console.error("Invalid review data format");
-          myReviews.value = [];
-        }
-      } catch (error) {
-        console.error("Error fetching reviews:", error);
-        myReviews.value = [];
+const fetchMyReviews = async () => {
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+    const response = await axios.get(
+      `http://localhost:8080/uhpooh/api/review/search/writer`,
+      {
+        params: {
+          userId: userId,
+        },
       }
-    };
+    );
 
-    const fetchLikedPlaces = async () => {
-      try {
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-          console.error("User ID not found");
-          return;
-        }
-        const response = await axios.get(
-          "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
-        );
-        if (response.data && Array.isArray(response.data)) {
-          likedPlacesId.value = response.data;
-          console.log(likedPlacesId.value);
-        } else {
-          console.error("Invalid liked places data format");
-          likedPlacesId.value = [];
-        }
-      } catch (error) {
-        console.error("Error fetching liked places:", error);
-        likedPlacesId.value = [];
-      }
-
-      for (const placeId of likedPlacesId.value) {
-        try {
-          const response = await axios.get(
-            "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" +
-              placeId
-          );
-          if (response && response.data) {
-            likedPlaces.value.push(response.data);
-          }
-        } catch (error) {
-          console.error("Error fetching place", placeId, ":", error);
-        }
-      }
-      console.log("좋아요를 누른 장소들", likedPlaces.value);
-    };
-
-    const formatDate = (dateString) => {
-      const date = new Date(dateString);
-      return `${date.getFullYear()}년 ${
-        date.getMonth() + 1
-      }월 ${date.getDate()}일`;
-    };
-
-    onMounted(async () => {
-      await fetchMyReviews();
-      await fetchLikedPlaces();
-    });
-
-    return {
-      likedPlaces,
-      myReviews,
-      formatDate,
-    };
-  },
+    if (response.data) {
+      myReviews.value = response.data.data.items;
+      console.log("작성한 리뷰들", myReviews.value);
+    } else {
+      console.error("Invalid review data format");
+      myReviews.value = [];
+    }
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    myReviews.value = [];
+  } finally {
+    isLoadingReviews.value = false;
+  }
 };
+
+const fetchLikedPlaces = async () => {
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+    const response = await axios.get(
+      "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
+    );
+    if (response.data && Array.isArray(response.data)) {
+      likedPlacesId.value = response.data;
+      console.log(likedPlacesId.value.length);
+    } else {
+      console.error("Invalid liked places data format");
+      likedPlacesId.value = [];
+    }
+  } catch (error) {
+    console.error("Error fetching liked places:", error);
+    likedPlacesId.value = [];
+  }
+
+  // Clear existing places
+  likedPlaces.value = [];
+  
+  // Create an array of promises for all place fetches
+  const placePromises = likedPlacesId.value.map(async (placeId) => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" + placeId
+      );
+      if (response && response.data) {
+        const place = response.data;
+
+        // Fetch image from Kakao Image Search API
+        try {
+          const imageResponse = await axios.get(
+            `https://dapi.kakao.com/v2/search/image?query=${encodeURIComponent(
+              place.placeName
+            )}`,
+            {
+              headers: {
+                Authorization: "KakaoAK 51f3e2722310a3c53f4698c4a1d57f30",
+              },
+            }
+          );
+
+          if (
+            imageResponse.data.documents &&
+            imageResponse.data.documents.length > 0
+          ) {
+            place.image = imageResponse.data.documents[0].image_url;
+            // Preload the image
+            await new Promise((resolve, reject) => {
+              const img = new Image();
+              img.onload = resolve;
+              img.onerror = () => {
+                place.image = "/public/default-pool.jpg";
+                resolve();
+              };
+              img.src = place.image;
+            });
+          } else {
+            place.image = "/public/default-pool.jpg";
+          }
+        } catch (imageError) {
+          console.error("Error fetching image for place:", imageError);
+          place.image = "/public/default-pool.jpg";
+        }
+        return place;
+      }
+    } catch (error) {
+      console.error("Error fetching place", placeId, ":", error);
+      return null;
+    }
+  });
+
+  try {
+    // Wait for all places and their images to be loaded
+    const places = await Promise.all(placePromises);
+    // Filter out any null values and update likedPlaces
+    likedPlaces.value = places.filter(place => place !== null);
+  } catch (error) {
+    console.error("Error loading places:", error);
+    likedPlaces.value = [];
+  } finally {
+    isLoading.value = false;
+  }
+  
+  console.log("좋아요를 누른 장소들", likedPlaces.value);
+  console.log(likedPlacesLength.value);
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
+
+const goPlaceBoard = async (placeId) => {
+  const response = await axios.get(
+    "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" + placeId
+  );
+  localStorage.setItem("currentPlace", response.data.placeName);
+  router.push("/placeBoard");
+};
+
+onMounted(async () => {
+  await fetchMyReviews();
+  await fetchLikedPlaces();
+});
 </script>
 
 <style scoped>
@@ -214,7 +297,8 @@ h1 {
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid #d1d5db;
 }
 
 .section-header {
@@ -230,31 +314,71 @@ h1 {
 }
 
 .count-badge {
-  background: #f0f0f0;
-  padding: 0.3rem 0.8rem;
+  background: linear-gradient(135deg, #63b8f1 0%, #4698e5 100%);
+  padding: 0.4rem 1rem;
   border-radius: 20px;
   margin-left: 1rem;
   font-size: 0.9rem;
-  color: #666;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(229, 200, 70, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.count-badge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.count-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
+}
+
+.count-badge:hover::before {
+  left: 100%;
 }
 
 .places-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  display: flex;
   gap: 1.5rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 .place-card {
+  flex: 0 0 280px;
   background: white;
   border-radius: 15px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
-  border: 1px solid #eee;
+  transition: all 0.3s ease;
+  border: 3px solid #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .place-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: #9ca3af;
 }
 
 .image-container {
@@ -359,15 +483,27 @@ h1 {
 
 .reviews-list {
   display: flex;
-  flex-direction: column;
-  gap: 1.2rem;
+  gap: 1.5rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 .review-card {
+  flex: 0 0 350px;
   background: white;
   border-radius: 15px;
   padding: 1.5rem;
-  border: 1px solid #eee;
+  border: 3px solid #d1d5db;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  border-color: #9ca3af;
 }
 
 .review-header {
@@ -436,6 +572,9 @@ h1 {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  border: 3px dashed #d1d5db;
+  border-radius: 15px;
+  background: #f9fafb;
 }
 
 .empty-icon {
@@ -465,13 +604,31 @@ h1 {
   background: #0056b3;
 }
 
+.places-grid::-webkit-scrollbar,
+.reviews-list::-webkit-scrollbar {
+  height: 8px;
+}
+
+.places-grid::-webkit-scrollbar-track,
+.reviews-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.places-grid::-webkit-scrollbar-thumb,
+.reviews-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.places-grid::-webkit-scrollbar-thumb:hover,
+.reviews-list::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
 @media (max-width: 768px) {
   .my-pools {
     padding: 1rem;
-  }
-
-  .places-grid {
-    grid-template-columns: 1fr;
   }
 
   .section {

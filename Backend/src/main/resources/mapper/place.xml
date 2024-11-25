@@ -65,7 +65,7 @@
     <!-- 리뷰를 작성한 장소를 조회-->
     <select id="getPlaceIdByUserId">
         SELECT DISTINCT placeId
-        FROM reviews
+        FROM likes
         WHERE userId = #{userId}
     </select>
 
