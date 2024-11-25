@@ -1,4 +1,4 @@
-package com.ssafy.edu.jwt.dao;
+package com.ssafy.edu.jwt.model.dao;
 
 import org.apache.ibatis.annotations.Param;
 

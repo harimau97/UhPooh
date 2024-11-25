@@ -45,7 +45,8 @@ const getUserInfo = async () => {
         },
       }
     );
-
+    console.log(response.data);
+    localStorage.setItem("userId", response.data.data.userId);
     localStorage.setItem("userName", response.data.data.userName);
     localStorage.setItem("userAddress", response.data.data.userAddress);
     localStorage.setItem("pImage", response.data.data.pimage);
@@ -55,5 +56,60 @@ const getUserInfo = async () => {
     console.log(error);
   }
 };
+
+// const logout = async () => {
+//   const userId = localStorage.getItem("userId");
+//   const userToken = localStorage.getItem("userToken");
+//   const provider = localStorage.getItem("provider"); // SNS provider info if available
+
+//   try {
+//     console.log("로그아웃 시작");
+
+//     if (provider) {
+//       // SNS 로그아웃
+//       await axios({
+//         method: "post",
+//         url: `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${userToken}`,
+//         },
+//         data: {
+//           userId: userId,
+//           provider: provider,
+//         },
+//       });
+//     } else {
+//       // 일반 로그아웃
+//       await axios({
+//         method: "post",
+//         url: `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${userToken}`,
+//         },
+//         data: {},
+//       });
+//     }
+
+//     // Clear all localStorage items
+//     localStorage.clear();
+//     userAuthenticated.value = false;
+
+//     // Redirect to home
+//     window.location.href = "/";
+//   } catch (error) {
+//     console.error("로그아웃 실패:", error);
+//     console.error("Error details:", {
+//       status: error.response?.status,
+//       data: error.response?.data,
+//       message: error.message,
+//     });
+//     // Even if the API call fails, clear local state
+//     localStorage.clear();
+//     userAuthenticated.value = false;
+//     window.location.href = "/";
+//   }
+// };
 
 export { isAuthenticated, getUserInfo, userAuthenticated };

@@ -1,4 +1,4 @@
-package com.ssafy.edu.jwt.controller;
+package com.ssafy.edu.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.ssafy.edu.jwt.service.CustomUserService;
+import com.ssafy.edu.jwt.model.service.CustomUserService;
 
 
 
