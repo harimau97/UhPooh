@@ -61,6 +61,10 @@ const router = createRouter({
     {
       path: '/change-password',
       component: () => import('@/views/PasswordChange.vue')
+    },
+    {
+      path: '/oauth2/callback',
+      component: () => import('../components/OAuth2Callback.vue')
     }
   ],
   // 스크롤 동작 추가
