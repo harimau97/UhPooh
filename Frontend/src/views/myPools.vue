@@ -1,119 +1,209 @@
 <template>
-  <div class="my-pools">
-    <div class="header-section">
-      <h1>My 수영장🏊‍♂️</h1>
-      <p class="subtitle">
-        내가 찜한 수영장과 작성한 리뷰를 한눈에 확인해보세요
-      </p>
-    </div>
-
-    <!-- Liked Places Section -->
-    <div v-if="isLoading">
-      <!-- Show a loading indicator -->
-      데이터를 불러오는 중입니다...
-    </div>
-
-    <div v-else class="section liked-places">
-      <div class="section-header">
-        <h2>❤️ 찜한 수영장</h2>
-        <span class="count-badge">{{ likedPlacesLength }}개</span>
+  <div class="min-h-screen bg-sky-50">
+    <!-- Header Section -->
+    <div class="relative bg-gradient-to-r from-cyan-600 to-blue-400 px-8 pt-16 pb-24 text-white overflow-hidden">
+      <div class="max-w-6xl mx-auto text-center relative z-10">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">
+          My 수영장 <span class="text-cyan-600">🏊‍♂️</span>
+        </h1>
+        <p class="text-lg text-blue-50 mb-8">
+          내가 찜한 수영장과 작성한 리뷰를 한눈에 확인해보세요
+        </p>
+        
+        <!-- Stats Cards -->
+        <div class="flex justify-center gap-8 mt-8">
+          <div class="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <span class="block text-3xl font-bold mb-2">{{ likedPlacesLength }}</span>
+            <span class="text-sm text-blue-50">찜한 수영장</span>
+          </div>
+          <div class="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur border border-white/20">
+            <span class="block text-3xl font-bold mb-2">{{ myReviewsLength }}</span>
+            <span class="text-sm text-blue-50">작성한 리뷰</span>
+          </div>
+        </div>
       </div>
-      <div class="places-grid" v-if="likedPlacesLength > 0">
-        <div
-          v-for="place in likedPlaces"
-          :key="place.placeId"
-          class="place-card"
-        >
-          <div class="image-container">
-            <img
-              v-if="place.image"
-              :src="place.image"
-              :alt="place.placeName"
-              class="place-image"
-            />
-            <img
-              v-else
-              src="/public/default-pool.jpg"
-              alt="빈 수영장"
-              class="place-image"
-            />
-            <div class="overlay">
-              <button @click="goPlaceBoard(place.placeId)" class="view-details">
-                자세히 보기
+      
+      <!-- Wave Effect -->
+      <div class="absolute bottom-0 left-0 w-full">
+        <svg class="w-full h-auto" viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,64L48,80C96,96,192,128,288,128C384,128,480,96,576,90.7C672,85,768,107,864,122.7C960,139,1056,149,1152,133.3C1248,117,1344,75,1392,53.3L1440,32L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z" 
+                fill="#f0f7ff"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-6xl mx-auto px-4 -mt-16 relative z-20">
+      <!-- Liked Places Section -->
+      <section class="bg-white rounded-3xl shadow-lg p-8 mb-8 relative">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex items-center gap-4">
+            <h2 class="text-2xl font-bold text-cyan-600">❤️ 찜한 수영장</h2>
+            <span class="px-4 py-1 bg-gradient-to-r from-cyan-600 to-blue-400 text-white rounded-full text-sm font-medium">
+              {{ likedPlacesLength }}개
+            </span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="isLoading" class="flex flex-col items-center justify-center py-12">
+          <div class="w-12 h-12 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"></div>
+          <p class="mt-4 text-gray-500">데이터를 불러오는 중입니다...</p>
+        </div>
+
+        <div v-else-if="likedPlacesLength > 0" class="relative group">
+          <button 
+            @click="prevLikedPage" 
+            class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <button 
+            @click="nextLikedPage"
+            class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-2 rounded-full bg-white shadow-lg hover:bg-gray-50 opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <div class="overflow-hidden px-4">
+            <div 
+              class="flex gap-6 transition-transform duration-500 ease-in-out"
+              :style="{ transform: `translateX(-${currentLikedPage * (300 + 24)}px)` }"
+            >
+              <div v-for="place in likedPlaces" 
+                   :key="place.placeId"
+                   @click="goPlaceBoard(place.placeId)"
+                   class="w-[300px] flex-shrink-0 group rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer bg-white"
+              >
+                <div class="relative h-48 overflow-hidden">
+                  <img
+                    :src="place.image || '/public/default-pool.jpg'"
+                    :alt="place.placeName"
+                    class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  />
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                    <span class="text-white font-medium px-6 py-2 rounded-full bg-white/20 backdrop-blur-sm">
+                      자세히 보기
+                    </span>
+                  </div>
+                </div>
+                <div class="p-6">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-2">{{ place.placeName }}</h3>
+                  <span class="text-sm text-cyan-600">📍 상세정보 보기</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-16 border-2 border-dashed border-gray-200 rounded-2xl">
+          <img src="@/assets/empty-heart.svg" alt="빈 하트" class="w-32 h-32 mx-auto mb-6 opacity-60" />
+          <p class="text-gray-600 mb-4">아직 찜한 수영장이 없어요</p>
+          <router-link 
+            to="/around" 
+            class="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-400 text-white rounded-full hover:shadow-lg transition-shadow"
+          >
+            수영장 둘러보기
+          </router-link>
+        </div>
+      </section>
+
+      <!-- Reviews Section -->
+      <section class="bg-white rounded-3xl shadow-lg p-8 mb-8">
+        <div class="flex justify-between items-center mb-8">
+          <div class="flex items-center gap-4">
+            <h2 class="text-2xl font-bold text-cyan-600">✏️ 내가 쓴 리뷰</h2>
+            <span class="px-4 py-1 bg-gradient-to-r from-cyan-600 to-blue-400 text-white rounded-full text-sm font-medium">
+              {{ myReviewsLength }}개
+            </span>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div v-if="isLoadingReviews" class="flex flex-col items-center justify-center py-12">
+          <div class="w-12 h-12 border-4 border-cyan-200 border-t-cyan-600 rounded-full animate-spin"></div>
+          <p class="mt-4 text-gray-500">리뷰를 불러오는 중입니다...</p>
+        </div>
+
+        <!-- Reviews Grid -->
+        <div v-else-if="myReviewsLength > 0">
+          <div class="flex justify-between items-center mb-6">
+            <div class="flex-1"></div>
+            <div class="flex gap-2 items-center">
+              <button 
+                v-if="currentPage > 1"
+                @click="currentPage--"
+                class="px-4 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+              >
+                이전
+              </button>
+              <button 
+                v-for="page in displayedPages" 
+                :key="page"
+                @click="currentPage = page"
+                :class="[
+                  'px-4 py-2 rounded-full transition-all duration-200',
+                  currentPage === page 
+                    ? 'bg-cyan-600 text-white transform scale-110' 
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                ]"
+              >
+                {{ page }}
+              </button>
+              <button 
+                v-if="currentPage < totalPages"
+                @click="currentPage++"
+                class="px-4 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+              >
+                다음
               </button>
             </div>
           </div>
-          <div class="place-info">
-            <h3>{{ place.placeName }}</h3>
-            <!-- <p class="address">📍 {{ place.address }}</p> -->
-            <!-- <div class="tags">
-              <span class="tag">{{ place.type }}</span>
-              <span class="tag">{{ place.price }}</span>
-            </div> -->
-            <div class="rating"></div>
-          </div>
-        </div>
-      </div>
-      <div v-else class="empty-state">
-        <img src="@/assets/empty-heart.svg" alt="빈 하트" class="empty-icon" />
-        <p>아직 찜한 수영장이 없어요</p>
-        <router-link to="/around" class="browse-button"
-          >수영장 둘러보기</router-link
-        >
-      </div>
-    </div>
-
-    <!-- My Reviews Section -->
-    <div v-if="isLoadingReviews">
-      <!-- Show a loading indicator -->
-      데이터를 불러오는 중입니다...
-    </div>
-    <div v-else class="section my-reviews">
-      <div class="section-header">
-        <h2>✏️ 내가 쓴 리뷰</h2>
-        <span class="count-badge">{{ myReviewsLength }}개</span>
-      </div>
-      <div class="reviews-list" v-if="myReviewsLength > 0">
-        <div
-          v-for="review in myReviews"
-          :key="review.reviewId"
-          class="review-card"
-        >
-          <div class="review-header">
-            <div class="place-details">
-              <h3>{{ review.title }}</h3>
-              <p class="review-date">{{ formatDate(review.regTime) }}</p>
-            </div>
-            <div class="review-rating">
-              <div class="stars">
-                <!-- <span v-for="n in review.rating" :key="n" class="star">⭐</span> -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div v-for="review in paginatedReviews" 
+                 :key="review.reviewId"
+                 class="p-6 rounded-2xl border border-gray-100 shadow-md hover:shadow-lg transition-shadow">
+              <div class="flex flex-col gap-2 mb-4 pb-4 border-b border-gray-100">
+                <div class="flex justify-between items-start">
+                  <h3 class="text-lg font-semibold text-gray-800">{{ review.title }}</h3>
+                  <span class="text-sm text-cyan-600">{{ formatDate(review.regTime) }}</span>
+                </div>
+                <span class="text-sm text-cyan-600">🏊‍♂️ {{ review.placeName }}</span>
               </div>
-              <!-- <span class="rating-text">{{ review.rating }}/5.0</span> -->
+              <p class="text-gray-600 mb-6 line-clamp-3">{{ review.content }}</p>
+              <button 
+                @click="goPlaceBoard(review.placeId)"
+                class="px-6 py-2 bg-cyan-600 text-white rounded-full hover:bg-cyan-700 transition-colors"
+              >
+                수영장 보기
+              </button>
             </div>
           </div>
-          <p class="review-content">{{ review.content }}</p>
-          <div class="review-footer">
-            <button @click="goPlaceBoard(review.placeId)" class="edit-button">
-              보러가기
-            </button>
-          </div>
         </div>
-      </div>
-      <div v-else class="empty-state">
-        <img src="@/assets/empty-review.svg" alt="빈 리뷰" class="empty-icon" />
-        <p>아직 작성한 리뷰가 없어요</p>
-        <!-- <router-link to="/placeBoard" class="browse-button">리뷰 작성하러 가기</router-link> -->
-      </div>
+
+        <!-- Empty State -->
+        <div v-else class="text-center py-16 border-2 border-dashed border-gray-200 rounded-2xl">
+          <img src="@/assets/empty-review.svg" alt="빈 리뷰" class="w-32 h-32 mx-auto mb-6 opacity-60" />
+          <p class="text-gray-600 mb-2">아직 작성한 리뷰가 없어요</p>
+          <p class="text-sm text-gray-400">수영장을 방문하고 리뷰를 남겨보세요!</p>
+        </div>
+      </section>
     </div>
   </div>
 </template>
 
 <script setup>
 import axios from "axios";
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import { useRouter } from "vue-router";
-const router = useRouter();
 
+const router = useRouter();
 const likedPlacesId = ref([]);
 const likedPlaces = ref([]);
 const myReviews = ref([]);
@@ -121,7 +211,67 @@ const myReviewsLength = computed(() => myReviews.value.length);
 const likedPlacesLength = computed(() => likedPlaces.value.length);
 const isLoading = ref(true);
 const isLoadingReviews = ref(true);
-const imgPath = ref("");
+
+const currentPage = ref(1);
+const itemsPerPage = 4;
+const currentLikedPage = ref(0);
+const cardWidth = 300;
+const cardGap = 24;
+
+const maxLikedScroll = computed(() => {
+  if (!likedPlaces.value.length) return 0;
+  const totalWidth = likedPlaces.value.length * (cardWidth + cardGap) - cardGap;
+  const visibleWidth = (cardWidth + cardGap) * 3;
+  return Math.max(0, totalWidth - visibleWidth);
+});
+
+const totalPages = computed(() => Math.ceil(myReviews.value.length / itemsPerPage));
+
+const displayedPages = computed(() => {
+  const total = totalPages.value;
+  if (total <= 3) return Array.from({ length: total }, (_, i) => i + 1);
+  
+  let start = currentPage.value - 1;
+  if (start < 1) start = 1;
+  if (start > total - 2) start = total - 2;
+  
+  return Array.from({ length: 3 }, (_, i) => start + i);
+});
+
+const paginatedReviews = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  return myReviews.value.slice(start, end);
+});
+
+const prevLikedPage = () => {
+  if (currentLikedPage.value > 0) {
+    currentLikedPage.value--;
+  }
+};
+
+const nextLikedPage = () => {
+  const nextScroll = (currentLikedPage.value + 1) * (cardWidth + cardGap);
+  if (nextScroll < maxLikedScroll.value) {
+    currentLikedPage.value++;
+  } else if (maxLikedScroll.value > currentLikedPage.value * (cardWidth + cardGap)) {
+    // 마지막 스크롤 위치로 이동
+    currentLikedPage.value = Math.ceil(maxLikedScroll.value / (cardWidth + cardGap));
+  }
+};
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+};
+
+const goPlaceBoard = async (placeId) => {
+  const response = await axios.get(
+    "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" + placeId
+  );
+  localStorage.setItem("currentPlace", response.data.placeName);
+  router.push("/placeBoard");
+};
 
 const fetchMyReviews = async () => {
   try {
@@ -135,12 +285,33 @@ const fetchMyReviews = async () => {
       {
         params: {
           userId: userId,
+          size: 100000  // 매우 큰 숫자로 설정하여 모든 리뷰를 가져옴
         },
       }
     );
 
     if (response.data) {
-      myReviews.value = response.data.data.items;
+      // Fetch place names for each review
+      const reviewsWithPlaceNames = await Promise.all(
+        response.data.data.items.map(async (review) => {
+          try {
+            const placeResponse = await axios.get(
+              `http://localhost:8080/uhpooh/api/place/getplacebyplaceid/${review.placeId}`
+            );
+            return {
+              ...review,
+              placeName: placeResponse.data.placeName
+            };
+          } catch (error) {
+            console.error("Error fetching place name:", error);
+            return {
+              ...review,
+              placeName: "알 수 없는 수영장"
+            };
+          }
+        })
+      );
+      myReviews.value = reviewsWithPlaceNames;
       console.log("작성한 리뷰들", myReviews.value);
     } else {
       console.error("Invalid review data format");
@@ -166,7 +337,6 @@ const fetchLikedPlaces = async () => {
     );
     if (response.data && Array.isArray(response.data)) {
       likedPlacesId.value = response.data;
-      console.log(likedPlacesId.value.length);
     } else {
       console.error("Invalid liked places data format");
       likedPlacesId.value = [];
@@ -176,10 +346,8 @@ const fetchLikedPlaces = async () => {
     likedPlacesId.value = [];
   }
 
-  // Clear existing places
   likedPlaces.value = [];
   
-  // Create an array of promises for all place fetches
   const placePromises = likedPlacesId.value.map(async (placeId) => {
     try {
       const response = await axios.get(
@@ -188,7 +356,6 @@ const fetchLikedPlaces = async () => {
       if (response && response.data) {
         const place = response.data;
 
-        // Fetch image from Kakao Image Search API
         try {
           const imageResponse = await axios.get(
             `https://dapi.kakao.com/v2/search/image?query=${encodeURIComponent(
@@ -206,7 +373,6 @@ const fetchLikedPlaces = async () => {
             imageResponse.data.documents.length > 0
           ) {
             place.image = imageResponse.data.documents[0].image_url;
-            // Preload the image
             await new Promise((resolve, reject) => {
               const img = new Image();
               img.onload = resolve;
@@ -232,9 +398,7 @@ const fetchLikedPlaces = async () => {
   });
 
   try {
-    // Wait for all places and their images to be loaded
     const places = await Promise.all(placePromises);
-    // Filter out any null values and update likedPlaces
     likedPlaces.value = places.filter(place => place !== null);
   } catch (error) {
     console.error("Error loading places:", error);
@@ -242,401 +406,15 @@ const fetchLikedPlaces = async () => {
   } finally {
     isLoading.value = false;
   }
-  
-  console.log("좋아요를 누른 장소들", likedPlaces.value);
-  console.log(likedPlacesLength.value);
-};
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-};
-
-const goPlaceBoard = async (placeId) => {
-  const response = await axios.get(
-    "http://localhost:8080/uhpooh/api/place/getplacebyplaceid/" + placeId
-  );
-  localStorage.setItem("currentPlace", response.data.placeName);
-  router.push("/placeBoard");
 };
 
 onMounted(async () => {
-  await fetchMyReviews();
-  await fetchLikedPlaces();
+  await Promise.all([fetchMyReviews(), fetchLikedPlaces()]);
+});
+
+watch(() => myReviews.value.length, () => {
+  if (currentPage.value > totalPages.value) {
+    currentPage.value = totalPages.value;
+  }
 });
 </script>
-
-<style scoped>
-.my-pools {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: #f8f9fa;
-  min-height: 100vh;
-}
-
-.header-section {
-  text-align: center;
-  margin-bottom: 3rem;
-}
-
-h1 {
-  font-size: 2.5rem;
-  color: #1a1a1a;
-  margin-bottom: 0.5rem;
-  font-weight: 700;
-}
-
-.subtitle {
-  color: #666;
-  font-size: 1.1rem;
-}
-
-.section {
-  background: white;
-  border-radius: 20px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  border: 3px solid #d1d5db;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
-
-.section-header h2 {
-  font-size: 1.5rem;
-  color: #333;
-  margin: 0;
-}
-
-.count-badge {
-  background: linear-gradient(135deg, #63b8f1 0%, #4698e5 100%);
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  margin-left: 1rem;
-  font-size: 0.9rem;
-  color: white;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(229, 200, 70, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  display: inline-flex;
-  align-items: center;
-  transition: all 0.3s ease;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.count-badge::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
-  transition: 0.5s;
-}
-
-.count-badge:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.4);
-}
-
-.count-badge:hover::before {
-  left: 100%;
-}
-
-.places-grid {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding: 0.5rem;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-.place-card {
-  flex: 0 0 280px;
-  background: white;
-  border-radius: 15px;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  border: 3px solid #d1d5db;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.place-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-color: #9ca3af;
-}
-
-.image-container {
-  position: relative;
-  height: 200px;
-  overflow: hidden;
-}
-
-.place-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s;
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.image-container:hover .overlay {
-  opacity: 1;
-}
-
-.image-container:hover .place-image {
-  transform: scale(1.1);
-}
-
-.view-details {
-  background: white;
-  color: #333;
-  border: none;
-  padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.view-details:hover {
-  background: #f0f0f0;
-}
-
-.place-info {
-  padding: 1.2rem;
-}
-
-.place-info h3 {
-  margin: 0 0 0.5rem 0;
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.address {
-  color: #666;
-  font-size: 0.9rem;
-  margin-bottom: 0.8rem;
-}
-
-.tags {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 0.8rem;
-}
-
-.tag {
-  background: #f0f0f0;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
-  font-size: 0.8rem;
-  color: #666;
-}
-
-.rating {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.stars {
-  display: flex;
-  gap: 2px;
-}
-
-.star {
-  font-size: 0.9rem;
-}
-
-.rating-text {
-  color: #666;
-  font-size: 0.9rem;
-}
-
-.reviews-list {
-  display: flex;
-  gap: 1.5rem;
-  overflow-x: auto;
-  padding: 0.5rem;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-.review-card {
-  flex: 0 0 350px;
-  background: white;
-  border-radius: 15px;
-  padding: 1.5rem;
-  border: 3px solid #d1d5db;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: all 0.3s ease;
-}
-
-.review-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  border-color: #9ca3af;
-}
-
-.review-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.place-details h3 {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #333;
-}
-
-.review-date {
-  color: #888;
-  font-size: 0.9rem;
-  margin: 0.3rem 0 0 0;
-}
-
-.review-content {
-  color: #444;
-  line-height: 1.6;
-  margin: 1rem 0;
-}
-
-.review-footer {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.edit-button,
-.delete-button {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-
-.edit-button {
-  background: #e9ecef;
-  color: #495057;
-}
-
-.delete-button {
-  background: #fff0f0;
-  color: #dc3545;
-}
-
-.edit-button:hover {
-  background: #dee2e6;
-}
-
-.delete-button:hover {
-  background: #ffe3e3;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 3rem 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border: 3px dashed #d1d5db;
-  border-radius: 15px;
-  background: #f9fafb;
-}
-
-.empty-icon {
-  width: 120px;
-  height: 120px;
-  margin-bottom: 1.5rem;
-  opacity: 0.6;
-}
-
-.empty-state p {
-  color: #666;
-  margin-bottom: 1rem;
-}
-
-.browse-button {
-  display: inline-block;
-  background: #007bff;
-  color: white;
-  padding: 0.8rem 1.5rem;
-  border-radius: 25px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: background 0.3s;
-}
-
-.browse-button:hover {
-  background: #0056b3;
-}
-
-.places-grid::-webkit-scrollbar,
-.reviews-list::-webkit-scrollbar {
-  height: 8px;
-}
-
-.places-grid::-webkit-scrollbar-track,
-.reviews-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.places-grid::-webkit-scrollbar-thumb,
-.reviews-list::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.places-grid::-webkit-scrollbar-thumb:hover,
-.reviews-list::-webkit-scrollbar-thumb:hover {
-  background: #666;
-}
-
-@media (max-width: 768px) {
-  .my-pools {
-    padding: 1rem;
-  }
-
-  .section {
-    padding: 1.5rem;
-  }
-
-  h1 {
-    font-size: 2rem;
-  }
-}
-</style>
