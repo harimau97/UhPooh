@@ -193,6 +193,10 @@
         VALUES
         (#{userEmail}, #{userName}, #{pImage}, #{provider}, 1)
     </insert>
+    
+    <delete id="deleteGoogleImage">
+    update users set pImage = null where pImage like ("%googleusercontent%");
+    </delete>
 
 
 </mapper>

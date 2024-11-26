@@ -62,5 +62,7 @@ public interface UserDao {
     public int updateOAuth2User(User user);
     
     public int saveOAuth2User(User user);
+
+    public void deleteGoogleImage();
 }
 

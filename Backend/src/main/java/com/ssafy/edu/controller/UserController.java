@@ -7,7 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import com.ssafy.edu.jwt.model.service.CustomUserService;
 import com.ssafy.edu.user.model.dto.User;
 import com.ssafy.edu.user.model.service.UserService;
@@ -114,11 +123,12 @@ public class UserController {
         responseData.put("message", "로그인에 성공했습니다.");
         responseData.put("user", loginUser);
         responseData.put("userToken", userToken);
-
+        userService.deleteGoogleImage();
         return new ResponseEntity<>(responseData, HttpStatus.OK);
       } else {
         return createResponse(false, "이메일 또는 비밀번호가 일치하지 않습니다.", HttpStatus.UNAUTHORIZED);
       }
+
     } catch (Exception e) {
       logger.error("Error in userLogin: ", e);
       return createResponse(false, "로그인 중 오류가 발생했습니다: " + e.getMessage(),

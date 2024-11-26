@@ -2,7 +2,7 @@ import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
 
 export const useThemeStore = defineStore('theme', () => {
-  const currentTheme = ref(localStorage.getItem('theme') || 'system');
+  const currentTheme = ref(localStorage.getItem('theme') || 'light');
 
   const applyDarkFilter = () => {
     // 전체 페이지에 필터 적용
