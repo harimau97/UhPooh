@@ -111,6 +111,12 @@ public class OAuth2ServiceImpl extends DefaultOAuth2UserService implements OAuth
         String profileImage = (String) userInfo.get(provider.equals("google") ? "picture" :
                 provider.equals("github") ? "profile_image" : "profile_image");
         
+        // Google 프로필 이미지 URL 필터링
+        if (provider.equals("google") && profileImage != null && profileImage.contains("googleusercontent")) {
+            log.info("Google profile image URL detected and filtered: {}", profileImage);
+            profileImage = null; // 또는 기본 이미지 URL로 설정
+        }
+        
         log.info("Extracted Email: {}", userEmail);
         log.info("Extracted Nickname: {}", nickname);
         log.info("Extracted Profile Image: {}", profileImage);
