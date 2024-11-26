@@ -137,7 +137,10 @@ const cacheMyImage = async (cat) => {
   try {
     console.log(cat);
     myImgPath.value =
-      "http://localhost:8080/uhpooh/api/images/" + cat + "/" + myImgName.value;
+      "http://localhost:8080/uhpooh/api/file/images/" +
+      cat +
+      "/" +
+      myImgName.value;
     const response = await axios.get(myImgPath.value, { timeout: 5000 });
     console.log("이미지 캐싱 성공:", myImgPath.value);
   } catch (error) {
@@ -170,15 +173,12 @@ onMounted(async () => {
   // 프로필 이미지 처리
   myImageTrue.value = pImage || "";
   console.log(myImageTrue.value);
-  if (pImage.includes("googleusercontent")) {
-    myImageTrue.value = "";
-    localStorage.setItem("pImage", "");
-  }
+
   if (pImage) {
     myImgName.value = myImageTrue.value.replace("/images/profiles/", "");
     await cacheMyImage("profiles");
-    user.value.profileImageUrl =
-      userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
+    // user.value.profileImageUrl =
+    //   userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
   }
 
   // 사용자 통계 데이터 로드
