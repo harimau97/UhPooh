@@ -5,7 +5,7 @@
 <h3><b>실시간 수영장 검색과 예약이 가능한 올인원 수영장 플랫폼</b></h3>
 
 
-<img src="https://github.com/user-attachments/assets/efa9501d-6683-4c47-8539-30008e352881" alt="서비스 대표 이미지"/>
+<img src="https://github.com/user-attachments/assets/1573bc80-7711-46c5-bdc9-cc3da59de574" alt="서비스 대표 이미지"/>
 </div>
 
 
@@ -70,16 +70,21 @@
 
 ### 1) 수영장 검색
 
-| 지도 검색 | 상세 정보 | 로드뷰 |
-|:---:|:---:|:---:|
-| <img src="" alt="지도" width="250"> | <img src="" alt="상세" width="250"> | <img src="" alt="로드뷰" width="250"> |
+|    수영장 찾기   | 상세 정보 |               리뷰 목록                |
+|:----------------------------------------------------------------------------------------------------------------:|:---:|:----------------------------------:|
+| <img src="https://github.com/user-attachments/assets/bcba4259-86be-430d-b70b-98a733be7585" alt="지도" width="250"> | <img src="https://github.com/user-attachments/assets/64b081a4-0a63-405b-b046-f91edb36599a" alt="상세" width="250"> | <img src="https://github.com/user-attachments/assets/68379d34-e0ce-484c-b891-67b289d3476f" alt="로드뷰" width="250"> |
 
-### 2) 회원 관리 및 예약
+### 2) 로그인 및 예약
 
-| 회원가입/로그인 | 예약 하기 | 결제 하기 |
-|:---:|:---:|:---:|
-| <img src="" alt="회원" width="250"> | <img src="" alt="예약" width="250"> | <img src="" alt="결제" width="250"> |
+|                                                       로그인                                                        | 예약 하기 | 결제 하기 |
+|:----------------------------------------------------------------------------------------------------------------:|:---:|:---:|
+| <img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250"> | <img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250"> | <img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250"> |
+
+### 3) 마이페이지
+
+|                                                      마이페이지                                                       |                                                     내 정보 수정                                                      | 결제 하기 |
+|:----------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------:|:---:|
+| <img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250"> | <img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250"> | <img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250"> |
 
 <br>
-
 
