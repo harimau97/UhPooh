@@ -155,7 +155,12 @@ onMounted(async () => {
 
   // 프로필 이미지 처리
   imageTrue.value = pImage || "";
-  if (pImage && pImage !== "null") {
+  console.log(imageTrue.value);
+  if (pImage.includes("googleusercontent")) {
+    imageTrue.value = "";
+    localStorage.setItem("pImage", "");
+  }
+  if (pImage) {
     imgName.value = imageTrue.value.replace("/images/profiles/", "");
     await cacheImage("profiles");
     user.value.profileImageUrl =
@@ -165,10 +170,11 @@ onMounted(async () => {
   // 사용자 통계 데이터 로드
   try {
     await Promise.all([fetchMyReviews(), fetchLikedPlaces()]);
-    
+
     // 포인트 계산: 좋아요 * 10 + 리뷰 * 20
-    const calculatedPoints = likedPlacesLength.value * 10 + myReviewsLength.value * 20;
-    
+    const calculatedPoints =
+      likedPlacesLength.value * 10 + myReviewsLength.value * 20;
+
     user.value.stats = [
       { label: "좋아요", value: likedPlacesLength.value.toString() },
       { label: "리뷰", value: myReviewsLength.value.toString() },

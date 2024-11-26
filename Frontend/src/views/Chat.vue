@@ -97,10 +97,10 @@ console.log(localStorage.setItem("채팅 확인", user_email.value));
 console.log("");
 
 const config = {
-  APP_ID: "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
+  APP_ID: import.meta.env.VITE_SENDBIRD_APP_ID,
   USER_ID: user_id.value,
   NICKNAME: user_email.value,
-  API_TOKEN: "insert your key here",
+  API_TOKEN: import.meta.env.VITE_SENDBIRD_API_TOKEN,
   LANG: "ko",
 };
 

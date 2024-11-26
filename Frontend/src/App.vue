@@ -1,7 +1,7 @@
 <script setup>
 import Header from "./views/Header.vue";
 import Chat from "./views/Chat.vue";
-import { useThemeStore } from './stores/theme';
+import { useThemeStore } from "./stores/theme";
 
 import {
   getUserInfo,
@@ -76,7 +76,7 @@ async function createChatUser() {
 const themeStore = useThemeStore();
 
 onMounted(async () => {
-  themeStore.initializeTheme();
+  themeStore.applyTheme(themeStore.currentTheme);
   (function (w, d, s, ...args) {
     const f = d.getElementsByTagName(s)[0];
     const j = d.createElement(s);
@@ -89,8 +89,8 @@ onMounted(async () => {
     window,
     document,
     "script",
-    "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
-    "1v5Rtog-RFAjUC4EjM-iY",
+    import.meta.env.VITE_SENDBIRD_APP_ID,
+    import.meta.env.VITE_SENDBIRD_CHATBOT_KEY,
     {
       apiHost: "https://api-cf-ap-2.sendbird.com",
     }

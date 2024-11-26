@@ -21,7 +21,10 @@
   <header class="absolute top-0 right-0 left-0 z-50">
     <nav class="container flex justify-between items-center px-4 py-4 mx-auto">
       <!-- Logo -->
-      <RouterLink to="/" class="text-2xl font-bold text-white flex items-center gap-2">
+      <RouterLink
+        to="/"
+        class="flex gap-2 items-center text-2xl font-bold text-white"
+      >
         <img
           src="../assets/logo_text.png"
           style="width: 130px; height: auto; filter: invert(100%)"
@@ -87,14 +90,18 @@ const logout = () => {
     }
   };
   tryLogout();
-  localStorage.removeItem("userToken");
-  localStorage.removeItem("userId");
-  localStorage.removeItem("userName");
-  localStorage.removeItem("userAddress");
-  localStorage.removeItem("pImage");
-  localStorage.removeItem("isAdmin");
-  localStorage.removeItem("userEmail");
-  localStorage.removeItem("tempKeyword");
+  // localStorage.removeItem("userToken");
+  // localStorage.removeItem("userId");
+  // localStorage.removeItem("userName");
+  // localStorage.removeItem("userAddress");
+  // localStorage.removeItem("pImage");
+  // localStorage.removeItem("isAdmin");
+  // localStorage.removeItem("userEmail");
+  // localStorage.removeItem("tempKeyword");
+  // localStorage.removeItem("provider");
+  // localStorage.removeItem("@tosspayments/client-id");
+  // localStorage.removeItem("@tosspayments/client-secret");
+  localStorage.clear();
   isLoggined.value = false; // 로그인 상태 변경
 
   location.replace("/"); // 메인 페이지로 이동;
