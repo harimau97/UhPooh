@@ -101,6 +101,25 @@ const router = createRouter({
       path: "/oauth2/callback",
       component: () => import("../components/OAuth2Callback.vue"),
     },
+    {
+      path: '/payment/success',
+      name: 'payment-success',
+      component: () => import('../views/PaymentSuccess.vue'),
+      props: (route) => ({
+        paymentKey: route.query.paymentKey,
+        orderId: route.query.orderId,
+        amount: parseInt(route.query.amount)
+      })
+    },
+    {
+      path: '/payment/fail',
+      name: 'payment-fail',
+      component: () => import('../views/PaymentFail.vue'),
+      props: (route) => ({
+        message: route.query.message,
+        code: route.query.code
+      })
+    }
   ],
   // 스크롤 동작 추가
   scrollBehavior(to, from, savedPosition) {

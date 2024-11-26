@@ -26,22 +26,61 @@ const Chat = (props) => {
     CHANNEL__MESSAGE_LIST__NOTHING_TO_SHOW: "메시지가 없습니다.",
   };
 
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .sendbird-channel-list {
+        width: 100% !important;
+      }
+      .sendbird-channel-list__body {
+        width: 100% !important;
+      }
+      .sendbird-channel-preview {
+        width: 100% !important;
+      }
+      .sendbird-channel-header {
+        width: 100% !important;
+      }
+      .sendbird-channel-header__title {
+        width: 100% !important;
+      }
+      .sendbird-channel-header__right-icon {
+        right: 16px !important;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
   return (
-    <div className="channel-wrap" style={{ height: "100%" }}>
-      <SendbirdApp
-        appId={props.config.APP_ID}
-        userId={props.config.USER_ID}
-        nickname={props.config.NICKNAME}
-        profileUrl={props.config.PROFILE_URL}
-        colorSet={myColorSet}
-        stringSet={myStringSet}
-        breakpoint={true}
-        theme="light"
-        config={{
-          enableEnterToSubmit: true,
-          isOnline: true,
-        }}
-      />
+    <div
+      className="channel-wrap"
+      style={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        display: "flex",
+        flexDirection: "column"
+      }}
+    >
+      <div style={{ flex: 1, width: "100%" }}>
+        <SendbirdApp
+          appId={props.config.APP_ID}
+          userId={props.config.USER_ID}
+          nickname={props.config.NICKNAME}
+          profileUrl={props.config.PROFILE_URL}
+          colorSet={myColorSet}
+          stringSet={myStringSet}
+          breakpoint={true}
+          theme="light"
+          config={{
+            enableEnterToSubmit: true,
+            isOnline: true,
+          }}
+        />
+      </div>
     </div>
   );
 };

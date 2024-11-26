@@ -49,7 +49,7 @@
   <!-- Chat button -->
   <button
     @click="openChat = !openChat"
-    class="flex fixed right-4 bottom-4 z-50 justify-center items-center w-10 h-10 text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-lg transition-all duration-300 transform hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
+    class="flex fixed bottom-[24px] right-20 z-50 justify-center items-center w-12 h-12 text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-lg transition-all duration-300 transform hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"

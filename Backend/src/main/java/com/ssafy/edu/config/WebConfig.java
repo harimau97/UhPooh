@@ -11,8 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**").allowedOriginPatterns("http://localhost:5173") // 클라이언트 URL
-        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowCredentials(false);
+    registry.addMapping("/**").allowedOriginPatterns("http://localhost:5173") // 클라이언트 URL 
+    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS").allowCredentials(false);   
+  
   }
 
   @Bean

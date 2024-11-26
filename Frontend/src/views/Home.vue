@@ -138,7 +138,7 @@ onMounted(() => {
       <!-- Video Background -->
       <div class="object-cover overflow-hidden absolute inset-0 w-full h-full">
         <video
-          src="@/assets/swimming.mp4"
+          src="@/assets/swimming2.mp4"
           autoplay
           loop
           muted

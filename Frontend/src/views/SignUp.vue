@@ -299,7 +299,7 @@ const signUp = async (event) => {
     });
     
     alert("회원 가입이 완료되었습니다.");
-    router.push("/");
+    router.push("/login");
   } catch (error) {
     console.error(error);
     alert("회원가입 처리 중 오류가 발생했습니다.");
