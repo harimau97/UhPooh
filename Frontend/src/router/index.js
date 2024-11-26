@@ -132,8 +132,17 @@ const router = createRouter({
 
 // 전역 라우터 가드 수정
 router.beforeEach(async (to, from, next) => {
+  // 비밀번호 변경 페이지에 대한 추가 검사
+  if (to.path === '/change-password') {
+    const provider = localStorage.getItem('provider');
+    if (provider !== 'local') {
+      next('/mypage'); // 소셜 로그인 사용자는 마이페이지로 리다이렉트
+      return;
+    }
+  }
+
   // 로그인이 필요한 페이지 체크
-  if (to.meta.requiresAuth) {
+  if (to.matched.some((record) => record.meta.requiresAuth)) {
     await isAuthenticated();
     if (!userAuthenticated.value) {
       alert("로그인이 필요한 서비스입니다.");

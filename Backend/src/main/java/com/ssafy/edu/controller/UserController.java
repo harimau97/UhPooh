@@ -7,16 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import com.ssafy.edu.jwt.model.service.CustomUserService;
 import com.ssafy.edu.user.model.dto.User;
 import com.ssafy.edu.user.model.service.UserService;
@@ -155,7 +146,7 @@ public class UserController {
   }
 
   @Operation(summary = "회원정보 수정", description = "사용자 정보 수정 (일반 회원은 자신의 정보만, 관리자는 모든 회원 정보 수정 가능)")
-  @PatchMapping("/{userId}")
+  @PutMapping("/{userId}")
   public ResponseEntity<Map<String, Object>> userUpdate(@PathVariable int userId,
       @RequestBody User user, @RequestParam int requestUserId) {
     logger.info("Update attempt for userId: {}, requestUserId: {}", userId, requestUserId);
@@ -216,7 +207,7 @@ public class UserController {
 
   @Operation(summary = "비밀번호 수정",
       description = "비밀번호 변경 (관리자가 변경 불가능) (필수: currentPassword, newPassword, confirmPassword)")
-  @PatchMapping("/password/{userId}")
+  @PutMapping("/password/{userId}")
   public ResponseEntity<Map<String, Object>> updatePassword(@PathVariable int userId,
       @RequestBody Map<String, String> request, @RequestParam int requestUserId) {
     logger.info("Password update attempt for userId: {}", userId);
