@@ -110,15 +110,15 @@
 
 **제공 기능:**
 
-<img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250">
+<img src="https://github.com/user-attachments/assets/71633fe4-84ab-4f76-bc4f-d2ab5f5b4158" alt="회원" width="250">
 
-- 회원 정보 조회 및 수정
+- 마이페이지
 
-<img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250">
+<img src="https://github.com/user-attachments/assets/8cc0a477-1d5a-4398-9330-a50ef52229d9" alt="예약" width="250">
 
 - 개인 정보 관리
 
-<img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250">
+<img src="https://github.com/user-attachments/assets/75c99bbc-27fe-4cdd-99d2-1e9b5f4196a5" alt="결제" width="250">
 
 - 개인별 좋아요, 리뷰 목록 조회
 
@@ -126,3 +126,6 @@
 
 - 관리자 페이지(관리자일 경우만)
 
+<img src="https://github.com/user-attachments/assets/92378b7c-18b6-4668-8aab-60d1a3ea85fa" alt="결제" width="250">
+
+- 다크모드 설정
