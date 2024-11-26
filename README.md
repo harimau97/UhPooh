@@ -68,23 +68,61 @@
 
 ## <span id="8">5. 💻 주요 기능 소개</span>
 
-### 1) 수영장 검색
+### 1) 수영장 검색 기능
 
-|    수영장 찾기   | 상세 정보 |               리뷰 목록                |
-|:----------------------------------------------------------------------------------------------------------------:|:---:|:----------------------------------:|
-| <img src="https://github.com/user-attachments/assets/bcba4259-86be-430d-b70b-98a733be7585" alt="지도" width="250"> | <img src="https://github.com/user-attachments/assets/64b081a4-0a63-405b-b046-f91edb36599a" alt="상세" width="250"> | <img src="https://github.com/user-attachments/assets/68379d34-e0ce-484c-b891-67b289d3476f" alt="로드뷰" width="250"> |
+**제공 기능:**
+<br>
+<img src="https://github.com/user-attachments/assets/bcba4259-86be-430d-b70b-98a733be7585" alt="지도" width="250">
 
-### 2) 로그인 및 예약
+- 카카오맵 API 기반 위치 검색
 
-|                                                       로그인                                                        | 예약 하기 | 결제 하기 |
-|:----------------------------------------------------------------------------------------------------------------:|:---:|:---:|
-| <img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250"> | <img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250"> | <img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250"> |
+<img src="https://github.com/user-attachments/assets/64b081a4-0a63-405b-b046-f91edb36599a" alt="상세" width="250">
+
+- 수영장 상세 정보 확인
+- 사용자 리뷰 및 좋아요 시스템
+- 로드뷰를 통한 실제 위치 확인
+
+<img src="https://github.com/user-attachments/assets/68379d34-e0ce-484c-b891-67b289d3476f" alt="로드뷰" width="250">
+
+- 리뷰 작성
+- 리뷰 목록 조회
+- 리뷰 수정, 삭제 가능 (본인이 작성한경우)
+
+### 2) 편리한 예약 및 결제 시스템
+
+**제공 기능:**
+
+<img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250">
+
+- 기본 로그인, 회원가입
+- 네이버/구글/깃허브 소셜 로그인
+
+<img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250">
+
+- 날짜, 시간별 예약
+- 실시간 예약 시스템
+
+<img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250">
+
+- 토스페이먼츠 결제 연동
 
 ### 3) 마이페이지
 
-|                                                      마이페이지                                                       |                                                     내 정보 수정                                                      | 결제 하기 |
-|:----------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------:|:---:|
-| <img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250"> | <img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250"> | <img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250"> |
+**제공 기능:**
 
-<br>
+<img src="https://github.com/user-attachments/assets/4de032f9-4a3f-4814-84de-7344c4a6f314" alt="회원" width="250">
+
+- 회원 정보 조회 및 수정
+
+<img src="https://github.com/user-attachments/assets/793ff903-8bf5-44fe-ae16-d2beb671191b" alt="예약" width="250">
+
+- 개인 정보 관리
+
+<img src="https://github.com/user-attachments/assets/6a6b5c28-ab74-473b-bbec-f94604fa1a5d" alt="결제" width="250">
+
+- 개인별 좋아요, 리뷰 목록 조회
+
+<img src="https://github.com/user-attachments/assets/98629550-cc4a-4206-9820-e224fa569ae2" alt="결제" width="250">
+
+- 관리자 페이지(관리자일 경우만)
 
