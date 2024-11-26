@@ -50,6 +50,7 @@ const Chat = (props) => {
       // }
       .sendbird-modal__content {
         width: 480px !important;
+        height: 50% !important;
       }
        
       .sendbird-channel-settings-header {

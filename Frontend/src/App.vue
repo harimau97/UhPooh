@@ -76,7 +76,7 @@ async function createChatUser() {
 const themeStore = useThemeStore();
 
 onMounted(async () => {
-  themeStore.initializeTheme();
+  themeStore.applyTheme(themeStore.currentTheme);
   (function (w, d, s, ...args) {
     const f = d.getElementsByTagName(s)[0];
     const j = d.createElement(s);

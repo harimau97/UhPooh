@@ -155,7 +155,12 @@ onMounted(async () => {
 
   // 프로필 이미지 처리
   imageTrue.value = pImage || "";
-  if (pImage && pImage !== "null") {
+  console.log(imageTrue.value);
+  if (pImage.includes("googleusercontent")) {
+    imageTrue.value = "";
+    localStorage.setItem("pImage", "");
+  }
+  if (pImage) {
     imgName.value = imageTrue.value.replace("/images/profiles/", "");
     await cacheImage("profiles");
     user.value.profileImageUrl =
