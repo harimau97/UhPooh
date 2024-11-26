@@ -1,12 +1,10 @@
-<script setup>
+<script setup >
 import { ref, computed } from "vue";
 import { onMounted } from "vue";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
 import { ThumbsUp } from "lucide-vue-next";
-
-
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
@@ -533,6 +531,7 @@ const getBookingInfo = computed(() => {
     date: selectedDate.value instanceof Date ? selectedDate.value.toLocaleDateString() : selectedDate.value,
     time: `${selectedTime.value}:00`,
     price: 10000,
+    totalPrice: 10000  // price와 동일한 값 추가
   };
 });
 
@@ -540,13 +539,47 @@ const isPaymentEnabled = computed(() => {
   return selectedDate.value && selectedTime.value;
 });
 
-// 결제 처리 함수 (나중에 토스 결제 연동)
-const handlePayment = () => {
-  if (!selectedDate.value || !selectedTime.value) {
-    alert('날짜와 시간을 선택해주세요.');
-    return;
+// 결제 처리 함수
+const handlePayment = async () => {
+  try {
+    const bookingInfo = getBookingInfo.value;
+    if (!bookingInfo) {
+      alert('날짜와 시간을 선택해주세요.');
+      return;
+    }
+
+    const userInfo = getUserInfo();
+    if (!userInfo) {
+      alert('로그인이 필요합니다.');
+      return;
+    }
+
+    // 결제 요청 데이터 준비
+    const paymentData = {
+      amount: bookingInfo.totalPrice,
+      orderId: `ORDER_${Date.now()}`,
+      orderName: `${bookingInfo.placeName} 예약`,
+      customerName: userInfo.name,
+      successUrl: `${window.location.origin}/payment/success`,
+      failUrl: `${window.location.origin}/payment/fail`
+    };
+
+    try {
+      // 백엔드에 결제 요청
+      const response = await axios.post('http://localhost:8080/uhpooh/api/payments/request', paymentData);
+      console.log('백엔드 응답:', response.data);
+    } catch (error) {
+      console.warn('백엔드 요청 실패, 토스페이먼츠 SDK로 직접 진행:', error);
+    }
+
+    // 토스페이먼츠 SDK 초기화 및 결제창 호출
+    const tossPayments = window.TossPayments('test_ck_PBal2vxj81LajZzexNOwr5RQgOAN');
+    await tossPayments.requestPayment('카드', paymentData);
+    
+  } catch (error) {
+    console.error('결제 초기화 중 오류 발생:', error);
+    alert('결제 처리 중 오류가 발생했습니다.');
   }
-  alert('토스 결제 연동 예정입니다.');
 };
 </script>
 
@@ -570,7 +603,6 @@ const handlePayment = () => {
                 <i class="fas fa-phone text-indigo-500 mr-3 text-lg"></i>
                 {{ phone }}
               </p>
-              
               <!-- 액션 버튼 그룹 -->
               <div class="flex flex-wrap items-center gap-4 mt-6">
                 <a :href="placeUrl" target="_blank" 
@@ -583,7 +615,6 @@ const handlePayment = () => {
                   <i class="fas fa-plus mr-2"></i>
                   리뷰 작성
                 </button>
-                
                 <!-- 좋아요 버튼 -->
                 <button v-if="!checkLike" @click="addLike(tableId, currentUser)"
                         class="flex items-center px-6 py-3 bg-gray-100 text-gray-700 rounded-xl shadow-lg transition-all duration-300 hover:bg-gray-200 hover:scale-105">
@@ -694,7 +725,7 @@ const handlePayment = () => {
           <div class="space-y-6">
             <!-- 제목 입력 -->
             <div>
-              <label class="block mb-2 text-lg font-semibold text-gray-700">제목</label>
+              <label class="block text-lg font-semibold text-gray-700">제목</label>
               <input v-model="title" type="text"
                      class="w-full px-5 py-3 text-gray-700 bg-gray-50 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 hover:border-gray-300"
                      placeholder="제목을 입력하세요" required />
@@ -702,7 +733,7 @@ const handlePayment = () => {
 
             <!-- 내용 입력 -->
             <div>
-              <label class="block mb-2 text-lg font-semibold text-gray-700">내용</label>
+              <label class="block text-lg font-semibold text-gray-700">내용</label>
               <textarea v-model="content" rows="4"
                         class="w-full px-5 py-3 text-gray-700 bg-gray-50 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 resize-none hover:border-gray-300"
                         placeholder="내용을 입력하세요" required></textarea>
@@ -713,7 +744,6 @@ const handlePayment = () => {
               <label class="block mb-4 text-lg font-semibold text-gray-700">
                 사진 첨부 (최대 5장)
               </label>
-              
               <!-- 기존 이미지 표시 -->
               <div v-if="watchingDetails && Object.keys(reviewMap).length > 0" class="mb-6">
                 <div class="flex flex-wrap gap-4">

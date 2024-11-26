@@ -10,10 +10,11 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { isAuthenticated, userAuthenticated } from '../composables/userAuth';
 
 const router = useRouter();
 
-onMounted(() => {
+onMounted(async () => {
   const params = new URLSearchParams(window.location.search);
   const token = params.get('token');
   const userId = params.get('userId');
@@ -26,6 +27,9 @@ onMounted(() => {
     localStorage.setItem('userId', userId);
     localStorage.setItem('userEmail', email);
     localStorage.setItem('userName', name);
+
+    // 인증 상태 업데이트
+    await isAuthenticated();
 
     // 메인 페이지로 리다이렉트
     router.push('/');
