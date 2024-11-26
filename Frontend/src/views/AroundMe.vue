@@ -4,6 +4,9 @@ import { useRouter } from "vue-router";
 import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
+import { useModal } from "@/composables/useModal";
+
+const { showModalMessage } = useModal();
 
 const userAddress = ref(localStorage.getItem("targetAddress"));
 const keyword = ref(userAddress.value);
@@ -11,6 +14,9 @@ const mapContainer = ref(null);
 const isLoading = ref(false);
 const hasSearched = ref(false);
 const router = useRouter();
+const showModal = ref(false);
+const modalMessage = ref("");
+
 let map;
 userAddress.value = localStorage.getItem("userAddress");
 var iwContent =
@@ -19,6 +25,10 @@ var infowindow = new kakao.maps.InfoWindow({
   content: iwContent,
   removable: true,
 });
+
+const closeModal = () => {
+  showModal.value = false;
+};
 
 onMounted(() => {
   const mapOptions = {
@@ -46,7 +56,7 @@ const handleClick = async (currentPlace) => {
 
 function searchPlaces() {
   if (!keyword.value || keyword.value.trim() === "") {
-    alert("검색어를 입력해주세요.");
+    showModalMessage("검색어를 입력해주세요.");
     return;
   }
 
@@ -61,10 +71,10 @@ function searchPlaces() {
     if (status === kakao.maps.services.Status.OK) {
       const resultDiv = document.getElementById("results");
       resultDiv.innerHTML = "";
-      
+
       // 모든 마커의 위치를 저장할 배열
       const positions = [];
-      
+
       data.forEach((place) => {
         if (place.phone !== "") {
           console.log(place.id);
@@ -124,12 +134,12 @@ function searchPlaces() {
         }
       });
       resultDiv.scrollTop = 0;
-      
+
       // 모든 마커가 보이도록 지도 범위 재설정
       if (positions.length > 0) {
-        positions.forEach(position => bounds.extend(position));
+        positions.forEach((position) => bounds.extend(position));
         map.setBounds(bounds);
-        
+
         // 약간의 지연 후에 지도 리사이즈 실행
         setTimeout(() => {
           map.relayout();
@@ -137,7 +147,7 @@ function searchPlaces() {
         }, 100);
       }
     } else {
-      alert("검색 결과가 없습니다.");
+      showModalMessage("검색 결과가 없습니다.");
       hasSearched.value = false;
     }
   });

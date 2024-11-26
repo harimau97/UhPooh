@@ -1,21 +1,36 @@
 <template>
-  <div class="flex overflow-hidden relative justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-white">
+  <div
+    class="flex overflow-hidden relative justify-center items-center min-h-screen bg-gradient-to-br from-gray-50 to-white"
+  >
     <!-- Animated Background Elements -->
     <div class="overflow-hidden absolute inset-0">
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[length:20px_20px]"></div>
-      <div class="absolute top-0 -left-4 w-96 h-96 bg-sky-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob"></div>
-      <div class="absolute top-0 -right-4 w-96 h-96 bg-blue-50 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-      <div class="absolute bottom-0 left-20 w-96 h-96 bg-gray-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.03)_1px,transparent_1px)] bg-[length:20px_20px]"
+      ></div>
+      <div
+        class="absolute top-0 -left-4 w-96 h-96 bg-sky-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob"
+      ></div>
+      <div
+        class="absolute top-0 -right-4 w-96 h-96 bg-blue-50 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"
+      ></div>
+      <div
+        class="absolute bottom-0 left-20 w-96 h-96 bg-gray-100 rounded-full opacity-70 mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"
+      ></div>
     </div>
 
     <!-- Signup Container -->
     <div class="relative mx-4 -mt-24 w-full max-w-lg">
-      <div class="rounded-md border border-gray-100 shadow-2xl backdrop-blur-lg bg-white/80">
+      <div
+        class="rounded-md border border-gray-100 shadow-2xl backdrop-blur-lg bg-white/80"
+      >
         <div class="p-8">
-          <form class="space-y-6">          
+          <form class="space-y-6">
             <!-- Email Input -->
             <div class="space-y-2">
-              <label for="userEmail" class="block text-sm font-bold text-gray-700">
+              <label
+                for="userEmail"
+                class="block text-sm font-bold text-gray-700"
+              >
                 아이디
               </label>
               <input
@@ -27,22 +42,36 @@
                 placeholder="이메일을 입력해주세요"
                 required="required"
                 class="w-full px-4 py-3 bg-gray-50 border rounded-sm text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-500 transition-colors duration-300"
-                :class="userEmail && ((!validEmail || emailExists) ? 'border-red-300' : 'border-gray-300')"
+                :class="
+                  userEmail &&
+                  (!validEmail || emailExists
+                    ? 'border-red-300'
+                    : 'border-gray-300')
+                "
               />
               <p v-if="userEmail && !validEmail" class="text-xs text-red-500">
                 이메일 형식만 가능합니다.
               </p>
-              <p v-if="userEmail && validEmail && emailExists" class="text-xs text-red-500">
+              <p
+                v-if="userEmail && validEmail && emailExists"
+                class="text-xs text-red-500"
+              >
                 이미 사용중인 이메일입니다.
               </p>
-              <p v-if="userEmail && validEmail && !emailExists && emailChecked" class="text-xs text-blue-500">
+              <p
+                v-if="userEmail && validEmail && !emailExists && emailChecked"
+                class="text-xs text-blue-500"
+              >
                 사용 가능한 이메일입니다.
               </p>
             </div>
 
             <!-- Password Input -->
             <div class="space-y-2">
-              <label for="password" class="block text-sm font-bold text-gray-700">
+              <label
+                for="password"
+                class="block text-sm font-bold text-gray-700"
+              >
                 비밀번호
               </label>
               <input
@@ -55,16 +84,24 @@
                 required="required"
                 minlength="8"
                 class="w-full px-4 py-3 bg-gray-50 border rounded-sm text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-500 transition-colors duration-300"
-                :class="password && !validPassword ? 'border-red-300' : 'border-gray-300'"
+                :class="
+                  password && !validPassword
+                    ? 'border-red-300'
+                    : 'border-gray-300'
+                "
               />
               <p v-if="password && !validPassword" class="text-xs text-red-500">
-                비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.
+                비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야
+                합니다.
               </p>
             </div>
-            
+
             <!-- Confirm Password Input -->
             <div class="space-y-2">
-              <label for="confirmPassword" class="block text-sm font-bold text-gray-700">
+              <label
+                for="confirmPassword"
+                class="block text-sm font-bold text-gray-700"
+              >
                 비밀번호 확인
               </label>
               <input
@@ -76,16 +113,26 @@
                 placeholder="비밀번호를 다시 입력해주세요"
                 required="required"
                 class="w-full px-4 py-3 bg-gray-50 border rounded-sm text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-500 transition-colors duration-300"
-                :class="confirmPassword && !validConfirmPassword ? 'border-red-300' : 'border-gray-300'"
+                :class="
+                  confirmPassword && !validConfirmPassword
+                    ? 'border-red-300'
+                    : 'border-gray-300'
+                "
               />
-              <p v-if="confirmPassword && !validConfirmPassword" class="text-xs text-red-500">
+              <p
+                v-if="confirmPassword && !validConfirmPassword"
+                class="text-xs text-red-500"
+              >
                 비밀번호가 일치하지 않습니다.
               </p>
             </div>
 
             <!-- Nickname Input -->
             <div class="space-y-2">
-              <label for="userName" class="block text-sm font-bold text-gray-700">
+              <label
+                for="userName"
+                class="block text-sm font-bold text-gray-700"
+              >
                 닉네임
               </label>
               <input
@@ -98,10 +145,13 @@
                 required="required"
                 maxlength="20"
                 class="w-full px-4 py-3 bg-gray-50 border rounded-sm text-gray-800 text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-100 focus:border-sky-500 transition-colors duration-300"
-                :class="userName && !validName ? 'border-red-300' : 'border-gray-300'"
+                :class="
+                  userName && !validName ? 'border-red-300' : 'border-gray-300'
+                "
               />
               <p v-if="userName && !validName" class="text-xs text-red-500">
-                닉네임은 2~20자의 한글, 영문, 숫자, 특수문자(_,-)만 사용 가능합니다.
+                닉네임은 2~20자의 한글, 영문, 숫자, 특수문자(_,-)만 사용
+                가능합니다.
               </p>
             </div>
 
@@ -161,6 +211,9 @@
 import axios from "axios";
 import { useRouter } from "vue-router";
 import { ref, watch, onMounted } from "vue";
+import { useModal } from "@/composables/useModal";
+
+const { showModalMessage } = useModal();
 
 // 라우터 및 기본 상태 설정
 const router = useRouter();
@@ -189,7 +242,7 @@ const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/;
 
 // Daum 우편번호 스크립트 로드
 const loadDaumPostcode = () => {
-  const script = document.createElement('script');
+  const script = document.createElement("script");
   script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
   document.head.appendChild(script);
 };
@@ -204,9 +257,9 @@ const openAddressSearch = () => {
     oncomplete: (data) => {
       postcode.value = data.zonecode;
       address.value = data.address;
-      detailAddress.value = '';
+      detailAddress.value = "";
       checkForm();
-    }
+    },
   }).open();
 };
 
@@ -222,9 +275,11 @@ const debounce = (fn, delay) => {
 // 이메일 중복 확인 (디바운스 적용)
 const checkEmailDuplicate = debounce(async (email) => {
   if (!email || !validEmail.value) return;
-  
+
   try {
-    await axios.get(`http://localhost:8080/uhpooh/api/user/check/email/${email}`);
+    await axios.get(
+      `http://localhost:8080/uhpooh/api/user/check/email/${email}`
+    );
     emailExists.value = false;
     emailChecked.value = true;
   } catch (error) {
@@ -243,9 +298,13 @@ const checkEmailValidity = () => {
 };
 
 // 입력값 변경 감지
-watch([userName, password, confirmPassword, detailAddress], () => {
-  checkForm();
-}, { deep: true });
+watch(
+  [userName, password, confirmPassword, detailAddress],
+  () => {
+    checkForm();
+  },
+  { deep: true }
+);
 
 // 비밀번호 확인 감지
 watch([password, confirmPassword], () => {
@@ -265,7 +324,8 @@ const checkForm = () => {
   const hasLetter = /[a-zA-Z]/.test(password.value);
   const hasNumber = /[0-9]/.test(password.value);
   const hasSpecialChar = /[!@#$%^&*]/.test(password.value);
-  validPassword.value = password.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
+  validPassword.value =
+    password.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
 
   // 비밀번호 확인 검사
   validConfirmPassword.value = password.value === confirmPassword.value;
@@ -277,13 +337,24 @@ const checkForm = () => {
 // 회원가입 처리
 const signUp = async (event) => {
   event.preventDefault();
-  
+
   // 모든 필드의 유효성 검사
-  if (!userName.value || !userEmail.value || !password.value || !confirmPassword.value || 
-      !postcode.value || !address.value || !detailAddress.value ||
-      !validName.value || !validEmail.value || !validPassword.value || 
-      !validConfirmPassword.value || !validAddress.value || emailExists.value) {
-    alert("입력하신 정보를 다시 확인해주세요.");
+  if (
+    !userName.value ||
+    !userEmail.value ||
+    !password.value ||
+    !confirmPassword.value ||
+    !postcode.value ||
+    !address.value ||
+    !detailAddress.value ||
+    !validName.value ||
+    !validEmail.value ||
+    !validPassword.value ||
+    !validConfirmPassword.value ||
+    !validAddress.value ||
+    emailExists.value
+  ) {
+    showModalMessage("입력하신 정보를 다시 확인해주세요.");
     return;
   }
 
@@ -291,18 +362,21 @@ const signUp = async (event) => {
 
   // 회원가입 요청
   try {
-    const response = await axios.post("http://localhost:8080/uhpooh/api/user/signup", {
-      userName: userName.value,
-      userEmail: userEmail.value,
-      password: password.value,
-      userAddress: fullAddress,
-    });
-    
-    alert("회원 가입이 완료되었습니다.");
+    const response = await axios.post(
+      "http://localhost:8080/uhpooh/api/user/signup",
+      {
+        userName: userName.value,
+        userEmail: userEmail.value,
+        password: password.value,
+        userAddress: fullAddress,
+      }
+    );
+
+    showModalMessage("회원 가입이 완료되었습니다.");
     router.push("/login");
   } catch (error) {
     console.error(error);
-    alert("회원가입 처리 중 오류가 발생했습니다.");
+    showModalMessage("회원가입 처리 중 오류가 발생했습니다.");
   }
 };
 </script>

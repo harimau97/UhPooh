@@ -1,11 +1,21 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import {
+  UserCog,
+  User,
+  Heart,
+  Settings,
+  LogOut,
+  ChevronRight,
+  Mail,
+  MapPin,
+} from "lucide-vue-next";
 
 const router = useRouter();
 const users = ref([]);
 const loading = ref(false);
-const imgPath = ref("");
+
 // 검색 관련 상태
 const searchKeyword = ref("");
 const searchType = ref("all");
@@ -21,6 +31,17 @@ const currentPage = ref(1);
 const pageSize = ref(12);
 const totalItems = ref(0);
 const displayedTotal = ref(0);
+
+// 이미지 처리
+const userImages = ref(new Map());
+
+const cacheUserImage = (cat, pimgName) => {
+  if (!pimgName) return null;
+  const cleanImgName = pimgName.replace("/images/profiles/", "");
+  const imgPath = `http://localhost:8080/uhpooh/api/file/images/${cat}/${cleanImgName}`;
+  userImages.value.set(pimgName, imgPath);
+  return imgPath;
+};
 
 // 전체 회원 목록을 가져오는 함수
 const loadAllUsers = async () => {
@@ -44,10 +65,16 @@ const loadAllUsers = async () => {
       console.log(result.data);
       totalItems.value = result.data.totalItems; // 전체 사용자 수
       displayedTotal.value = result.data.length;
+      // Pre-cache all user images
+      users.value.forEach((user) => {
+        if (user.pimage) {
+          cacheUserImage("profiles", user.pimage);
+        }
+      });
     }
   } catch (error) {
     console.error("데이터 로딩 중 오류:", error);
-    alert("회원 목록을 불러오는데 실패했습니다.");
+    showModalMessage("회원 목록을 불러오는데 실패했습니다.");
   } finally {
     loading.value = false;
   }
@@ -116,6 +143,12 @@ const handleSearch = async () => {
       } else {
         displayedTotal.value = result.data.totalItems;
       }
+      // Pre-cache all user images
+      users.value.forEach((user) => {
+        if (user.pimage) {
+          cacheUserImage("profiles", user.pimage);
+        }
+      });
     } else {
       throw new Error(result.message || "데이터 형식이 올바르지 않습니다.");
     }
@@ -152,7 +185,6 @@ const formatDate = (dateString) => {
 
 // 초기 데이터 로드
 onMounted(async () => {
-  imgPath.value = "http://localhost:5173/src/assets/default-profile.png";
   const userId = localStorage.getItem("userId");
   const isAdmin = localStorage.getItem("isAdmin");
 
@@ -271,16 +303,15 @@ onMounted(async () => {
               <!-- 프로필 이미지 -->
               <td class="p-4">
                 <img
-                  v-if="user.pimage === null"
-                  :src="imgPath"
+                  v-if="user.pimage !== null"
+                  :src="
+                    userImages.get(user.pimage) ||
+                    cacheUserImage('profiles', user.pimage)
+                  "
                   alt="Profile"
                   class="object-cover w-12 h-12 rounded-full border border-gray-200"
                 />
-                <img
-                  v-else
-                  src="http://localhost:8080/uhpooh/api/file/images/profiles/${user.pimage}"
-                  alt="Profile"
-                />
+                <User v-else class="w-12 h-12 text-gray-400" />
               </td>
 
               <!-- 유저 ID -->

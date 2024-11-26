@@ -12,6 +12,8 @@ import { onMounted, provide, ref, computed } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import MainHeader from "./views/Header.vue";
 import DefaultHeader from "./views/DefaultHeader.vue";
+import CustomModal from "@/components/CustomModal.vue";
+import { useModal } from "@/composables/useModal";
 
 const isLoggedIn = computed(() => userAuthenticated.value);
 console.log("로그인 상태", isLoggedIn.value);
@@ -106,20 +108,36 @@ onMounted(async () => {
 // 현재 라우트를 사용하여 메인 페이지 여부를 확인
 const route = useRoute();
 const isMainPage = computed(() => route.path === "/");
+
+const { showModal, modalMessage, closeModal } = useModal();
 </script>
 
 <template>
-  <MainHeader v-if="isMainPage" />
-  <DefaultHeader v-else />
-  <RouterView />
-  <div v-show="isLoggedIn">
-    <Chat />
-    <ChatBot />
-  </div>
   <div>
-    <!-- AI Chatbot이 삽입될 div -->
-    <div id="aichatbot"></div>
+    <CustomModal 
+      :show="showModal"
+      :message="modalMessage"
+      @close="closeModal"
+    />
+    <MainHeader v-if="isMainPage" />
+    <DefaultHeader v-else />
+    <RouterView />
+    <div v-show="isLoggedIn">
+      <Chat />
+      <ChatBot />
+    </div>
+    <div>
+      <!-- AI Chatbot이 삽입될 div -->
+      <div id="aichatbot"></div>
+    </div>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+</style>

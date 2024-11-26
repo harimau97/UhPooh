@@ -5,6 +5,9 @@ import axios from "axios";
 import { isAuthenticated, getUserInfo } from "@/composables/userAuth";
 import { inject } from "vue";
 import { ThumbsUp } from "lucide-vue-next";
+import { useModal } from "@/composables/useModal";
+
+const { showModalMessage } = useModal();
 
 //로그인 상태 확인
 const isLoggined = inject("isLoggedIn");
@@ -59,7 +62,7 @@ const handleFileUpload = (event, reviewId) => {
   const remainingSlots = 5 - totalCurrentImages;
 
   if (remainingSlots <= 0) {
-    alert("최대 5장까지만 업로드할 수 있습니다.");
+    showModalMessage("최대 5장까지만 업로드할 수 있습니다.");
     return;
   }
 
@@ -140,7 +143,7 @@ const deleteReviewImage = async (targetImageId) => {
     console.log("Image deleted successfully");
   } catch (error) {
     console.error("Failed to delete image:", error);
-    alert("이미지 삭제에 실패했습니다.");
+    showModalMessage("이미지 삭제에 실패했습니다.");
   }
 };
 // 이미지 캐싱 처리
@@ -238,11 +241,11 @@ async function searchPlaces() {
             rLabel.open(roadview, rMarker);
           });
         } else {
-          alert("해당 위치에서 이용 가능한 로드뷰가 없습니다.");
+          showModalMessage("해당 위치에서 이용 가능한 로드뷰가 없습니다.");
         }
       });
     } else {
-      alert("오류가 발생했습니다.");
+      showModalMessage("오류가 발생했습니다.");
       hasSearched.value = false;
     }
   });
@@ -272,9 +275,8 @@ const addReview = async () => {
     );
 
     await sendImageData(response.data.data.reviewId);
-    await alert("리뷰가 성공적으로 작성되었습니다.");
-
-    closeModal();
+    await showModalMessage("리뷰가 성공적으로 작성되었습니다.");
+    await new Promise((resolve) => setTimeout({ resolve }, 3000));
   } catch (error) {
     console.error(error);
   }
@@ -287,7 +289,7 @@ const deleteReview = async (rId) => {
       "http://localhost:8080/uhpooh/api/review/delete/" + rId
     );
     console.log(response);
-    alert("리뷰가 성공적으로 삭제되었습니다.");
+    showModalMessage("리뷰가 성공적으로 삭제되었습니다.");
   } catch (error) {
     console.error(error);
   }
@@ -313,7 +315,7 @@ const confirmEdit = async (rId) => {
     location.reload();
   } catch (error) {
     console.log(error);
-    alert("리뷰 수정 중 오류가 발생했습니다.");
+    showModalMessage("리뷰 수정 중 오류가 발생했습니다.");
   }
 };
 const searchPlaceById = async () => {
@@ -546,13 +548,13 @@ const handlePayment = async () => {
   try {
     const bookingInfo = getBookingInfo.value;
     if (!bookingInfo) {
-      alert("날짜와 시간을 선택해주세요.");
+      showModalMessage("날짜와 시간을 선택해주세요.");
       return;
     }
 
     const userInfo = getUserInfo();
     if (!userInfo) {
-      alert("로그인이 필요합니다.");
+      showModalMessage("로그인이 필요합니다.");
       return;
     }
 
@@ -584,7 +586,7 @@ const handlePayment = async () => {
     await tossPayments.requestPayment("카드", paymentData);
   } catch (error) {
     console.error("결제 초기화 중 오류 발생:", error);
-    alert("결제 처리 중 오류가 발생했습니다.");
+    showModalMessage("결제 처리 중 오류가 발생했습니다.");
   }
 };
 </script>
@@ -662,7 +664,10 @@ const handlePayment = async () => {
           <div
             class="overflow-hidden bg-white rounded-2xl shadow-xl transition-all duration-300 transform hover:shadow-2xl roadview-wrapper"
           >
-            <div ref="roadviewContainer" class="w-full h-[400px] roadview-container"></div>
+            <div
+              ref="roadviewContainer"
+              class="w-full h-[400px] roadview-container"
+            ></div>
           </div>
 
           <!-- 리뷰 섹션 -->

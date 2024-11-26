@@ -5,6 +5,9 @@ import {
   getUserInfo,
   userAuthenticated,
 } from "../composables/userAuth";
+import { useModal } from "@/composables/useModal";
+
+const { showModalMessage } = useModal();
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -102,23 +105,23 @@ const router = createRouter({
       component: () => import("../components/OAuth2Callback.vue"),
     },
     {
-      path: '/payment/success',
-      name: 'payment-success',
-      component: () => import('../views/PaymentSuccess.vue'),
+      path: "/payment/success",
+      name: "payment-success",
+      component: () => import("../views/PaymentSuccess.vue"),
       props: (route) => ({
         paymentKey: route.query.paymentKey,
         orderId: route.query.orderId,
-        amount: parseInt(route.query.amount)
-      })
+        amount: parseInt(route.query.amount),
+      }),
     },
     {
-      path: '/payment/fail',
-      name: 'payment-fail',
-      component: () => import('../views/PaymentFail.vue'),
+      path: "/payment/fail",
+      name: "payment-fail",
+      component: () => import("../views/PaymentFail.vue"),
       props: (route) => ({
         message: route.query.message,
-        code: route.query.code
-      })
+        code: route.query.code,
+      }),
     },
     {
       path: "/settings",
@@ -136,41 +139,41 @@ const router = createRouter({
   },
 });
 
-// 전역 라우터 가드 수정
+// 전역 라우터 가드
 router.beforeEach(async (to, from, next) => {
   // 비밀번호 변경 페이지에 대한 추가 검사
-  if (to.path === '/change-password') {
-    const provider = localStorage.getItem('provider');
-    if (provider !== 'local') {
-      next('/mypage'); // 소셜 로그인 사용자는 마이페이지로 리다이렉트
+  if (to.path === "/change-password") {
+    const provider = localStorage.getItem("provider");
+    if (provider !== "local") {
+      next("/mypage"); // 소셜 로그인 사용자는 마이페이지로 리다이렉트
       return;
     }
   }
 
+  // 먼저 인증 상태를 체크
+  await isAuthenticated();
+  const isLoggedIn = userAuthenticated.value;
+
+  // 이미 로그인한 사용자가 로그인/회원가입 페이지 접근 시 홈으로 리다이렉트
+  if ((to.path === "/login" || to.path === "/signup") && isLoggedIn) {
+    return next("/");
+  }
+
   // 로그인이 필요한 페이지 체크
   if (to.matched.some((record) => record.meta.requiresAuth)) {
-    await isAuthenticated();
-    if (!userAuthenticated.value) {
-      alert("로그인이 필요한 서비스입니다.");
+    if (!isLoggedIn) {
+      showModalMessage("로그인이 필요한 서비스입니다.");
       return next({
         path: "/login",
-        query: { redirect: to.fullPath }, // 로그인 후 원래 가려던 페이지로 리다이렉트하기 위한 정보 저장
+        query: { redirect: to.fullPath },
       });
     }
 
     // Admin 페이지 접근 체크
     if (to.meta.requiresAdmin && localStorage.getItem("isAdmin") !== "1") {
-      alert("관리자 권한이 필요합니다.");
+      showModalMessage("관리자 권한이 필요합니다.");
       return next("/");
     }
-  }
-
-  // 이미 로그인한 사용자가 로그인/회원가입 페이지 접근 시 홈으로 리다이렉트
-  if (
-    (to.name === "login" || to.name === "signup") &&
-    userAuthenticated.value
-  ) {
-    return next("/");
   }
 
   await getUserInfo();
