@@ -28,3 +28,4 @@ out/
 # Properties
 application-*.properties
 !application-example.properties
+/.metadata/
