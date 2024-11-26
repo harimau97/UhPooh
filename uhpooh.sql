@@ -7,7 +7,7 @@ USE uhpooh;
 -- Users table
 CREATE TABLE users (
     userId INT AUTO_INCREMENT PRIMARY KEY,
-    userEmail VARCHAR(255) NOT NULL UNIQUE,
+    userEmail VARCHAR(255) NOT NULL unique,
     password VARBINARY(255),
     userName VARCHAR(50) NOT NULL,
     userAddress VARCHAR(50) NOT NULL,
@@ -40,12 +40,10 @@ CREATE TABLE places (
     INDEX idxKakaoPlaceId (kakaoPlaceId)
 );
 
-
-
 -- Reviews table
 CREATE TABLE reviews (
     reviewId INT AUTO_INCREMENT PRIMARY KEY,
-    userId INT NOT NULL,
+    userId INT NOT NULL,    
     placeId INT NOT NULL,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
@@ -95,3 +93,21 @@ CREATE TABLE reviewImages (
     FOREIGN KEY (reviewId) REFERENCES reviews(reviewId) ON DELETE CASCADE,
     INDEX idx_review (reviewId)
 );
+
+ALTER TABLE users 
+ADD COLUMN provider VARCHAR(255);
+
+ALTER TABLE users 
+MODIFY COLUMN userAddress VARCHAR(255) NULL;
+
+ALTER TABLE users
+ALTER COLUMN provider SET DEFAULT 'local';
+
+ALTER TABLE token
+DROP FOREIGN KEY token_ibfk_1;
+
+ALTER TABLE token
+ADD CONSTRAINT token_ibfk_1
+FOREIGN KEY (userId) REFERENCES users(userId)
+ON DELETE CASCADE
+ON UPDATE CASCADE;
