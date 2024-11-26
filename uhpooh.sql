@@ -111,3 +111,9 @@ ADD CONSTRAINT token_ibfk_1
 FOREIGN KEY (userId) REFERENCES users(userId)
 ON DELETE CASCADE
 ON UPDATE CASCADE;
+
+ALTER TABLE users 
+modify COLUMN userName VARCHAR(50);
+
+ALTER TABLE users 
+modify COLUMN userEmail VARCHAR(50);
