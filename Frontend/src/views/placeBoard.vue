@@ -660,9 +660,9 @@ const handlePayment = async () => {
 
           <!-- 로드뷰 컨테이너 -->
           <div
-            class="overflow-hidden bg-white rounded-2xl shadow-xl transition-all duration-300 transform hover:shadow-2xl"
+            class="overflow-hidden bg-white rounded-2xl shadow-xl transition-all duration-300 transform hover:shadow-2xl roadview-wrapper"
           >
-            <div ref="roadviewContainer" class="w-full h-[400px]"></div>
+            <div ref="roadviewContainer" class="w-full h-[400px] roadview-container"></div>
           </div>
 
           <!-- 리뷰 섹션 -->

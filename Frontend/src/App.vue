@@ -1,6 +1,7 @@
 <script setup>
 import Header from "./views/Header.vue";
 import Chat from "./views/Chat.vue";
+import { useThemeStore } from './stores/theme';
 
 import {
   getUserInfo,
@@ -71,9 +72,11 @@ async function createChatUser() {
   }
 }
 
-// 함수 호출
+// 테마 스토어 초기화
+const themeStore = useThemeStore();
 
 onMounted(async () => {
+  themeStore.initializeTheme();
   (function (w, d, s, ...args) {
     const f = d.getElementsByTagName(s)[0];
     const j = d.createElement(s);

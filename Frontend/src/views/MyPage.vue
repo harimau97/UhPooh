@@ -53,7 +53,7 @@ const menuItems = computed(() => {
       icon: Settings,
       label: "설정",
       path: "/settings",
-      description: "앱 설정 및 개인정보 관리",
+      description: "웹사이트 설정",
     },
   ];
 

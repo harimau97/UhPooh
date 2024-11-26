@@ -119,7 +119,13 @@ const router = createRouter({
         message: route.query.message,
         code: route.query.code
       })
-    }
+    },
+    {
+      path: "/settings",
+      name: "settings",
+      component: () => import("../views/Settings.vue"),
+      meta: { requiresAuth: true },
+    },
   ],
   // 스크롤 동작 추가
   scrollBehavior(to, from, savedPosition) {
