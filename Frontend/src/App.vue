@@ -1,6 +1,7 @@
 <script setup>
 import Header from "./views/Header.vue";
 import Chat from "./views/Chat.vue";
+
 import {
   getUserInfo,
   isAuthenticated,
@@ -73,6 +74,24 @@ async function createChatUser() {
 // 함수 호출
 
 onMounted(async () => {
+  (function (w, d, s, ...args) {
+    const f = d.getElementsByTagName(s)[0];
+    const j = d.createElement(s);
+    w.chatbotConfig = args;
+    j.defer = true;
+    j.type = "module";
+    j.src = "https://aichatbot.sendbird.com/index.js";
+    f.parentNode.insertBefore(j, f);
+  })(
+    window,
+    document,
+    "script",
+    "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
+    "1v5Rtog-RFAjUC4EjM-iY",
+    {
+      apiHost: "https://api-cf-ap-2.sendbird.com",
+    }
+  );
   await isAuthenticated();
   if (userAuthenticated.value) {
     await getUserInfo();
@@ -92,6 +111,11 @@ const isMainPage = computed(() => route.path === "/");
   <RouterView />
   <div v-show="isLoggedIn">
     <Chat />
+    <ChatBot />
+  </div>
+  <div>
+    <!-- AI Chatbot이 삽입될 div -->
+    <div id="aichatbot"></div>
   </div>
 </template>
 

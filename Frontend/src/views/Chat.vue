@@ -2,7 +2,7 @@
   <transition name="slide">
     <div
       v-show="openChat"
-      class="fixed inset-0 flex items-end justify-end z-50"
+      class="flex fixed inset-0 z-50 justify-end items-end"
     >
       <div
         class="flex flex-col h-[600px] w-[400px] mr-4 mb-20 bg-white rounded-lg shadow-2xl overflow-hidden border border-indigo-100"
@@ -14,7 +14,7 @@
           <h3 class="text-lg font-semibold text-white">채팅</h3>
           <button
             @click="closeChat"
-            class="p-1 text-white hover:text-gray-200 transition-colors"
+            class="p-1 text-white transition-colors hover:text-gray-200"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -49,7 +49,7 @@
   <!-- Chat button -->
   <button
     @click="openChat = !openChat"
-    class="fixed right-4 bottom-4 z-50 flex items-center justify-center w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-full shadow-lg hover:from-indigo-600 hover:to-purple-600 transition-all duration-300 transform hover:scale-105"
+    class="flex fixed right-4 bottom-4 z-50 justify-center items-center w-10 h-10 text-white bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full shadow-lg transition-all duration-300 transform hover:from-indigo-600 hover:to-purple-600 hover:scale-105"
   >
     <svg
       xmlns="http://www.w3.org/2000/svg"
