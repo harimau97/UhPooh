@@ -32,6 +32,8 @@ public interface ReviewDao {
     
     public int getPlaceReviewCount(int placeId);
     
+    public int getReviewCountByUserId(int userId);
+    
     public int getTitleSearchCountInPlace(Map<String, Object> params);
     
     public List<Review> searchByTitleInPlace(Map<String, Object> params);

@@ -30,6 +30,8 @@ public interface ReviewService {
     
     int getPlaceReviewCount(int placeId);
     
+    int getReviewCountByUserId(int userId);
+    
     List<Review> searchByTitleInPlace(Map<String, Object> params);
     
     int getTitleSearchCountInPlace(Map<String, Object> params);

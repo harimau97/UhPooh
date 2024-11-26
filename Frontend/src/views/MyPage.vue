@@ -12,13 +12,17 @@ import {
   MapPin,
 } from "lucide-vue-next";
 import axios from "axios";
+import { logout } from "../composables/userAuth";
 
 const router = useRouter();
 const showLogoutModal = ref(false);
 const imageTrue = ref("");
 const imgName = ref("");
 const imgPath = ref("");
-
+const likedPlaces = ref([]);
+const myReviews = ref([]);
+const myReviewsLength = computed(() => myReviews.value.length);
+const likedPlacesLength = computed(() => likedPlaces.value.length);
 const user = ref({
   name: "",
   email: "",
@@ -31,6 +35,96 @@ const user = ref({
     { label: "포인트", value: "0" },
   ],
 });
+const menuItems = computed(() => {
+  const items = [
+    {
+      icon: UserCog,
+      label: "내 정보 수정",
+      path: "/edit",
+      description: "내 정보 수정",
+    },
+    {
+      icon: Heart,
+      label: "My 수영장",
+      path: "/mypools",
+      description: "좋아요 및 리뷰 조회",
+    },
+    {
+      icon: Settings,
+      label: "설정",
+      path: "/settings",
+      description: "앱 설정 및 개인정보 관리",
+    },
+  ];
+
+  if (localStorage.getItem("isAdmin") === "1") {
+    items.push({
+      icon: User,
+      label: "Admin",
+      path: "/admin",
+      description: "전체 회원 목록 관리",
+      adminStyle: true,
+    });
+  }
+
+  return items;
+});
+
+const isLoggined = inject("isLoggedIn");
+
+// 내가 쓴 리뷰 목록 가져오기
+const fetchMyReviews = async () => {
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+    const response = await axios.get(
+      `http://localhost:8080/uhpooh/api/review/search/writer`,
+      {
+        params: {
+          userId: userId,
+        },
+      }
+    );
+
+    if (response.data) {
+      myReviews.value = response.data.data.items;
+      console.log("작성한 리뷰들", myReviews.value);
+    } else {
+      console.error("Invalid review data format");
+      myReviews.value = [];
+    }
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    myReviews.value = [];
+  }
+};
+
+// 좋아요한 수영장 목록 가져오기
+const fetchLikedPlaces = async () => {
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found");
+      return;
+    }
+    const response = await axios.get(
+      "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
+    );
+    if (response.data && Array.isArray(response.data)) {
+      likedPlaces.value = response.data;
+      console.log("좋아요 개수", likedPlaces.value.length);
+    } else {
+      console.error("Invalid liked places data format");
+      likedPlaces.value = [];
+    }
+  } catch (error) {
+    console.error("Error fetching liked places:", error);
+    likedPlaces.value = [];
+  }
+};
 
 //프로필이미지 캐싱
 const cacheImage = async (cat) => {
@@ -72,17 +166,16 @@ onMounted(async () => {
 
   // 사용자 통계 데이터 로드
   try {
-    const response = await fetch(
-      `http://localhost:8080/uhpooh/api/user/${userId}`
-    );
-    if (response.ok) {
-      const userData = await response.json();
-      user.value.stats = [
-        { label: "예약", value: userData.reservationCount || "0" },
-        { label: "리뷰", value: userData.reviewCount || "0" },
-        { label: "포인트", value: userData.points?.toLocaleString() || "0" },
-      ];
-    }
+    await Promise.all([fetchMyReviews(), fetchLikedPlaces()]);
+
+    // 포인트 계산: 좋아요 * 10 + 리뷰 * 20
+    const calculatedPoints = likedPlacesLength.value * 10 + myReviewsLength.value * 20;
+
+    user.value.stats = [
+      { label: "좋아요", value: likedPlacesLength.value.toString() },
+      { label: "리뷰", value: myReviewsLength.value.toString() },
+      { label: "포인트", value: calculatedPoints.toLocaleString() },
+    ];
   } catch (error) {
     console.error("사용자 데이터 로딩 중 오류 발생:", error);
   }
@@ -93,43 +186,6 @@ const handleImageError = (event) => {
   user.value.profileImageUrl = ""; // 상태도 업데이트
 };
 
-const menuItems = computed(() => {
-  const items = [
-    {
-      icon: UserCog,
-      label: "내 정보 수정",
-      path: "/edit",
-      description: "내 정보 수정",
-    },
-    {
-      icon: Heart,
-      label: "My 수영장",
-      path: "/mypools",
-      description: "좋아요 및 리뷰 조회",
-    },
-    {
-      icon: Settings,
-      label: "설정",
-      path: "/settings",
-      description: "앱 설정 및 개인정보 관리",
-    },
-  ];
-
-  if (localStorage.getItem("isAdmin") === "1") {
-    items.push({
-      icon: User,
-      label: "Admin",
-      path: "/admin",
-      description: "전체 회원 목록 관리",
-      adminStyle: true,
-    });
-  }
-
-  return items;
-});
-
-const isLoggined = inject("isLoggedIn");
-
 const confirmLogout = () => {
   showLogoutModal.value = false;
   handleLogout();
@@ -137,7 +193,11 @@ const confirmLogout = () => {
 
 const handleLogout = async () => {
   showLogoutModal.value = false;
-  logout();
+  try {
+    await logout();
+  } catch (error) {
+    console.error("로그아웃 처리 중 오류 발생:", error);
+  }
 };
 </script>
 

@@ -8,18 +8,20 @@ import org.springframework.web.multipart.support.StandardServletMultipartResolve
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-
-  @Override
-  public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**")
-            .allowedOrigins("http://localhost:5173") // 클라이언트 URL
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-            .allowedHeaders("*")
-            .allowCredentials(true);
-  }
-
-  @Bean
-  public StandardServletMultipartResolver multipartResolver() {
-    return new StandardServletMultipartResolver();
-  }
+    
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("*") // 클라이언트 URL
+                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .exposedHeaders("*")
+                .allowCredentials(false);
+        
+    }
+    
+    @Bean
+    public StandardServletMultipartResolver multipartResolver() {
+        return new StandardServletMultipartResolver();
+    }
 }
