@@ -123,4 +123,8 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewDao.getReviewIdByTitleAndContent(review);
     }
 
+    @Override
+    public int getReviewCountByUserId(int userId) {
+        return reviewDao.getReviewCountByUserId(userId);
+    }
 }

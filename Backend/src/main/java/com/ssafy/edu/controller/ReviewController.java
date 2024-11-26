@@ -292,6 +292,19 @@ public class ReviewController {
     }
   }
 
-  
+  @Operation(summary = "사용자별 리뷰 개수 조회", description = "특정 사용자가 작성한 리뷰의 총 개수를 반환합니다.")
+  @GetMapping("/count/{userId}")
+  public ResponseEntity<Map<String, Object>> getReviewCountByUserId(@PathVariable int userId) {
+    try {
+      int count = reviewService.getReviewCountByUserId(userId);
+      Map<String, Object> response = new HashMap<>();
+      response.put("userId", userId);
+      response.put("reviewCount", count);
+      return new ResponseEntity<>(response, HttpStatus.OK);
+    } catch (Exception e) {
+      logger.error(ERROR_PREFIX + e.getMessage());
+      return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
 }

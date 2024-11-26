@@ -52,64 +52,49 @@ const getUserInfo = async () => {
     localStorage.setItem("pImage", response.data.data.pimage);
     localStorage.setItem("isAdmin", response.data.data.isAdmin);
     localStorage.setItem("userEmail", response.data.data.userEmail);
+    localStorage.setItem("provider", response.data.data.provider);
   } catch (error) {
     console.log(error);
   }
 };
 
-// const logout = async () => {
-//   const userId = localStorage.getItem("userId");
-//   const userToken = localStorage.getItem("userToken");
-//   const provider = localStorage.getItem("provider"); // SNS provider info if available
+const logout = async () => {
+  const userId = localStorage.getItem("userId");
+  const userToken = localStorage.getItem("userToken");
+  const provider = localStorage.getItem("provider");
 
-//   try {
-//     console.log("로그아웃 시작");
+  try {
+    console.log("로그아웃 시작");
+    const response = await axios.post(
+      `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
+      {
+        userId: userId,
+        provider: provider || "local"
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`
+        }
+      }
+    );
 
-//     if (provider) {
-//       // SNS 로그아웃
-//       await axios({
-//         method: "post",
-//         url: `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${userToken}`,
-//         },
-//         data: {
-//           userId: userId,
-//           provider: provider,
-//         },
-//       });
-//     } else {
-//       // 일반 로그아웃
-//       await axios({
-//         method: "post",
-//         url: `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${userToken}`,
-//         },
-//         data: {},
-//       });
-//     }
+    if (response.status === 200) {
+      // Clear all localStorage items
+      localStorage.clear();
+      userAuthenticated.value = false;
+      // Redirect to home
+      window.location.href = "/";
+    } else {
+      throw new Error("로그아웃 요청이 실패했습니다.");
+    }
+  } catch (error) {
+    console.error("로그아웃 실패:", error);
+    // Even if the API call fails, clear local state
+    localStorage.clear();
+    userAuthenticated.value = false;
+    window.location.href = "/";
+  }
+};
 
-//     // Clear all localStorage items
-//     localStorage.clear();
-//     userAuthenticated.value = false;
-
-//     // Redirect to home
-//     window.location.href = "/";
-//   } catch (error) {
-//     console.error("로그아웃 실패:", error);
-//     console.error("Error details:", {
-//       status: error.response?.status,
-//       data: error.response?.data,
-//       message: error.message,
-//     });
-//     // Even if the API call fails, clear local state
-//     localStorage.clear();
-//     userAuthenticated.value = false;
-//     window.location.href = "/";
-//   }
-// };
-
-export { isAuthenticated, getUserInfo, userAuthenticated };
+export { isAuthenticated, getUserInfo, userAuthenticated, logout };

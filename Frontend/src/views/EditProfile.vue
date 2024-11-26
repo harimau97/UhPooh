@@ -13,6 +13,11 @@ import {
 } from "lucide-vue-next";
 import axios from "axios";
 
+const api = axios.create({
+  baseURL: 'http://localhost:8080/uhpooh/api',
+  timeout: 5000
+});
+
 const router = useRouter();
 const showSuccessMessage = ref(false);
 const isLoading = ref(false);
@@ -44,14 +49,11 @@ const originalEmail = ref("");
 const nicknameRegex = /^[a-zA-Z0-9가-힣_-]{2,20}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|net|org|kr|co)$/;
 
-// API 요청에 인터셉터 추가
-axios.interceptors.request.use((config) => {
-  const currentUserId = localStorage.getItem("userId");
-  if (!currentUserId) {
-    throw new Error("User ID not found");
-  }
-  return config;
-});
+// 소셜 로그인 사용자 여부
+const isLocalProvider = ref(localStorage.getItem("provider") === "local");
+
+// 소셜 로그인 알림 모달 상태
+const showSocialLoginModal = ref(false);
 
 // 초기 데이터 로드
 // loadUserData 함수 수정
@@ -65,18 +67,18 @@ const loadUserData = async () => {
       return;
     }
 
-   
-
-    const response = await axios.get(
-      `http://localhost:8080/uhpooh/api/user/${userId}`,
-      {
-        timeout: 5000,
-        validateStatus: (status) => status === 200,
-      }
+    const response = await api.get(
+      `/user/${userId.value}?requestUserId=${userId.value}`
     );
 
-    if (response.data) {
-      const userData = response.data;
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.data;
+    
+    if (data) {
+      const userData = data;
       const storedAddress = localStorage.getItem("userAddress");
 
       userForm.value = {
@@ -108,7 +110,6 @@ const loadUserData = async () => {
     }
   } catch (error) {
     console.error("사용자 데이터 로딩 실패:", error);
-    // localStorage의 데이터만 사용하고 에러 메시지는 표시하지 않음
     userForm.value = {
       name: localStorage.getItem("userName") || "",
       email: localStorage.getItem("userEmail") || "",
@@ -156,30 +157,37 @@ const parseAddress = (fullAddress) => {
 // 이미지 업로드 처리
 const handleImageUpload = async (event) => {
   const file = event.target.files[0];
-  console.log(file);
   if (!file) return;
+
+  // 파일 크기 체크 (5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert("파일 크기는 5MB를 초과할 수 없습니다.");
+    return;
+  }
+
+  // 파일 형식 체크
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+  if (!allowedTypes.includes(file.type)) {
+    alert("JPG, PNG, GIF 형식의 이미지만 업로드 가능합니다.");
+    return;
+  }
 
   const formData = new FormData();
   formData.append("file", file);
 
   try {
     isLoading.value = true;
-    const response = await axios.post(
-      `http://localhost:8080/uhpooh/api/file/profile/${userId.value}`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 10000,
-      }
-    );
-    userForm.value.profileImageUrl = response.data.imageUrl || response.data;
-    imgName.value= response.data.data.filename;
-    console.log(response.data.data.filename);
-    cacheImage("profiles");
-    alert("이미지가 성공적으로 업로드되었습니다.");
-    location.reload();
+    const response = await api.post(`/file/profile/${userId.value}`, formData);
+    
+    if (response.data && response.data.data) {
+      userForm.value.profileImageUrl = response.data.data.imageUrl;
+      imgName.value = response.data.data.filename;
+      localStorage.setItem("userProfileImage", response.data.data.imageUrl);
+      alert("이미지가 성공적으로 업로드되었습니다.");
+      location.reload();
+    } else {
+      throw new Error("이미지 업로드 응답 형식이 올바르지 않습니다.");
+    }
   } catch (error) {
     console.error("프로필 이미지 업로드 실패:", error);
     alert("이미지 업로드에 실패했습니다. 다시 시도해주세요.");
@@ -192,10 +200,11 @@ const handleImageUpload = async (event) => {
 const handleImageDelete = async () => {
   try {
     isLoading.value = true;
-    const response = await axios.delete(
-      `http://localhost:8080/uhpooh/api/file/profile/user/${userId.value}`,
-      { timeout: 5000 }
-    );
+    const response = await api.delete(`/file/profile/user/${userId.value}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
     // 프로필 이미지 상태 및 localStorage 업데이트
     userForm.value.profileImageUrl = "";
@@ -215,10 +224,7 @@ const handleImageDelete = async () => {
 // 이미지 캐싱 처리
 const cacheImage = async (cat) => {
   imgPath.value = "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;  
-  const response = await axios.get(
-    imgPath.value,
-    { timeout: 5000 }
-  );
+  const response = await api.get(imgPath.value);
   
 };
 
@@ -250,6 +256,8 @@ const openAddressSearch = () => {
 
 // 이메일 중복 확인
 const checkEmailDuplicate = async () => {
+  if (!isLocalProvider.value) return; // 소셜 로그인 사용자는 이메일 중복 확인 불가
+
   if (!validEmail.value) {
     alert("올바른 이메일 형식이 아닙니다.");
     return;
@@ -263,10 +271,12 @@ const checkEmailDuplicate = async () => {
 
   try {
     isLoading.value = true;
-    await axios.get(
-      `http://localhost:8080/uhpooh/api/user/check/email/${userForm.value.email}`,
-      { timeout: 5000 }
-    );
+    const response = await api.get(`/user/check/email/${userForm.value.email}`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     emailExists.value = false;
     emailChecked.value = true;
     alert("사용 가능한 이메일입니다.");
@@ -325,24 +335,32 @@ const handleSubmit = async (e) => {
       : userForm.value.address;
 
   try {
-    const response = await axios.patch(
-      `http://localhost:8080/uhpooh/api/user/${userId.value}?requestUserId=${userId.value}`,
-      {
+    const response = await axios({
+      method: 'PUT',  
+      url: `http://localhost:8080/uhpooh/api/user/${userId.value}?requestUserId=${userId.value}`,
+      data: {
         userEmail: userForm.value.email,
         userName: userForm.value.name,
         userAddress: fullAddress,
-        pImage: userForm.value.profileImageUrl,
+        pImage: imageTrue.value || null
       },
-      { timeout: 5000 }
-    );
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      withCredentials: true
+    });
 
     if (response.data) {
       localStorage.setItem("userName", userForm.value.name);
       localStorage.setItem("userEmail", userForm.value.email);
       localStorage.setItem("userAddress", fullAddress);
-      localStorage.setItem("userProfileImage", userForm.value.profileImageUrl);
+      if (imageTrue.value) {
+        localStorage.setItem("pImage", imageTrue.value);
+      }
 
       showSuccessMessage.value = true;
+      console.log("정보 수정 성공:", response.data);
     }
   } catch (error) {
     console.error("정보 수정 실패:", error);
@@ -361,6 +379,15 @@ const handleSuccessConfirm = () => {
 const goBack = () => {
   router.push("/mypage");
 };
+
+// 비밀번호 변경 버튼 클릭 핸들러
+const handlePasswordChangeClick = () => {
+  if (!isLocalProvider.value) {
+    showSocialLoginModal.value = true;
+  } else {
+    router.push('/change-password');
+  }
+};
 </script>
 
 <template>
@@ -370,27 +397,7 @@ const goBack = () => {
       v-if="errorMessage"
       class="relative px-4 py-3 mb-4 text-red-700 bg-red-100 rounded border border-red-400"
     >
-      <strong class="font-bold">오류 발생!</strong>
-      <span class="block sm:inline">{{ errorMessage }}</span>
-      <button
-        @click="errorMessage = ''"
-        class="absolute top-0 right-0 bottom-0 px-4 py-3"
-      >
-        <span class="sr-only">닫기</span>
-        <svg
-          class="w-6 h-6"
-          stroke="currentColor"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
-        </svg>
-      </button>
+      {{ errorMessage }}
     </div>
 
     <!-- 로딩 인디케이터 -->
@@ -401,6 +408,25 @@ const goBack = () => {
       <div
         class="w-32 h-32 rounded-full border-b-2 border-white animate-spin"
       ></div>
+    </div>
+
+    <!-- 소셜 로그인 알림 모달 -->
+    <div
+      v-if="showSocialLoginModal"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+    >
+      <div class="p-6 bg-white rounded-lg shadow-xl">
+        <h3 class="mb-4 text-lg font-semibold">알림</h3>
+        <p class="mb-6">소셜 로그인 사용자는 비밀번호를 변경할 수 없습니다.</p>
+        <div class="flex justify-end">
+          <button
+            @click="showSocialLoginModal = false"
+            class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700"
+          >
+            확인
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- 헤더 -->
@@ -432,7 +458,6 @@ const goBack = () => {
                 alt="프로필 이미지"
                 class="object-cover w-full h-full rounded-full"
               />
-              
               <div
                 v-else
                 class="flex justify-center items-center w-full h-full bg-gray-200 rounded-full"
@@ -505,37 +530,28 @@ const goBack = () => {
             <label class="block mb-1 text-sm font-medium text-gray-700">
               이메일
             </label>
-            <div class="flex space-x-2">
-              <div class="relative flex-1">
-                <div
-                  class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none"
-                >
-                  <Mail class="w-5 h-5 text-gray-400" />
-                </div>
-                <input
-                  v-model="userForm.email"
-                  type="email"
-                  class="block py-2 pr-3 pl-10 w-full rounded-md border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  :class="{
-                    'border-red-500':
-                      (!validEmail || emailExists) && userForm.email,
-                  }"
-                />
-              </div>
+            <div class="flex gap-2">
+              <input
+                v-model="userForm.email"
+                type="email"
+                :disabled="!isLocalProvider"
+                class="flex-1 px-3 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+                :class="[
+                  !validEmail ? 'border-red-300' : 'border-gray-300',
+                  !isLocalProvider ? 'bg-gray-100' : ''
+                ]"
+              />
               <button
+                v-if="isLocalProvider"
                 type="button"
                 @click="checkEmailDuplicate"
-                class="px-4 py-2 text-white bg-gray-500 rounded-md hover:bg-gray-600"
-                :disabled="!validEmail || userForm.email === originalEmail"
+                class="px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
                 중복확인
               </button>
             </div>
-            <p
-              v-if="userForm.email && !validEmail"
-              class="mt-1 text-sm text-red-600"
-            >
-              이메일 형식이 올바르지 않습니다.
+            <p v-if="!validEmail" class="mt-1 text-sm text-red-600">
+              올바른 이메일 형식이 아닙니다.
             </p>
           </div>
 
@@ -581,12 +597,12 @@ const goBack = () => {
               비밀번호 변경
             </h2>
             <button
+              @click.prevent.stop="handlePasswordChangeClick"
               type="button"
-              @click="() => router.push('/change-password')"
-              class="flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white rounded-md border border-gray-300 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              class="flex items-center px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
-              <Lock class="mr-2 w-5 h-5" />
-              비밀번호 변경하기
+              <Lock class="w-5 h-5 mr-2" />
+              비밀번호 변경
             </button>
           </div>
 
