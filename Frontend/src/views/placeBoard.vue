@@ -276,7 +276,6 @@ const addReview = async () => {
 
     await sendImageData(response.data.data.reviewId);
     await showModalMessage("리뷰가 성공적으로 작성되었습니다.");
-    await new Promise((resolve) => setTimeout({ resolve }, 3000));
   } catch (error) {
     console.error(error);
   }
