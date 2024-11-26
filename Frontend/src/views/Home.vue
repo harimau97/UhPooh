@@ -8,6 +8,10 @@ import {
   Clock,
   Users,
   Phone,
+  Heart, // 체력 향상
+  Brain, // 스트레스 해소
+  Scale, // 체중 관리
+  UsersRound, // 함께하는 즐거움
 } from "lucide-vue-next";
 import router from "@/router";
 import ContactModal from "../components/ContactModal.vue";
@@ -131,6 +135,7 @@ onMounted(() => {
 });
 </script>
 
+
 <template>
   <main class="min-h-screen">
     <!-- Hero Section with Navigation -->
@@ -235,8 +240,6 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-
-            <!-- Search Suggestions (Optional) -->
           </div>
         </div>
       </div>
@@ -276,14 +279,10 @@ onMounted(() => {
     </section>
 
     <!-- Benefits Section -->
-    <section
-      class="overflow-hidden relative py-20 bg-gradient-to-r from-blue-600 to-blue-400"
-    >
+    <section class="overflow-hidden relative py-20 bg-gradient-to-r from-blue-600 to-blue-400">
       <!-- Background Pattern -->
       <div class="absolute inset-0 opacity-10">
-        <div
-          class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"
-        ></div>
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"></div>
       </div>
 
       <div class="container relative px-4 mx-auto">
@@ -308,37 +307,37 @@ onMounted(() => {
 
           <!-- Benefits Grid -->
           <div class="grid grid-cols-1 gap-6 md:col-span-2 sm:grid-cols-2">
-            <div
-              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div class="mb-2 text-4xl">🏊‍♂️</div>
+            <div class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg">
+              <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-white/20">
+                <Heart class="w-6 h-6 text-white" />
+              </div>
               <div class="mb-2 text-2xl font-bold">체력 향상</div>
               <p class="text-blue-100">
                 수영은 유산소 운동으로 심폐 기능을 강화하고 근력을 향상시킵니다
               </p>
             </div>
-            <div
-              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div class="mb-2 text-4xl">🧘‍♀️</div>
+            <div class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg">
+              <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-white/20">
+                <Brain class="w-6 h-6 text-white" />
+              </div>
               <div class="mb-2 text-2xl font-bold">스트레스 해소</div>
               <p class="text-blue-100">
                 물속에서의 운동은 마음의 안정과 스트레스 해소에 도움이 됩니다
               </p>
             </div>
-            <div
-              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div class="mb-2 text-4xl">⚖️</div>
+            <div class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg">
+              <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-white/20">
+                <Scale class="w-6 h-6 text-white" />
+              </div>
               <div class="mb-2 text-2xl font-bold">체중 관리</div>
               <p class="text-blue-100">
                 부상 위험이 적으면서도 효과적인 체중 관리가 가능합니다
               </p>
             </div>
-            <div
-              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
-            >
-              <div class="mb-2 text-4xl">👥</div>
+            <div class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg">
+              <div class="flex justify-center items-center mb-4 w-12 h-12 rounded-full bg-white/20">
+                <UsersRound class="w-6 h-6 text-white" />
+              </div>
               <div class="mb-2 text-2xl font-bold">함께하는 즐거움</div>
               <p class="text-blue-100">
                 수영 커뮤니티에서 같은 취미를 가진 사람들과 교류할 수 있습니다
@@ -411,9 +410,7 @@ onMounted(() => {
     </section>
 
     <!-- CTA Section -->
-    <section
-      class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600"
-    >
+    <section class="py-24 text-white bg-gradient-to-r from-blue-600 to-cyan-600">
       <div class="container px-4 mx-auto text-center">
         <h2 class="mb-6 text-4xl font-bold">지금 바로 시작하세요</h2>
         <p class="mb-8 text-xl text-blue-100">
@@ -427,98 +424,97 @@ onMounted(() => {
         </RouterLink>
       </div>
     </section>
-
-    <!-- Footer -->
-    <footer class="text-gray-400 bg-gray-900">
-      <div class="container px-4 py-12 mx-auto">
-        <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
-          <!-- Company Info -->
-          <div>
-            <div class="mb-4 text-2xl font-bold text-white">어푸어푸</div>
-            <p class="mb-4">더 쉽고 스마트한<br />수영장 찾기 서비스</p>
-            <div class="flex gap-4">
-              <a
-                v-for="link in socialLinks"
-                :key="link.name"
-                :href="link.url"
-                class="text-gray-400 transition-colors hover:text-white"
-              >
-                <component :is="link.icon" class="w-6 h-6" />
-              </a>
-            </div>
-          </div>
-          <!-- Service Links -->
-          <div>
-            <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
-            <ul class="space-y-2">
-              <li v-for="link in serviceLinks" :key="link.name">
-                <RouterLink
-                  :to="link.path"
-                  class="transition-colors hover:text-white"
-                >
-                  {{ link.name }}
-                </RouterLink>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Support Links -->
-          <div>
-            <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
-            <ul class="space-y-2">
-              <li v-for="link in supportLinks" :key="link.name">
-                <RouterLink
-                  :to="link.path"
-                  class="transition-colors hover:text-white"
-                >
-                  {{ link.name }}
-                </RouterLink>
-              </li>
-            </ul>
-          </div>
-
-          <!-- Customer Service -->
-          <div>
-            <h3 class="mb-4 text-lg font-semibold text-white">고객센터</h3>
-            <div class="space-y-4">
-              <div class="flex gap-2 items-center">
-                <Phone class="w-5 h-5" />
-                <span class="text-white">1234-5678</span>
-              </div>
-              <div class="text-sm text-gray-400">
-                <p>평일 09:00 - 18:00</p>
-                <p>주말 및 공휴일 휴무</p>
-              </div>
-              <button
-                @click="showContactModal = true"
-                class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
-              >
-                문의하기
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="pt-8 mt-12 border-t border-gray-800">
-          <div
-            class="flex flex-col gap-4 justify-between items-center md:flex-row"
+</main>
+     <!-- Footer -->
+<footer class="text-gray-400 bg-gray-900">
+  <div class="container px-4 py-12 mx-auto">
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-4">
+      <!-- Company Info -->
+      <div>
+        <div class="mb-4 text-2xl font-bold text-white">어푸어푸</div>
+        <p class="mb-4">더 쉽고 스마트한<br />수영장 찾기 서비스</p>
+        <div class="flex gap-4">
+          <a
+            v-for="link in socialLinks"
+            :key="link.name"
+            :href="link.url"
+            class="text-gray-400 transition-colors hover:text-white"
           >
-            <p>&copy; 2024 어푸어푸. All rights reserved.</p>
-            <address class="not-italic text-center md:text-right">
-              서울특별시 강남구 테헤란로 212 멀티캠퍼스 501호<br />
-              사업자등록번호: 123-45-67890
-            </address>
-          </div>
+            <component :is="link.icon" class="w-6 h-6" />
+          </a>
         </div>
       </div>
-    </footer>
-  </main>
-  <ContactModal :is-open="showContactModal" @close="showContactModal = false" />
 
-  <div>
-    <!-- AI Chatbot이 삽입될 div -->
-    <div id="aichatbot"></div>
+      <!-- Service Links -->
+      <div>
+        <h3 class="mb-4 text-lg font-semibold text-white">서비스</h3>
+        <ul class="space-y-2">
+          <li v-for="link in serviceLinks" :key="link.name">
+            <RouterLink
+              :to="link.path"
+              class="transition-colors hover:text-white"
+            >
+              {{ link.name }}
+            </RouterLink>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Support Links -->
+      <div>
+        <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
+        <ul class="space-y-2">
+          <li v-for="link in supportLinks" :key="link.name">
+            <RouterLink
+              :to="link.path"
+              class="transition-colors hover:text-white"
+            >
+              {{ link.name }}
+            </RouterLink>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Customer Service -->
+      <div>
+        <h3 class="mb-4 text-lg font-semibold text-white">고객센터</h3>
+        <div class="space-y-4">
+          <div class="flex gap-2 items-center">
+            <Phone class="w-5 h-5" />
+            <span class="text-white">1234-5678</span>
+          </div>
+          <div class="text-sm text-gray-400">
+            <p>평일 09:00 - 18:00</p>
+            <p>주말 및 공휴일 휴무</p>
+          </div>
+          <button
+            @click="showContactModal = true"
+            class="px-4 py-2 w-full text-white bg-gray-800 rounded transition-colors hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2 focus:ring-offset-gray-900"
+          >
+            문의하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-8 mt-12 border-t border-gray-800">
+      <div class="flex flex-col gap-4 justify-between items-center md:flex-row">
+        <p>&copy; 2024 어푸어푸. All rights reserved.</p>
+        <address class="not-italic text-center md:text-right">
+          서울특별시 강남구 테헤란로 212 멀티캠퍼스 501호<br />
+          사업자등록번호: 123-45-67890
+        </address>
+      </div>
+    </div>
   </div>
+</footer>
+
+<ContactModal :is-open="showContactModal" @close="showContactModal = false" />
+
+<div>
+  <!-- AI Chatbot이 삽입될 div -->
+  <div id="aichatbot"></div>
+</div>
 </template>
 
 <style scoped>
