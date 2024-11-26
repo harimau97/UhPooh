@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.7.23",
+    "@react-native-firebase/app": "^21.6.1",
+    "@react-native-firebase/messaging": "^21.6.1",
     "@tosspayments/payment-sdk": "^1.9.1",
     "@tosspayments/tosspayments-sdk": "^2.3.2",
     "axios": "^1.7.7",
