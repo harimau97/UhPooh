@@ -30,7 +30,7 @@ const user = ref({
   membershipLevel: "Member",
   profileImageUrl: "",
   stats: [
-    { label: "예약", value: "0" },
+    { label: "좋아요", value: "0" },
     { label: "리뷰", value: "0" },
     { label: "포인트", value: "0" },
   ],
@@ -91,7 +91,6 @@ const fetchMyReviews = async () => {
 
     if (response.data) {
       myReviews.value = response.data.data.items;
-      console.log("작성한 리뷰들", myReviews.value);
     } else {
       console.error("Invalid review data format");
       myReviews.value = [];
@@ -115,7 +114,6 @@ const fetchLikedPlaces = async () => {
     );
     if (response.data && Array.isArray(response.data)) {
       likedPlaces.value = response.data;
-      console.log("좋아요 개수", likedPlaces.value.length);
     } else {
       console.error("Invalid liked places data format");
       likedPlaces.value = [];
@@ -167,10 +165,10 @@ onMounted(async () => {
   // 사용자 통계 데이터 로드
   try {
     await Promise.all([fetchMyReviews(), fetchLikedPlaces()]);
-
+    
     // 포인트 계산: 좋아요 * 10 + 리뷰 * 20
     const calculatedPoints = likedPlacesLength.value * 10 + myReviewsLength.value * 20;
-
+    
     user.value.stats = [
       { label: "좋아요", value: likedPlacesLength.value.toString() },
       { label: "리뷰", value: myReviewsLength.value.toString() },
