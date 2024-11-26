@@ -87,7 +87,7 @@ onMounted(async () => {
     document,
     "script",
     "43DAD9E4-1689-4998-A4FB-5BC073125CE4",
-    "1v5Rtog-RFAjUC4EjM-iY",
+    "8xEQ0UT5bOjVSUbkZQCXC",
     {
       apiHost: "https://api-cf-ap-2.sendbird.com",
     }

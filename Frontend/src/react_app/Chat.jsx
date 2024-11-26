@@ -27,7 +27,7 @@ const Chat = (props) => {
   };
 
   useEffect(() => {
-    const style = document.createElement('style');
+    const style = document.createElement("style");
     style.textContent = `
       .sendbird-channel-list {
         width: 100% !important;
@@ -42,6 +42,17 @@ const Chat = (props) => {
         width: 100% !important;
       }
       .sendbird-channel-header__title {
+        width: 100% !important;
+      }
+      // .sendbird-modal__body{
+      // width: 100% !important;
+      // height: 75% !important;
+      // }
+      .sendbird-modal__content {
+        width: 480px !important;
+      }
+       
+      .sendbird-channel-settings-header {
         width: 100% !important;
       }
       .sendbird-channel-header__right-icon {
@@ -62,7 +73,7 @@ const Chat = (props) => {
         height: "100%",
         position: "relative",
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
       }}
     >
       <div style={{ flex: 1, width: "100%" }}>
@@ -78,6 +89,28 @@ const Chat = (props) => {
           config={{
             enableEnterToSubmit: true,
             isOnline: true,
+            createChannelPreview: {
+              hideProfileImage: false,
+              onlineStateText: false,
+              statusMessage: false,
+            },
+            userListQuery: {
+              limit: 20,
+              metaDataKeyFilter: "name",
+            },
+            groupChannel: {
+              enableCreate: true,
+              enableLeave: true,
+              channelListQuery: {
+                includeEmpty: false,
+                limit: 20,
+                order: "latest_last_message",
+              },
+              createChannel: {
+                enableSelectChannelType: false,
+                channelType: "group",
+              },
+            },
           }}
         />
       </div>
