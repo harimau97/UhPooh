@@ -5,7 +5,7 @@
 <h3><b>실시간 수영장 검색과 예약이 가능한 올인원 수영장 플랫폼</b></h3>
 
 
-<img src="https://github.com/user-attachments/assets/1573bc80-7711-46c5-bdc9-cc3da59de574" alt="서비스 대표 이미지"/>
+<img src="https://github.com/user-attachments/assets/efa9501d-6683-4c47-8539-30008e352881" alt="서비스 대표 이미지"/>
 </div>
 
 
