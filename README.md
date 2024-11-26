@@ -24,7 +24,7 @@
 
 <div align="center">
 
-| <img src="" width="120px;" alt="이시호 사진"/> |                                      <img src="" width="120px;" alt="팀원2 사진"/>                                      |
+| <img src="https://github.com/user-attachments/assets/cad90985-cfca-41aa-9eac-a0d3a35b87e4" width="120px;" alt="이시호 사진"/> |                                      <img src="https://github.com/user-attachments/assets/688455f5-e93c-4320-8f78-abb7f364d328" width="120px;" alt="팀원2 사진"/>                                      |
 |:-----------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:|
 |    [이시호](https://github.com/harimau97)    |                                         [김용명](https://github.com/kunzatt)                                         |
 
