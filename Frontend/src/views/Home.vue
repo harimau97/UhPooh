@@ -201,10 +201,14 @@ onMounted(() => {
                 <RouterLink
                   to="/around"
                   @click="handleSearch"
-                  class="group flex gap-2 items-center px-8 py-4 font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5"
+                  class="flex gap-2 items-center px-8 py-4 font-medium text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg shadow-md transition-all duration-300 group hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5"
                 >
-                  <Search class="w-5 h-5 transition-transform group-hover:scale-110" />
-                  <span class="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full">
+                  <Search
+                    class="w-5 h-5 transition-transform group-hover:scale-110"
+                  />
+                  <span
+                    class="relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-white after:transition-all after:duration-300 group-hover:after:w-full"
+                  >
                     찾아보기
                   </span>
                 </RouterLink>
@@ -224,7 +228,9 @@ onMounted(() => {
                   >
                     <MapPin class="w-4 h-4" />
                     <span>{{ area.name }}</span>
-                    <span class="text-xs text-gray-400">({{ area.count }})</span>
+                    <span class="text-xs text-gray-400"
+                      >({{ area.count }})</span
+                    >
                   </button>
                 </div>
               </div>
@@ -270,75 +276,87 @@ onMounted(() => {
     </section>
 
     <!-- Benefits Section -->
-<section class="relative py-20 bg-gradient-to-r from-blue-600 to-blue-400 overflow-hidden">
-  <!-- Background Pattern -->
-  <div class="absolute inset-0 opacity-10">
-    <div
-      class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"
-    ></div>
-  </div>
-
-  <div class="container relative px-4 mx-auto">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-      <!-- Text Content -->
-      <div class="md:col-span-1 text-white">
-        <h2 class="text-3xl md:text-4xl font-bold mb-6">
-          건강한 수영 라이프를<br />시작해보세요
-        </h2>
-        <p class="text-blue-100 text-lg mb-8">
-          수영은 전신 운동으로 체력 향상과 스트레스 해소에 도움을 줍니다.
-          어푸어푸와 함께 즐거운 수영을 시작해보세요.
-        </p>
-        <RouterLink
-          to="/guide"
-          class="inline-flex items-center px-6 py-3 bg-white text-blue-600 rounded-lg font-medium transition-all duration-200 hover:bg-blue-50 hover:shadow-lg"
-        >
-          이용가이드 보기
-          <ChevronRight class="w-5 h-5 ml-2" />
-        </RouterLink>
+    <section
+      class="overflow-hidden relative py-20 bg-gradient-to-r from-blue-600 to-blue-400"
+    >
+      <!-- Background Pattern -->
+      <div class="absolute inset-0 opacity-10">
+        <div
+          class="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]"
+        ></div>
       </div>
 
-      <!-- Benefits Grid -->
-      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-          <div class="text-4xl mb-2">🏊‍♂️</div>
-          <div class="text-2xl font-bold mb-2">체력 향상</div>
-          <p class="text-blue-100">
-            수영은 유산소 운동으로 심폐 기능을 강화하고 근력을 향상시킵니다
-          </p>
-        </div>
-        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-          <div class="text-4xl mb-2">🧘‍♀️</div>
-          <div class="text-2xl font-bold mb-2">스트레스 해소</div>
-          <p class="text-blue-100">
-            물속에서의 운동은 마음의 안정과 스트레스 해소에 도움이 됩니다
-          </p>
-        </div>
-        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-          <div class="text-4xl mb-2">⚖️</div>
-          <div class="text-2xl font-bold mb-2">체중 관리</div>
-          <p class="text-blue-100">
-            부상 위험이 적으면서도 효과적인 체중 관리가 가능합니다
-          </p>
-        </div>
-        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-white transform transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-          <div class="text-4xl mb-2">👥</div>
-          <div class="text-2xl font-bold mb-2">함께하는 즐거움</div>
-          <p class="text-blue-100">
-            수영 커뮤니티에서 같은 취미를 가진 사람들과 교류할 수 있습니다
-          </p>
+      <div class="container relative px-4 mx-auto">
+        <div class="grid grid-cols-1 gap-8 items-center md:grid-cols-3">
+          <!-- Text Content -->
+          <div class="text-white md:col-span-1">
+            <h2 class="mb-6 text-3xl font-bold md:text-4xl">
+              건강한 수영 라이프를<br />시작해보세요
+            </h2>
+            <p class="mb-8 text-lg text-blue-100">
+              수영은 전신 운동으로 체력 향상과 스트레스 해소에 도움을 줍니다.
+              어푸어푸와 함께 즐거운 수영을 시작해보세요.
+            </p>
+            <RouterLink
+              to="/guide"
+              class="inline-flex items-center px-6 py-3 font-medium text-blue-600 bg-white rounded-lg transition-all duration-200 hover:bg-blue-50 hover:shadow-lg"
+            >
+              이용가이드 보기
+              <ChevronRight class="ml-2 w-5 h-5" />
+            </RouterLink>
+          </div>
+
+          <!-- Benefits Grid -->
+          <div class="grid grid-cols-1 gap-6 md:col-span-2 sm:grid-cols-2">
+            <div
+              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div class="mb-2 text-4xl">🏊‍♂️</div>
+              <div class="mb-2 text-2xl font-bold">체력 향상</div>
+              <p class="text-blue-100">
+                수영은 유산소 운동으로 심폐 기능을 강화하고 근력을 향상시킵니다
+              </p>
+            </div>
+            <div
+              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div class="mb-2 text-4xl">🧘‍♀️</div>
+              <div class="mb-2 text-2xl font-bold">스트레스 해소</div>
+              <p class="text-blue-100">
+                물속에서의 운동은 마음의 안정과 스트레스 해소에 도움이 됩니다
+              </p>
+            </div>
+            <div
+              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div class="mb-2 text-4xl">⚖️</div>
+              <div class="mb-2 text-2xl font-bold">체중 관리</div>
+              <p class="text-blue-100">
+                부상 위험이 적으면서도 효과적인 체중 관리가 가능합니다
+              </p>
+            </div>
+            <div
+              class="p-6 text-white rounded-xl backdrop-blur-sm transition-all duration-200 transform bg-white/10 hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div class="mb-2 text-4xl">👥</div>
+              <div class="mb-2 text-2xl font-bold">함께하는 즐거움</div>
+              <p class="text-blue-100">
+                수영 커뮤니티에서 같은 취미를 가진 사람들과 교류할 수 있습니다
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- Testimonials Section -->
     <section class="relative py-12">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-2">이용자 후기</h2>
-          <p class="text-gray-600">어푸어푸와 함께한 분들의 이야기를 들어보세요</p>
+      <div class="container px-4 mx-auto">
+        <div class="mb-8 text-center">
+          <h2 class="mb-2 text-3xl font-bold text-gray-900">이용자 후기</h2>
+          <p class="text-gray-600">
+            어푸어푸와 함께한 분들의 이야기를 들어보세요
+          </p>
         </div>
 
         <!-- Testimonials Carousel -->
@@ -352,18 +370,24 @@ onMounted(() => {
                 class="flex absolute inset-0 items-center"
               >
                 <div class="w-full">
-                  <div class="h-full flex flex-col items-center justify-center text-center px-4">
+                  <div
+                    class="flex flex-col justify-center items-center px-4 h-full text-center"
+                  >
                     <img
                       :src="testimonial.image"
                       :alt="testimonial.name"
-                      class="w-16 h-16 rounded-full object-cover mb-4"
+                      class="object-cover mb-4 w-16 h-16 rounded-full"
                     />
-                    <p class="text-gray-600 text-lg mb-6 max-w-2xl">
+                    <p class="mb-6 max-w-2xl text-lg text-gray-600">
                       "{{ testimonial.content }}"
                     </p>
                     <div class="text-center">
-                      <div class="font-semibold text-gray-900">{{ testimonial.name }}</div>
-                      <div class="text-sm text-gray-500">{{ testimonial.role }}</div>
+                      <div class="font-semibold text-gray-900">
+                        {{ testimonial.name }}
+                      </div>
+                      <div class="text-sm text-gray-500">
+                        {{ testimonial.role }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -443,7 +467,10 @@ onMounted(() => {
             <h3 class="mb-4 text-lg font-semibold text-white">고객지원</h3>
             <ul class="space-y-2">
               <li v-for="link in supportLinks" :key="link.name">
-                <RouterLink :to="link.path" class="transition-colors hover:text-white">
+                <RouterLink
+                  :to="link.path"
+                  class="transition-colors hover:text-white"
+                >
                   {{ link.name }}
                 </RouterLink>
               </li>
@@ -486,10 +513,12 @@ onMounted(() => {
       </div>
     </footer>
   </main>
-  <ContactModal
-    :is-open="showContactModal"
-    @close="showContactModal = false"
-  />
+  <ContactModal :is-open="showContactModal" @close="showContactModal = false" />
+
+  <div>
+    <!-- AI Chatbot이 삽입될 div -->
+    <div id="aichatbot"></div>
+  </div>
 </template>
 
 <style scoped>
