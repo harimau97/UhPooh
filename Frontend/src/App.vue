@@ -18,8 +18,8 @@ console.log("로그인 상태", isLoggedIn.value);
 provide("isLoggedIn", isLoggedIn);
 
 // Sendbird 설정
-const applicationId = "43DAD9E4-1689-4998-A4FB-5BC073125CE4"; // Sendbird 애플리케이션 ID
-const apiToken = "insert your key here"; // Sendbird API 토큰
+const applicationId = import.meta.env.VITE_SENDBIRD_APP_ID; // Sendbird 애플리케이션 ID
+const apiToken = import.meta.env.VITE_SENDBIRD_API_TOKEN; // Sendbird API 토큰
 
 // API URL
 const url = `https://api-${applicationId}.sendbird.com/v3/users`;

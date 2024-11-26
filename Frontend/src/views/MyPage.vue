@@ -16,13 +16,13 @@ import { logout } from "../composables/userAuth";
 
 const router = useRouter();
 const showLogoutModal = ref(false);
-const imageTrue = ref("");
-const imgName = ref("");
-const imgPath = ref("");
-const likedPlaces = ref([]);
-const myReviews = ref([]);
-const myReviewsLength = computed(() => myReviews.value.length);
-const likedPlacesLength = computed(() => likedPlaces.value.length);
+const myImageTrue = ref("");
+const myImgName = ref("");
+const myImgPath = ref("");
+const countLikedPlaces = ref([]);
+const countMyReviews = ref([]);
+const countMyReviewsLength = computed(() => countMyReviews.value.length);
+const countLikedPlacesLength = computed(() => countLikedPlaces.value.length);
 const user = ref({
   name: "",
   email: "",
@@ -73,11 +73,11 @@ const menuItems = computed(() => {
 const isLoggined = inject("isLoggedIn");
 
 // 내가 쓴 리뷰 목록 가져오기
-const fetchMyReviews = async () => {
+const countFetchMyReviews = async () => {
   try {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      console.error("User ID not found");
+      console.log("User ID not found");
       return;
     }
     const response = await axios.get(
@@ -90,45 +90,59 @@ const fetchMyReviews = async () => {
     );
 
     if (response.data) {
-      myReviews.value = response.data.data.items;
+      countMyReviews.value = response.data.data.items;
+      console.log("리뷰 데이터:", countMyReviews.value);
     } else {
-      console.error("Invalid review data format");
-      myReviews.value = [];
+      console.log("Invalid review data format", response.data);
+      countMyReviews.value = [];
     }
   } catch (error) {
-    console.error("Error fetching reviews:", error);
-    myReviews.value = [];
+    console.log(
+      "Error fetching reviews:",
+      error.response?.data || error.message
+    );
+    countMyReviews.value = [];
   }
 };
 
 // 좋아요한 수영장 목록 가져오기
-const fetchLikedPlaces = async () => {
+const countFetchLikedPlaces = async () => {
   try {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      console.error("User ID not found");
+      console.log("User ID not found");
       return;
     }
     const response = await axios.get(
       "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
     );
     if (response.data && Array.isArray(response.data)) {
-      likedPlaces.value = response.data;
+      countLikedPlaces.value = response.data;
+      console.log("좋아요 데이터:", countLikedPlaces.value);
     } else {
-      console.error("Invalid liked places data format");
-      likedPlaces.value = [];
+      console.log("Invalid liked places data format", response.data);
+      countLikedPlaces.value = [];
     }
   } catch (error) {
-    console.error("Error fetching liked places:", error);
-    likedPlaces.value = [];
+    console.log(
+      "Error fetching liked places:",
+      error.response?.data || error.message
+    );
+    countLikedPlaces.value = [];
   }
 };
 
 //프로필이미지 캐싱
-const cacheImage = async (cat) => {
-  imgPath.value =
-    "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;
-  const response = await axios.get(imgPath.value, { timeout: 5000 });
+const cacheMyImage = async (cat) => {
+  try {
+    console.log(cat);
+    myImgPath.value =
+      "http://localhost:8080/uhpooh/api/images/" + cat + "/" + myImgName.value;
+    const response = await axios.get(myImgPath.value, { timeout: 5000 });
+    console.log("이미지 캐싱 성공:", myImgPath.value);
+  } catch (error) {
+    console.log("이미지 캐싱 실패:", error.response?.data || error.message);
+  }
 };
 
 // 사용자 데이터 로드
@@ -154,34 +168,34 @@ onMounted(async () => {
   };
 
   // 프로필 이미지 처리
-  imageTrue.value = pImage || "";
-  console.log(imageTrue.value);
+  myImageTrue.value = pImage || "";
+  console.log(myImageTrue.value);
   if (pImage.includes("googleusercontent")) {
-    imageTrue.value = "";
+    myImageTrue.value = "";
     localStorage.setItem("pImage", "");
   }
   if (pImage) {
-    imgName.value = imageTrue.value.replace("/images/profiles/", "");
-    await cacheImage("profiles");
+    myImgName.value = myImageTrue.value.replace("/images/profiles/", "");
+    await cacheMyImage("profiles");
     user.value.profileImageUrl =
       userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
   }
 
   // 사용자 통계 데이터 로드
   try {
-    await Promise.all([fetchMyReviews(), fetchLikedPlaces()]);
+    await Promise.all([countFetchMyReviews(), countFetchLikedPlaces()]);
 
     // 포인트 계산: 좋아요 * 10 + 리뷰 * 20
     const calculatedPoints =
-      likedPlacesLength.value * 10 + myReviewsLength.value * 20;
+      countLikedPlacesLength.value * 10 + countMyReviewsLength.value * 20;
 
     user.value.stats = [
-      { label: "좋아요", value: likedPlacesLength.value.toString() },
-      { label: "리뷰", value: myReviewsLength.value.toString() },
+      { label: "좋아요", value: countLikedPlacesLength.value.toString() },
+      { label: "리뷰", value: countMyReviewsLength.value.toString() },
       { label: "포인트", value: calculatedPoints.toLocaleString() },
     ];
   } catch (error) {
-    console.error("사용자 데이터 로딩 중 오류 발생:", error);
+    console.log("사용자 데이터 로딩 중 오류 발생:", error);
   }
 });
 
@@ -200,7 +214,7 @@ const handleLogout = async () => {
   try {
     await logout();
   } catch (error) {
-    console.error("로그아웃 처리 중 오류 발생:", error);
+    console.log("로그아웃 처리 중 오류 발생:", error);
   }
 };
 </script>
@@ -216,8 +230,8 @@ const handleLogout = async () => {
             class="overflow-hidden w-24 h-24 rounded-full border-4 border-blue-100"
           >
             <img
-              v-if="imageTrue !== 'null' && imageTrue !== ''"
-              :src="imgPath"
+              v-if="myImageTrue !== 'null' && myImageTrue !== ''"
+              :src="myImgPath"
               alt="Profile"
               class="object-cover w-full h-full"
               @error="handleImageError"

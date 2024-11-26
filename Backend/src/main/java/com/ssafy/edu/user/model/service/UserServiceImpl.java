@@ -149,4 +149,10 @@ public class UserServiceImpl implements UserService {
   public int getTotalEverythingCount(Map<String, Object> params) {
     return userDao.getTotalEverythingCount(params);
   }
+
+
+  @Override
+  public void deleteGoogleImage() {
+    userDao.deleteGoogleImage();
+  }
 }

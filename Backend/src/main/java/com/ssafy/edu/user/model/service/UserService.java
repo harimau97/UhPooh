@@ -51,6 +51,8 @@ public interface UserService {
     
     int getTotalUserCount();
     
-    User confirmPassword(User user);;
+    User confirmPassword(User user);
+
+    void deleteGoogleImage();
     
 }
