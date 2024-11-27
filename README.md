@@ -8,6 +8,7 @@
 <img src="https://github.com/user-attachments/assets/1573bc80-7711-46c5-bdc9-cc3da59de574" alt="서비스 대표 이미지"/>
 </div>
 
+시연링크 : https://youtu.be/tWJUcvHwGok
 
 ## <span id="1">🚩 1. 프로젝트 소개</span>
 
