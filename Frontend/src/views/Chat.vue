@@ -3,6 +3,7 @@
     <div
       v-show="openChat"
       class="flex fixed inset-0 z-50 justify-end items-end"
+      @click.self="closeChat"
     >
       <div
         class="flex flex-col h-[600px] w-[400px] mr-4 mb-20 bg-white rounded-lg shadow-2xl overflow-hidden border border-indigo-100"
@@ -74,90 +75,60 @@
   </button>
 </template>
 
-<script>
-import { applyReactInVue, applyPureReactInVue } from "veaury";
-import { onMounted, ref, watch } from "vue";
+<script setup>
+import { ref, watch, computed, inject } from "vue";
+import { applyPureReactInVue } from "veaury";
 import ChatReactComponent from "../react_app/Chat.jsx";
-import Header from "./Header.vue";
-import { inject } from "vue";
-const isLoggined = ref(false);
-onMounted(async () => {
-  isLoggined.value = await inject("isLoggedIn");
-});
 
-console.log("채팅 가능 여부", isLoggined.value);
+const isLoggined = inject("isLoggedIn");
+const openChat = ref(false);
+const messageCount = ref(0);
+const chatRef = ref(null);
 
 const user_id = ref("");
 const user_email = ref("");
 
-user_id.value = localStorage.getItem("userName");
-user_email.value = localStorage.getItem("userEmail");
+// localStorage 값 변경 감지
+watch(isLoggined, (newValue) => {
+  if (newValue) {
+    user_id.value = localStorage.getItem("userName");
+    user_email.value = localStorage.getItem("userEmail");
+  }
+}, { immediate: true });
 
-console.log(localStorage.setItem("채팅 확인", user_email.value));
-console.log("");
-
-const config = {
+const config = computed(() => ({
   APP_ID: import.meta.env.VITE_SENDBIRD_APP_ID,
   USER_ID: user_id.value,
   NICKNAME: user_email.value,
   API_TOKEN: import.meta.env.VITE_SENDBIRD_API_TOKEN,
   LANG: "ko",
+}));
+
+const Chat = applyPureReactInVue(ChatReactComponent);
+
+// Methods
+const handleChatRef = (ref) => {
+  chatRef.value = ref;
 };
 
-export default {
-  data() {
-    return {
-      openChat: false, // 모달을 열고 닫기 위한 상태 변수
-      chatRef: null,
-    };
-  },
-  components: {
-    Chat: applyPureReactInVue(ChatReactComponent),
-  },
-  computed: {
-    classStyle() {
-      switch (this.openChat) {
-        case true:
-          return "animate-slide-up";
-        case false:
-          return "animate-slide-down";
-      }
-    },
-  },
-  methods: {
-    handleChatRef(ref) {
-      this.chatRef = ref;
-    },
-    async closeChat() {
-      if (this.chatRef && this.chatRef.disconnect) {
-        await this.chatRef.disconnect();
-      }
-      this.openChat = false;
-    },
-  },
-  watch: {
-    openChat(newValue) {
-      if (!newValue && this.chatRef && this.chatRef.disconnect) {
-        this.chatRef.disconnect();
-      }
-    },
-  },
-  setup() {
-    const userRef = ref(null);
-    const messageCountRef = ref(null);
-    return {
-      config: config,
-      setSbUserInfo: (user) => {
-        userRef.value = user;
-      },
-      setUnreadMessageCount: (count) => {
-        messageCountRef.value = count;
-      },
-      sbUserInfo: userRef,
-      messageCount: messageCountRef,
-    };
-  },
+const closeChat = () => {
+  openChat.value = false;
 };
+
+const setUnreadMessageCount = (count) => {
+  messageCount.value = count;
+};
+
+const setSbUserInfo = (userInfo) => {
+  // Sendbird 사용자 정보 설정 로직
+};
+
+// Watch openChat
+watch(openChat, (newValue) => {
+  if (newValue && chatRef.value) {
+    chatRef.value.clearUnreadCount();
+  }
+});
 </script>
 
 <style scoped>

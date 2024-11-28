@@ -190,7 +190,10 @@ const login = async () => {
       localStorage.setItem("provider", response.data.provider);
       console.log(response.data);
       console.log(localStorage.getItem("userToken"));
-      location.replace("/");
+      setTimeout(() => {
+       location.replace("/"); 
+      }, 3000);
+      
     })
     .catch((err) => {
       loginError.value = true;
