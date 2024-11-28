@@ -8,7 +8,7 @@ import {
   isAuthenticated,
   userAuthenticated,
 } from "./composables/userAuth.js";
-import { onMounted, provide, ref, computed } from "vue";
+import { onMounted, provide, ref, computed, watch } from "vue";
 import { RouterLink, RouterView, useRoute } from "vue-router";
 import MainHeader from "./views/Header.vue";
 import DefaultHeader from "./views/DefaultHeader.vue";
@@ -77,6 +77,12 @@ async function createChatUser() {
 // 테마 스토어 초기화
 const themeStore = useThemeStore();
 
+watch(userAuthenticated, async (newValue) => {
+  if (newValue) {
+    await createChatUser();
+  }
+});
+
 onMounted(async () => {
   themeStore.applyTheme(themeStore.currentTheme);
   (function (w, d, s, ...args) {
@@ -101,8 +107,8 @@ onMounted(async () => {
   if (userAuthenticated.value) {
     await getUserInfo();
   }
-
-  await createChatUser();
+  
+ 
 });
 
 // 현재 라우트를 사용하여 메인 페이지 여부를 확인

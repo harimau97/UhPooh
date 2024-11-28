@@ -128,6 +128,7 @@ const changeTargetAddress = async () => {
 };
 
 onMounted(() => {
+  
   setInterval(() => {
     activeTestimonial.value =
       (activeTestimonial.value + 1) % testimonials.length;
