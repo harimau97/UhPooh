@@ -38,7 +38,7 @@ const getUserInfo = async () => {
 
   try {
     const response = await axios.get(
-      `http://localhost:8080/uhpooh/api/user/${userId}`,
+      `${import.meta.env.VITE_API_URL}/user/${userId}`,
       {
         params: {
           requestUserId: userId,
@@ -66,16 +66,16 @@ const logout = async () => {
   try {
     console.log("로그아웃 시작");
     const response = await axios.post(
-      `http://localhost:8080/uhpooh/api/user/logout/${userId}`,
+      `${import.meta.env.VITE_API_URL}/user/logout/${userId}`,
       {
         userId: userId,
-        provider: provider || "local"
+        provider: provider || "local",
       },
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`
-        }
+          Authorization: `Bearer ${userToken}`,
+        },
       }
     );
 

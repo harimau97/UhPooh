@@ -278,7 +278,7 @@ const checkEmailDuplicate = debounce(async (email) => {
 
   try {
     await axios.get(
-      `http://localhost:8080/uhpooh/api/user/check/email/${email}`
+      `${import.meta.env.VITE_API_URL}/user/check/email/${email}`
     );
     emailExists.value = false;
     emailChecked.value = true;
@@ -363,7 +363,7 @@ const signUp = async (event) => {
   // 회원가입 요청
   try {
     const response = await axios.post(
-      "http://localhost:8080/uhpooh/api/user/signup",
+      import.meta.env.VITE_API_URL + "/user/signup",
       {
         userName: userName.value,
         userEmail: userEmail.value,
