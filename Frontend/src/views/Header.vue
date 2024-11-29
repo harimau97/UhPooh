@@ -79,7 +79,7 @@ const logout = () => {
       console.log("로그아웃 시작");
       const response = await axios({
         method: "post", // 강제로 POST로 설정
-        url: `${import.meta.env.VITE_API_URL}/user/logout/${uId}`,
+        url: `http://localhost:8080/uhpooh/api/user/logout/${uId}`,
         headers: {
           "Content-Type": "application/json",
         },

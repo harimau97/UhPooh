@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpEntity;
@@ -44,9 +43,6 @@ public class SecurityConfig {
   private final CustomUserService customUserService;
   private final UserDao userDao;
   private final OAuth2AuthorizedClientService authorizedClientService;
-
-  @Value("${app.frontend-url}")
-  private String frontendUrl;
 
   public SecurityConfig(OAuth2Service oAuth2Service, CustomUserService customUserService,
                         UserDao userDao, OAuth2AuthorizedClientService authorizedClientService) {
@@ -181,7 +177,7 @@ public class SecurityConfig {
 
                         String token = customUserService.loginUser((long) user.getUserId());
 
-                        String redirectUrl = UriComponentsBuilder.fromHttpUrl(frontendUrl)
+                        String redirectUrl = UriComponentsBuilder.fromHttpUrl("http://localhost:5173")
                                 .path("/oauth2/callback").queryParam("token", token)
                                 .queryParam("userId", user.getUserId()).queryParam("email", user.getUserEmail())
                                 .queryParam("name", user.getUserName()).build().encode().toUriString();
@@ -189,7 +185,7 @@ public class SecurityConfig {
                         servletResponse.sendRedirect(redirectUrl);
                       } catch (Exception e) {
                         log.error("OAuth2 Login Error", e);
-                        servletResponse.sendRedirect(frontendUrl + "/login?error=true");
+                        servletResponse.sendRedirect("http://localhost:5173/login?error=true");
                       }
                     }))
             .exceptionHandling(
@@ -206,7 +202,7 @@ public class SecurityConfig {
   @Bean
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(Arrays.asList(frontendUrl));
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);

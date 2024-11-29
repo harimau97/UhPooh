@@ -81,7 +81,7 @@ const countFetchMyReviews = async () => {
       return;
     }
     const response = await axios.get(
-      `${import.meta.env.VITE_API_URL}/review/search/writer`,
+      `http://localhost:8080/uhpooh/api/review/search/writer`,
       {
         params: {
           userId: userId,
@@ -114,7 +114,7 @@ const countFetchLikedPlaces = async () => {
       return;
     }
     const response = await axios.get(
-      import.meta.env.VITE_API_URL + "/place/getplaceidbyuserid/" + userId
+      "http://localhost:8080/uhpooh/api/place/getplaceidbyuserid/" + userId
     );
     if (response.data && Array.isArray(response.data)) {
       countLikedPlaces.value = response.data;
@@ -137,8 +137,7 @@ const cacheMyImage = async (cat) => {
   try {
     console.log(cat);
     myImgPath.value =
-      import.meta.env.VITE_API_URL +
-      "/file/images/" +
+      "http://localhost:8080/uhpooh/api/file/images/" +
       cat +
       "/" +
       myImgName.value;
@@ -178,6 +177,8 @@ onMounted(async () => {
   if (pImage) {
     myImgName.value = myImageTrue.value.replace("/images/profiles/", "");
     await cacheMyImage("profiles");
+    // user.value.profileImageUrl =
+    //   userProfileImage || `http://localhost:8080/uhpooh/api/images/${pImage}`;
   }
 
   // 사용자 통계 데이터 로드
