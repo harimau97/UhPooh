@@ -176,7 +176,7 @@ const handleSubmit = async () => {
 
 const login = async () => {
   await axios
-    .post(import.meta.env.VITE_API_URL + "/user/login", {
+    .post("http://localhost:8080/uhpooh/api/user/login", {
       userEmail: userEmail.value,
       password: password.value,
     })
@@ -191,8 +191,9 @@ const login = async () => {
       console.log(response.data);
       console.log(localStorage.getItem("userToken"));
       setTimeout(() => {
-        location.replace("/");
+       location.replace("/"); 
       }, 3000);
+      
     })
     .catch((err) => {
       loginError.value = true;
@@ -201,19 +202,19 @@ const login = async () => {
 
 const handleNaverLogin = () => {
   window.location.href =
-    import.meta.env.VITE_API_URL_AUTH + "/authorization/naver";
+    "http://localhost:8080/uhpooh/oauth2/authorization/naver";
 };
 
 const handleGithubLogin = () => {
   console.log("GitHub Login Button Clicked");
   window.location.href =
-    import.meta.env.VITE_API_URL_AUTH + "/authorization/github";
+    "http://localhost:8080/uhpooh/oauth2/authorization/github";
   console.log("GitHub Login Redirected");
 };
 
 const handleGoogleLogin = () => {
   window.location.href =
-    import.meta.env.VITE_API_URL_AUTH + "/authorization/google";
+    "http://localhost:8080/uhpooh/oauth2/authorization/google";
 };
 </script>
 

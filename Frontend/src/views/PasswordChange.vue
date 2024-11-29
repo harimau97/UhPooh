@@ -5,7 +5,7 @@ import { Lock, ArrowLeft } from "lucide-vue-next";
 import axios from "axios";
 
 const router = useRouter();
-const currentStep = ref("verify");
+const currentStep = ref('verify');
 const isLoading = ref(false);
 const showModal = ref(false);
 
@@ -36,8 +36,7 @@ const checkPassword = () => {
   const hasLetter = /[a-zA-Z]/.test(newPassword.value);
   const hasNumber = /[0-9]/.test(newPassword.value);
   const hasSpecialChar = /[!@#$%^&*]/.test(newPassword.value);
-  validPassword.value =
-    newPassword.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
+  validPassword.value = newPassword.value.length >= 8 && hasLetter && hasNumber && hasSpecialChar;
 };
 
 const verifyCurrentPassword = async () => {
@@ -50,17 +49,14 @@ const verifyCurrentPassword = async () => {
 
   const requestData = {
     userId: parseInt(localStorage.getItem("userId")),
-    password: currentPassword.value,
+    password: currentPassword.value
   };
 
   try {
-    const response = await axios.post(
-      import.meta.env.VITE_API_URL + "/user/verify-password",
-      requestData
-    );
+    const response = await axios.post("http://localhost:8080/uhpooh/api/user/verify-password", requestData);
 
     if (response.data.success) {
-      currentStep.value = "change";
+      currentStep.value = 'change';
       errors.value.currentPassword = "";
     } else {
       errors.value.currentPassword = "비밀번호가 일치하지 않습니다";
@@ -77,8 +73,7 @@ const handlePasswordChange = async () => {
   // Validation check
   if (!validPassword.value || !validConfirmPassword.value) {
     if (!validPassword.value) {
-      errors.value.newPassword =
-        "비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다";
+      errors.value.newPassword = "비밀번호는 영문, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다";
     }
     if (!validConfirmPassword.value) {
       errors.value.confirmPassword = "비밀번호가 일치하지 않습니다";
@@ -92,19 +87,17 @@ const handlePasswordChange = async () => {
   const requestData = {
     currentPassword: currentPassword.value,
     newPassword: newPassword.value,
-    confirmPassword: confirmPassword.value,
+    confirmPassword: confirmPassword.value
   };
 
   try {
     const response = await axios.put(
-      `${
-        import.meta.env.VITE_API_URL
-      }/user/password/${userId}?requestUserId=${userId}`,
+      `http://localhost:8080/uhpooh/api/user/password/${userId}?requestUserId=${userId}`,
       requestData,
       {
         headers: {
-          "Content-Type": "application/json",
-        },
+          'Content-Type': 'application/json'
+        }
       }
     );
 
@@ -137,27 +130,19 @@ const goBack = () => {
         <ArrowLeft class="w-5 h-5 mr-2" />
         돌아가기
       </button>
-      <h1 class="text-2xl font-bold text-center text-gray-900">
-        비밀번호 변경
-      </h1>
+      <h1 class="text-2xl font-bold text-center text-gray-900">비밀번호 변경</h1>
       <div class="w-20"></div>
     </div>
 
     <div class="bg-white rounded-2xl shadow-sm p-6">
       <!-- Current password verification step -->
-      <form
-        v-if="currentStep === 'verify'"
-        @submit.prevent="verifyCurrentPassword"
-        class="space-y-6"
-      >
+      <form v-if="currentStep === 'verify'" @submit.prevent="verifyCurrentPassword" class="space-y-6">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             현재 비밀번호를 입력해주세요
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock class="h-5 w-5 text-gray-400" />
             </div>
             <input
@@ -188,20 +173,14 @@ const goBack = () => {
             새 비밀번호
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock class="h-5 w-5 text-gray-400" />
             </div>
             <input
               v-model="newPassword"
               type="password"
               class="block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              :class="
-                newPassword && !validPassword
-                  ? 'border-red-300'
-                  : 'border-gray-300'
-              "
+              :class="newPassword && !validPassword ? 'border-red-300' : 'border-gray-300'"
             />
           </div>
           <p v-if="newPassword && !validPassword" class="text-xs text-red-500">
@@ -214,26 +193,17 @@ const goBack = () => {
             새 비밀번호 확인
           </label>
           <div class="relative">
-            <div
-              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
-            >
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Lock class="h-5 w-5 text-gray-400" />
             </div>
             <input
               v-model="confirmPassword"
               type="password"
               class="block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              :class="
-                confirmPassword && !validConfirmPassword
-                  ? 'border-red-300'
-                  : 'border-gray-300'
-              "
+              :class="confirmPassword && !validConfirmPassword ? 'border-red-300' : 'border-gray-300'"
             />
           </div>
-          <p
-            v-if="confirmPassword && !validConfirmPassword"
-            class="text-xs text-red-500"
-          >
+          <p v-if="confirmPassword && !validConfirmPassword" class="text-xs text-red-500">
             비밀번호가 일치하지 않습니다.
           </p>
         </div>
@@ -249,10 +219,7 @@ const goBack = () => {
     </div>
 
     <!-- Success modal -->
-    <div
-      v-if="showModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    >
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
         <h3 class="text-lg font-medium text-gray-900 mb-4">알림</h3>
         <p class="text-gray-600 mb-6">비밀번호가 성공적으로 변경되었습니다.</p>

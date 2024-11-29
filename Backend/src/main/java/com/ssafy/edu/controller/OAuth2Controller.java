@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -29,8 +28,7 @@ public class OAuth2Controller {
 
   private static final Logger logger = LoggerFactory.getLogger(OAuth2Controller.class);
 
-  @Value("${app.frontend-url}")
-  private String frontendUrl;
+  private final String frontendUrl = "http://localhost:5173";
 
   private final UserDao userDao;
   private final UserService userService;
@@ -43,7 +41,7 @@ public class OAuth2Controller {
     try {
       String email = extractEmail(oauth2User);
       User user = userDao.findByUserEmail(email)
-          .orElseThrow(() -> new IllegalArgumentException("User not found");
+          .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
       // 토큰 생성
       String token = customUserService.loginUser((long) user.getUserId());
