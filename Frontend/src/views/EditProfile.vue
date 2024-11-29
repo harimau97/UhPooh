@@ -14,7 +14,7 @@ import {
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8080/uhpooh/api",
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 5000,
 });
 
@@ -272,8 +272,8 @@ const handleImageDelete = async () => {
 // 이미지 캐싱 처리
 const cacheImage = async (cat) => {
   imgPath.value =
-    "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;
-  const response = await api.get(imgPath.value);
+    import.meta.env.VITE_API_URL + "/file/images/" + cat + "/" + imgName.value;
+  const response = await axios.get(imgPath.value);
 };
 
 // Daum 우편번호 스크립트 로드
@@ -352,7 +352,9 @@ const handleSubmit = async (e) => {
   try {
     const response = await axios({
       method: "PUT",
-      url: `http://localhost:8080/uhpooh/api/user/${userId.value}?requestUserId=${userId.value}`,
+      url: `${import.meta.env.VITE_API_URL}/user/${
+        userId.value
+      }?requestUserId=${userId.value}`,
       data: {
         userEmail: userForm.value.email,
         userName: userForm.value.name,

@@ -38,7 +38,9 @@ const userImages = ref(new Map());
 const cacheUserImage = (cat, pimgName) => {
   if (!pimgName) return null;
   const cleanImgName = pimgName.replace("/images/profiles/", "");
-  const imgPath = `http://localhost:8080/uhpooh/api/file/images/${cat}/${cleanImgName}`;
+  const imgPath = `${
+    import.meta.env.VITE_API_URL
+  }/file/images/${cat}/${cleanImgName}`;
   userImages.value.set(pimgName, imgPath);
   return imgPath;
 };
@@ -52,7 +54,9 @@ const loadAllUsers = async () => {
   try {
     // 전체 목록도 페이징 처리된 API를 호출
     const response = await fetch(
-      `http://localhost:8080/uhpooh/api/user/list?page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`
+      `${import.meta.env.VITE_API_URL}/user/list?page=${
+        currentPage.value
+      }&size=${pageSize.value}&requestUserId=${requestUserId}`
     );
 
     if (!response.ok) {
@@ -93,19 +97,27 @@ const handleSearch = async () => {
       if (!searchKeyword.value.trim()) {
         // 전체 선택에서 검색어가 없을 때는 기본 페이징된 목록 호출
         isAll.value = true;
-        url = `http://localhost:8080/uhpooh/api/user/list?page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`;
+        url = `${import.meta.env.VITE_API_URL}/user/list?page=${
+          currentPage.value
+        }&size=${pageSize.value}&requestUserId=${requestUserId}`;
       } else {
         // 전체 선택에서 검색어가 있을 때는 통합 검색 API 호출
         isAll.value = false;
-        url = `http://localhost:8080/uhpooh/api/user/search/integrated?keyword=${searchKeyword.value}&page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`;
+        url = `${import.meta.env.VITE_API_URL}/user/search/integrated?keyword=${
+          searchKeyword.value
+        }&page=${currentPage.value}&size=${
+          pageSize.value
+        }&requestUserId=${requestUserId}`;
       }
     } else if (searchType.value === "admin") {
       if (!searchKeyword.value.trim()) {
         isAll.value = true;
-        url = `http://localhost:8080/uhpooh/api/user/list?page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`;
+        url = `${import.meta.env.VITE_API_URL}/user/list?page=${
+          currentPage.value
+        }&size=${pageSize.value}&requestUserId=${requestUserId}`;
       } else {
         isAll.value = false;
-        url = `http://localhost:8080/uhpooh/api/user/search/admin?isAdmin=${
+        url = `${import.meta.env.VITE_API_URL}/user/search/admin?isAdmin=${
           searchKeyword.value === "관리자" ? "1" : "0"
         }&page=${currentPage.value}&size=${
           pageSize.value
@@ -114,10 +126,16 @@ const handleSearch = async () => {
     } else {
       if (!searchKeyword.value.trim()) {
         isAll.value = true;
-        url = `http://localhost:8080/uhpooh/api/user/list?page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`;
+        url = `${import.meta.env.VITE_API_URL}/user/list?page=${
+          currentPage.value
+        }&size=${pageSize.value}&requestUserId=${requestUserId}`;
       } else {
         isAll.value = false;
-        url = `http://localhost:8080/uhpooh/api/user/search/${searchType.value}?keyword=${searchKeyword.value}&page=${currentPage.value}&size=${pageSize.value}&requestUserId=${requestUserId}`;
+        url = `${import.meta.env.VITE_API_URL}/user/search/${
+          searchType.value
+        }?keyword=${searchKeyword.value}&page=${currentPage.value}&size=${
+          pageSize.value
+        }&requestUserId=${requestUserId}`;
       }
     }
 

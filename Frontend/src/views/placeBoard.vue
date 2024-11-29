@@ -96,7 +96,7 @@ const sendImageData = async (reviewId) => {
     }
 
     const response = await axios.post(
-      "http://localhost:8080/uhpooh/api/file/review/" + reviewId,
+      import.meta.env.VITE_API_URL + "/file/review/" + reviewId,
       formData,
       {
         headers: {
@@ -119,7 +119,7 @@ const imgName = ref("");
 const imgPath = ref("");
 const cacheImage = async (cat) => {
   imgPath.value =
-    "http://localhost:8080/uhpooh/api/file/images/" + cat + "/" + imgName.value;
+    import.meta.env.VITE_API_URL + "/file/images/" + cat + "/" + imgName.value;
   const response = await axios.get(imgPath.value, { timeout: 5000 });
   console.log("이미지 캐싱");
 };
@@ -131,7 +131,7 @@ const removeImage = (index) => {
 const deleteReviewImage = async (targetImageId) => {
   try {
     await axios.delete(
-      `http://localhost:8080/uhpooh/api/file/review/image/${targetImageId}`
+      `${import.meta.env.VITE_API_URL}/file/review/image/${targetImageId}`
     );
     // Find and remove the image from reviewMap
     const imageKey = Object.keys(reviewMap.value).find(
@@ -160,7 +160,7 @@ const addPlace = async () => {
   });
   try {
     const response = await axios.post(
-      "http://localhost:8080/uhpooh/api/place/",
+      import.meta.env.VITE_API_URL + "/place/",
       {
         kakaoPlaceId: placeId.value,
         placeName: placeName.value,
@@ -171,7 +171,7 @@ const addPlace = async () => {
   }
   await searchPlaceById();
   const result = await axios.get(
-    "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
+    import.meta.env.VITE_API_URL + "/place/kakao/" + placeId.value
   );
 
   tableId.value = result.data.data.placeId;
@@ -265,7 +265,7 @@ const addReview = async () => {
   });
   try {
     const response = await axios.post(
-      "http://localhost:8080/uhpooh/api/review/write",
+      import.meta.env.VITE_API_URL + "/review/write",
       {
         userId: localStorage.getItem("userId"),
         placeId: tableId.value,
@@ -285,7 +285,7 @@ const addReview = async () => {
 const deleteReview = async (rId) => {
   try {
     const response = await axios.delete(
-      "http://localhost:8080/uhpooh/api/review/delete/" + rId
+      import.meta.env.VITE_API_URL + "/review/delete/" + rId
     );
     console.log(response);
     showModalMessage("리뷰가 성공적으로 삭제되었습니다.");
@@ -299,7 +299,7 @@ const confirmEdit = async (rId) => {
   try {
     // First update the review text
     const response = await axios.put(
-      "http://localhost:8080/uhpooh/api/review/edit/" + rId,
+      import.meta.env.VITE_API_URL + "/review/edit/" + rId,
       { title: title.value, content: content.value }
     );
     console.log(response);
@@ -321,7 +321,7 @@ const searchPlaceById = async () => {
   console.log("Searching place by ID:", placeId.value);
   try {
     const response = await axios.get(
-      "http://localhost:8080/uhpooh/api/place/kakao/" + placeId.value
+      import.meta.env.VITE_API_URL + "/place/kakao/" + placeId.value
     );
     tableId.value = response.data.data.placeId;
     console.log("Received tableId from API:", tableId.value);
@@ -338,7 +338,7 @@ const reviewList = async () => {
   console.log(tableId.value);
   try {
     const response = await axios.get(
-      "http://localhost:8080/uhpooh/api/review/place/" + tableId.value
+      import.meta.env.VITE_API_URL + "/review/place/" + tableId.value
     );
     console.log(response.data.data.items);
     reviews.value = response.data.data.items;
@@ -352,12 +352,12 @@ const openDetail = async (rId) => {
   watchingDetails.value = true;
   console.log("리뷰를 상세조회합니다.", rId);
   const response = await axios.get(
-    "http://localhost:8080/uhpooh/api/review/detail/" + rId
+    import.meta.env.VITE_API_URL + "/review/detail/" + rId
   );
   console.log("Current user:", currentUser.value);
   console.log("Review user:", response.data.data.userId);
   const imageArray = await axios.get(
-    "http://localhost:8080/uhpooh/api/review/reviewimages/" + rId
+    import.meta.env.VITE_API_URL + "/review/reviewimages/" + rId
   );
   console.log(imageArray.data);
 
@@ -430,7 +430,7 @@ const isFormValid = computed(() => {
 const isLiked = async () => {
   try {
     const checkResponse = await axios.get(
-      "http://localhost:8080/uhpooh/api/like/checklike",
+      import.meta.env.VITE_API_URL + "/like/checklike",
       {
         params: {
           placeId: tableId.value,
@@ -452,7 +452,7 @@ const addLike = async (placeId, userId) => {
   if (!checkLike.data) {
     try {
       const response = await axios.post(
-        "http://localhost:8080/uhpooh/api/like/addlike",
+        import.meta.env.VITE_API_URL + "/like/addlike",
         {
           placeId: placeId,
           userId: userId,
@@ -472,7 +472,7 @@ const deleteLike = async (tableId, userId) => {
   console.log("Deleting like with tableId:", tableId, "and", userId);
   try {
     const response = await axios.delete(
-      "http://localhost:8080/uhpooh/api/like/deletelike",
+      import.meta.env.VITE_API_URL + "/like/deletelike",
       {
         data: {
           placeId: tableId,
@@ -491,7 +491,7 @@ const deleteLike = async (tableId, userId) => {
 const getLikeCount = async () => {
   try {
     const response = await axios.get(
-      "http://localhost:8080/uhpooh/api/like/getlikebyplaceid/" + tableId.value
+      import.meta.env.VITE_API_URL + "/like/getlikebyplaceid/" + tableId.value
     );
     likeCount.value = response.data.length;
   } catch (error) {
@@ -570,7 +570,7 @@ const handlePayment = async () => {
     try {
       // 백엔드에 결제 요청
       const response = await axios.post(
-        "http://localhost:8080/uhpooh/api/payments/request",
+        import.meta.env.VITE_API_URL + "/payments/request",
         paymentData
       );
       console.log("백엔드 응답:", response.data);
@@ -849,9 +849,7 @@ const handlePayment = async () => {
                     class="relative group"
                   >
                     <img
-                      :src="
-                        'http://localhost:8080/uhpooh/api/file' + image.path
-                      "
+                      :src="import.meta.env.VITE_API_URL + '/file' + image.path"
                       class="object-cover w-32 h-32 rounded-xl shadow-md transition-transform duration-300 group-hover:scale-105"
                       alt="Review image"
                     />
