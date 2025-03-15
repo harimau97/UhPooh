@@ -11,7 +11,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtTokenUtil {
 
   private final String SECRET_KEY =
-      "insert your key here";
+      "insert your key";
   private final long EXPIRATION_TIME = 1000 * 60 * 10; // 3 in milliseconds
 
   // Generate Token
