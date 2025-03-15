@@ -15,13 +15,13 @@
     <select id="userLogin" parameterType="User" resultType="User">
         SELECT userId, userEmail, userName, isAdmin, isLogin
         FROM users
-        WHERE userEmail = #{userEmail} AND password = AES_ENCRYPT(#{password}, 'REDACTED')
+        WHERE userEmail = #{userEmail} AND password = AES_ENCRYPT(#{password}, 'insert_your_key')
     </select>
 
     <!-- 회원가입 -->
     <insert id="userSignup" parameterType="User">
         INSERT INTO users (userEmail, password, userName, userAddress)
-        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'REDACTED'), #{userName}, #{userAddress})
+        VALUES (#{userEmail}, AES_ENCRYPT(#{password}, 'insert_your_key'), #{userName}, #{userAddress})
     </insert>
 
     <!-- 회원정보 수정 -->
